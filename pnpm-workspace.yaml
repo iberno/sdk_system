@@ -1,0 +1,14 @@
+packages:
+  - 'packages/*'
+
+allowBuilds:
+  '@prisma/engines': set this to true or false
+  '@scarf/scarf': set this to true or false
+
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - 'prisma'
+  - '@scarf/scarf'
+  - 'esbuild'
+  - 'bcrypt'

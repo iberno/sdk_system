@@ -1,0 +1,11 @@
+{
+  "unauthorized": "Você não está autenticado",
+  "forbidden": "Você não tem permissão para esta ação",
+  "not_found": "Recurso não encontrado",
+  "internal": "Erro interno do servidor",
+  "conflict": "Conflito na operação",
+  "too_many_requests": "Muitas requisições. Tente novamente em instantes",
+  "invalid_credentials": "E-mail ou senha inválidos",
+  "account_inactive": "Sua conta está inativa",
+  "email_taken": "Este e-mail já está em uso"
+}

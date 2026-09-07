@@ -1,0 +1,11 @@
+{
+  "isNotEmpty": "The {property} field is required",
+  "isEmail": "The {property} field must be a valid email",
+  "isString": "The {property} field must be text",
+  "isEnum": "The {property} field must be one of the valid values",
+  "isUuid": "The {property} field must be a valid identifier",
+  "minLength": "The {property} field must be at least {constraints.0} characters long",
+  "maxLength": "The {property} field must be at most {constraints.0} characters long",
+  "min": "The {property} field must be at least {constraints.0}",
+  "max": "The {property} field must be at most {constraints.0}"
+}

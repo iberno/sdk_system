@@ -1,0 +1,11 @@
+{
+  "isNotEmpty": "El campo {property} es obligatorio",
+  "isEmail": "El campo {property} debe ser un correo válido",
+  "isString": "El campo {property} debe ser texto",
+  "isEnum": "El campo {property} debe ser uno de los valores válidos",
+  "isUuid": "El campo {property} debe ser un identificador válido",
+  "minLength": "El campo {property} debe tener al menos {constraints.0} caracteres",
+  "maxLength": "El campo {property} debe tener como máximo {constraints.0} caracteres",
+  "min": "El campo {property} debe ser mayor o igual a {constraints.0}",
+  "max": "El campo {property} debe ser menor o igual a {constraints.0}"
+}

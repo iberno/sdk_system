@@ -1,0 +1,32 @@
+# Dependências
+node_modules/
+*.tsbuildinfo
+
+# Builds
+dist/
+build/
+coverage/
+*.local
+
+# Ambiente / Segredos
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Editores / IDEs
+.vscode/
+.idea/
+*.swp
+
+# Prisma
+packages/api/prisma/*.db
+packages/api/prisma/dev.db

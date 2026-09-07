@@ -1,0 +1,527 @@
+// ============================================================
+// Service Desk ITIL v4 - Schema Prisma
+// Fonte definitiva: docs/ERD.md
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  AGENT
+  USER
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum GroupLevel {
+  N1
+  N2
+  N3
+  N4
+  REDES
+  INFRA
+  DEVOPS
+  DATABASE
+  SECURITY
+}
+
+enum TicketType {
+  INCIDENT
+  SERVICE_REQUEST
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  PENDING
+  WAITING_USER
+  WAITING_APPROVAL
+  RESOLVED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Impact {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Urgency {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CommentVisibility {
+  PUBLIC
+  INTERNAL
+}
+
+enum ProblemStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum ChangeType {
+  STANDARD
+  NORMAL
+  EMERGENCY
+}
+
+enum ChangeStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  ROLLED_BACK
+}
+
+enum Risk {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum RoutingStrategy {
+  TO_GROUP
+  ROUND_ROBIN
+  LEAST_LOADED
+  MANUAL
+}
+
+enum SequenceEntityType {
+  TICKET
+  CHANGE
+  PROBLEM
+}
+
+enum SLAType {
+  INCIDENT
+  SERVICE_REQUEST
+}
+
+// ============================================================
+// MODELOS BASE
+// ============================================================
+
+model Company {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  cnpj      String?   @unique
+  status    Status    @default(PENDING)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  users         User[]
+  tickets       Ticket[]
+  problems      Problem[]
+  changes       Change[]
+  approvalFlows ApprovalFlow[]
+  routingRules  RoutingRule[]
+  sequenceCounters SequenceCounter[]
+}
+
+model SolverGroup {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  level       GroupLevel @default(N1)
+  status      Status     @default(PENDING)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  users        User[]
+  tickets      Ticket[]
+  routingRules RoutingRule[]
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  password      String
+  role          UserRole @default(USER)
+  status        Status   @default(PENDING)
+  locale        String   @default("pt-BR")
+  avatar        String?
+  companyId     String?
+  solverGroupId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  company          Company?      @relation(fields: [companyId], references: [id])
+  solverGroup      SolverGroup?  @relation(fields: [solverGroupId], references: [id])
+  requestedTickets Ticket[]      @relation("Requester")
+  beneficiaryTickets Ticket[]    @relation("Beneficiary")
+  assignedTickets  Ticket[]      @relation("Assignee")
+  comments         TicketComment[]
+  historyEntries   TicketHistory[]
+  approvals        Approval[]
+  articles         KnowledgeArticle[]
+  auditLogs        AuditLog[]
+  refreshTokens    RefreshToken[]
+  changesRequested Change[]      @relation("ChangeRequester")
+
+  @@index([email])
+  @@index([companyId])
+  @@index([solverGroupId])
+}
+
+// ============================================================
+// TICKETS (INCIDENTES + REQUISICOES)
+// ============================================================
+
+model Ticket {
+  id            String       @id @default(uuid())
+  ticketNumber  String       @unique
+  requesterId   String
+  beneficiaryId String?
+  title         String
+  description   String
+  type          TicketType
+  status        TicketStatus @default(OPEN)
+  priority      Priority     @default(MEDIUM)
+  impact        Impact       @default(MEDIUM)
+  urgency       Urgency      @default(MEDIUM)
+  slaResponseAt DateTime?
+  slaResolveAt  DateTime?
+  slaBreached   Boolean      @default(false)
+  assigneeId    String?
+  companyId     String
+  solverGroupId String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  resolvedAt    DateTime?
+  closedAt      DateTime?
+
+  company     Company?     @relation(fields: [companyId], references: [id])
+  requester   User         @relation("Requester", fields: [requesterId], references: [id])
+  beneficiary User?        @relation("Beneficiary", fields: [beneficiaryId], references: [id])
+  assignee    User?        @relation("Assignee", fields: [assigneeId], references: [id])
+  solverGroup SolverGroup? @relation(fields: [solverGroupId], references: [id])
+
+  comments  TicketComment[]
+  history   TicketHistory[]
+  attachments Attachment[]
+  approvals   Approval[]
+  problems    ProblemTicket[]
+  changes     ChangeTicket[]
+
+  @@index([status])
+  @@index([type])
+  @@index([priority])
+  @@index([requesterId])
+  @@index([beneficiaryId])
+  @@index([assigneeId])
+  @@index([companyId])
+  @@index([solverGroupId])
+  @@index([createdAt(sort: Desc)])
+}
+
+model TicketComment {
+  id         String           @id @default(uuid())
+  content    String
+  visibility CommentVisibility @default(PUBLIC)
+  ticketId   String
+  authorId   String
+  createdAt  DateTime         @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+  author User   @relation(fields: [authorId], references: [id])
+
+  @@index([ticketId])
+  @@index([ticketId, visibility])
+}
+
+model TicketHistory {
+  id        String   @id @default(uuid())
+  field     String
+  oldValue  String?
+  newValue  String?
+  ticketId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([ticketId])
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  filename  String
+  url       String
+  size      Int
+  mimetype  String
+  ticketId  String
+  createdAt DateTime @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+}
+
+// ============================================================
+// PROBLEMAS
+// ============================================================
+
+model Problem {
+  id          String        @id @default(uuid())
+  title       String
+  description String
+  status      ProblemStatus @default(OPEN)
+  impact      Impact        @default(MEDIUM)
+  rootCause   String?
+  workaround  String?
+  solution    String?
+  companyId   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  resolvedAt  DateTime?
+
+  company Company?        @relation(fields: [companyId], references: [id])
+  tickets ProblemTicket[]
+}
+
+model ProblemTicket {
+  id        String   @id @default(uuid())
+  problemId String
+  ticketId  String
+  createdAt DateTime @default(now())
+
+  problem Problem @relation(fields: [problemId], references: [id])
+  ticket  Ticket  @relation(fields: [ticketId], references: [id])
+
+  @@unique([problemId, ticketId])
+}
+
+// ============================================================
+// MUDANCAS
+// ============================================================
+
+model Change {
+  id            String       @id @default(uuid())
+  title         String
+  description   String
+  type          ChangeType   @default(STANDARD)
+  status        ChangeStatus @default(DRAFT)
+  risk          Risk         @default(LOW)
+  reason        String
+  plan          String
+  rollbackPlan  String
+  scheduledAt   DateTime?
+  companyId     String
+  requesterId   String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  company   Company?       @relation(fields: [companyId], references: [id])
+  requester User           @relation("ChangeRequester", fields: [requesterId], references: [id])
+  approvals Approval[]
+  tickets   ChangeTicket[]
+}
+
+model ChangeTicket {
+  id        String   @id @default(uuid())
+  changeId  String
+  ticketId  String
+  createdAt DateTime @default(now())
+
+  change Change @relation(fields: [changeId], references: [id])
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+
+  @@unique([changeId, ticketId])
+}
+
+// ============================================================
+// APROVACOES MULTIETAPAS
+// ============================================================
+
+model Approval {
+  id        String         @id @default(uuid())
+  status    ApprovalStatus @default(PENDING)
+  comment   String?
+  order     Int            @default(1)
+  ticketId  String?
+  changeId  String?
+  approverId String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  ticket   Ticket?  @relation(fields: [ticketId], references: [id])
+  change   Change?  @relation(fields: [changeId], references: [id])
+  approver User     @relation(fields: [approverId], references: [id])
+
+  @@index([status])
+  @@index([ticketId])
+  @@index([changeId])
+  @@index([approverId])
+}
+
+model ApprovalFlow {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  entityType  String
+  rules       Json
+  status      Status   @default(ACTIVE)
+  companyId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company? @relation(fields: [companyId], references: [id])
+}
+
+// ============================================================
+// ROTEAMENTO E AUTO-ATRIBUICAO
+// ============================================================
+
+model RoutingRule {
+  id           String          @id @default(uuid())
+  name         String
+  description  String?
+  ticketType   TicketType
+  priority     Priority?
+  category     String?
+  strategy     RoutingStrategy @default(TO_GROUP)
+  targetGroupId String?
+  order        Int             @default(0)
+  status       Status          @default(ACTIVE)
+  companyId    String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  targetGroup SolverGroup? @relation(fields: [targetGroupId], references: [id])
+  company     Company?     @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+  @@index([ticketType, priority])
+  @@index([targetGroupId])
+  @@index([status, order])
+}
+
+model SequenceCounter {
+  id         String            @id @default(uuid())
+  entityType SequenceEntityType
+  year       Int
+  companyId  String?
+  lastValue  Int               @default(0)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  company Company? @relation(fields: [companyId], references: [id])
+
+  @@unique([entityType, year, companyId])
+  @@index([companyId])
+}
+
+// ============================================================
+// SLA
+// ============================================================
+
+model SLAPolicy {
+  id           String   @id @default(uuid())
+  name         String
+  description  String?
+  type         SLAType
+  priority     Priority
+  responseTime Int
+  resolveTime  Int
+  status       Status   @default(ACTIVE)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([type, priority])
+}
+
+// ============================================================
+// BASE DE CONHECIMENTO
+// ============================================================
+
+model KnowledgeArticle {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  category  String
+  tags      String[]
+  published Boolean  @default(false)
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author User @relation(fields: [authorId], references: [id])
+
+  @@index([category])
+  @@index([published])
+}
+
+// ============================================================
+// AUDITORIA E SESSOES
+// ============================================================
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  entity    String
+  entityId  String?
+  oldData   Json?
+  newData   Json?
+  userId    String?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt(sort: Desc)])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  revoked   Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}

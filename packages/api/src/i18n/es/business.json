@@ -1,0 +1,15 @@
+{
+  "group_min_one_agent": "El grupo de resolución debe tener al menos 1 agente",
+  "agent_one_group": "El agente ya pertenece a otro grupo de resolución",
+  "agent_not_in_group": "El agente indicado no pertenece al grupo {group}",
+  "group_inactive": "El grupo de resolución está inactivo",
+  "agent_inactive": "El agente indicado está inactivo",
+  "ticket_needs_destination": "El ticket debe tener al menos un destino: grupo o agente",
+  "ticket_not_found": "Ticket no encontrado",
+  "ticket_not_assignable": "Este ticket no se puede asignar en su estado actual",
+  "ticket_already_assigned": "Ticket ya asignado a {assignee}",
+  "ticket_not_in_my_group": "Este ticket no está en la cola de tu grupo",
+  "ticket_internal_comment_forbidden": "Solo el equipo de atención puede crear comentarios internos",
+  "change_requires_approval": "Este cambio requiere aprobación antes de programar",
+  "approval_already_decided": "Esta aprobación ya fue decidida"
+}

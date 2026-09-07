@@ -1,0 +1,11 @@
+{
+  "unauthorized": "You are not authenticated",
+  "forbidden": "You do not have permission to perform this action",
+  "not_found": "Resource not found",
+  "internal": "Internal server error",
+  "conflict": "Conflict in operation",
+  "too_many_requests": "Too many requests. Try again in a moment",
+  "invalid_credentials": "Invalid email or password",
+  "account_inactive": "Your account is inactive",
+  "email_taken": "This email is already in use"
+}

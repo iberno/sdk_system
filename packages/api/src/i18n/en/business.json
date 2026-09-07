@@ -1,0 +1,15 @@
+{
+  "group_min_one_agent": "The resolver group must have at least 1 agent",
+  "agent_one_group": "The agent already belongs to another resolver group",
+  "agent_not_in_group": "The given agent does not belong to the {group} group",
+  "group_inactive": "The resolver group is inactive",
+  "agent_inactive": "The given agent is inactive",
+  "ticket_needs_destination": "The ticket must have at least one destination: group or agent",
+  "ticket_not_found": "Ticket not found",
+  "ticket_not_assignable": "This ticket cannot be assigned in its current state",
+  "ticket_already_assigned": "Ticket already assigned to {assignee}",
+  "ticket_not_in_my_group": "This ticket is not in your group's queue",
+  "ticket_internal_comment_forbidden": "Only the service team can create internal comments",
+  "change_requires_approval": "This change requires approval before scheduling",
+  "approval_already_decided": "This approval has already been decided"
+}

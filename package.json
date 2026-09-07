@@ -1,0 +1,22 @@
+{
+  "name": "service-desk",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Service Desk ITIL v4 - monorepo (API NestJS + Web React)",
+  "packageManager": "pnpm@11.24.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev:api": "pnpm --filter @servicedesk/api start:dev",
+    "dev:web": "pnpm --filter @servicedesk/web dev",
+    "dev": "pnpm --parallel -r dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "prisma:generate": "pnpm --filter @servicedesk/api prisma:generate",
+    "prisma:migrate": "pnpm --filter @servicedesk/api prisma:migrate",
+    "prisma:seed": "pnpm --filter @servicedesk/api prisma:seed"
+  }
+}
