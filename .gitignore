@@ -30,3 +30,5 @@ Thumbs.db
 # Prisma
 packages/api/prisma/*.db
 packages/api/prisma/dev.db
+# anexos locais
+packages/api/uploads/

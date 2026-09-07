@@ -229,6 +229,9 @@ model Ticket {
   updatedAt     DateTime     @updatedAt
   resolvedAt    DateTime?
   closedAt      DateTime?
+  routedByAuto  Boolean      @default(false)
+  routedStrategy RoutingStrategy?
+  routedRuleId  String?
 
   company     Company?     @relation(fields: [companyId], references: [id])
   requester   User         @relation("Requester", fields: [requesterId], references: [id])

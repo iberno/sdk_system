@@ -221,47 +221,47 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 5.1 CRUD Básico
 
-- [ ] `GET /tickets` com filtros avançados (inclui requesterId, beneficiaryId e ticketNumber)
-- [ ] `POST /tickets` criação (auto: requester, company, status, SLA; beneficiary ← requester se omitido)
-- [ ] **Gerar `ticketNumber`** atomicamente (SequenceCounter: `SD-{ano}-{000001}`)
-- [ ] Serviço `SequenceService` reutilizável (TICKET, CHANGE, PROBLEM)
-- [ ] `GET /tickets/:id` detalhe com personas (solicitante/beneficiário/aprovadores) + timeline, comments, history
-- [ ] `PUT /tickets/:id` atualização
-- [ ] Transições de status validadas (state machine)
+- [x] `GET /tickets` com filtros avançados (inclui requesterId, beneficiaryId e ticketNumber)
+- [x] `POST /tickets` criação (auto: requester, company, status, SLA; beneficiary ← requester se omitido)
+- [x] **Gerar `ticketNumber`** atomicamente (SequenceCounter: `SD-{ano}-{000001}`)
+- [x] Serviço `SequenceService` reutilizável (TICKET, CHANGE, PROBLEM)
+- [x] `GET /tickets/:id` detalhe com personas (solicitante/beneficiário/aprovadores) + timeline, comments, history
+- [x] `PUT /tickets/:id` atualização
+- [x] Transições de status validadas (state machine)
 
 ### 5.2 Comentários
 
-- [ ] `POST /tickets/:id/comments` com `visibility: PUBLIC | INTERNAL`
-- [ ] `INTERNAL` apenas para equipe criar (AGENT/MANAGER/ADMIN ou grupo solucionador)
-- [ ] **Filtro por participação:** solicitante/beneficiário/aprovadores NUNCA recebem `INTERNAL` (ADR-007)
-- [ ] Proteção vale por participação no ticket, não por role
-- [ ] Mesmo filtro aplicado no Socket.IO (evento `ticket.commented`)
+- [x] `POST /tickets/:id/comments` com `visibility: PUBLIC | INTERNAL`
+- [x] `INTERNAL` apenas para equipe criar (AGENT/MANAGER/ADMIN ou grupo solucionador)
+- [x] **Filtro por participação:** solicitante/beneficiário/aprovadores NUNCA recebem `INTERNAL` (ADR-007)
+- [x] Proteção vale por participação no ticket, não por role
+- [ ] Mesmo filtro aplicado no Socket.IO (evento `ticket.commented`) — na Fase 10 (Realtime)
 
 ### 5.3 Atribuição e Direcionamento
 
-- [ ] `POST /tickets/:id/assign` (agente + grupo, mínimo 1 destino)
-- [ ] Validação de coerência: agente deve pertencer ao grupo (422)
-- [ ] Validação: grupo e agente ACTIVE
-- [ ] `POST /tickets/:id/pickup` (agente assume ticket da fila do grupo)
-- [ ] `GET /tickets/unassigned` (fila de pickup filtrada pelo grupo do usuário)
-- [ ] `POST /tickets/reassign` (batch, MANAGER/ADMIN)
-- [ ] Registro de `routedBy` (auto/estrategia/regra) no ticket
-- [ ] Auto-atribuição na criação via RoutingRule
-- [ ] Escala: regra de nível crescente (N1 → N2 → N3)
-- [ ] Notificação ao agente atribuído (Socket + Email)
-- [ ] TicketHistory + AuditLog em toda atribuição
+- [x] `POST /tickets/:id/assign` (agente + grupo, mínimo 1 destino)
+- [x] Validação de coerência: agente deve pertencer ao grupo (422)
+- [x] Validação: grupo e agente ACTIVE
+- [x] `POST /tickets/:id/pickup` (agente assume ticket da fila do grupo)
+- [x] `GET /tickets/unassigned` (fila de pickup filtrada pelo grupo do usuário)
+- [x] `POST /tickets/reassign` (batch, MANAGER/ADMIN)
+- [x] Registro de `routedBy` (auto/estrategia/regra) no ticket
+- [x] Auto-atribuição na criação via RoutingRule
+- [x] Escala: regra de nível crescente (N1 → N2 → N3) — AGENT só escala p/ nível ≥; MANAGER/ADMIN livres
+- [ ] Notificação ao agente atribuído (Socket + Email) — na Fase 10 (Realtime)
+- [x] TicketHistory em toda atribuição (AuditLog dedicado na Fase 8)
 
 ### 5.4 Histórico
 
-- [ ] Registrar alterações em `TicketHistory`
-- [ ] Unificar com Auditoria
-- [ ] Timeline de eventos do ticket
+- [x] Registrar alterações em `TicketHistory`
+- [ ] Unificar com Auditoria — integração AuditLog na Fase 8
+- [x] Timeline de eventos do ticket
 
 ### 5.5 Anexos
 
-- [ ] Upload de arquivos (multer)
-- [ ] Download/visualização
-- [ ] Validação de tipo e tamanho
+- [x] Upload de arquivos (multer)
+- [x] Download/visualização
+- [x] Validação de tipo e tamanho (máx 10MB, whitelist MIME)
 
 **Referência:** docs/FLUXOS.md (Fluxo 1 e 2)
 

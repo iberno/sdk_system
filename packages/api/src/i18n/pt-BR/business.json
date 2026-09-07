@@ -14,5 +14,15 @@
   "change_requires_approval": "Esta mudança requer aprovação antes de agendar",
   "approval_already_decided": "Esta aprovação já foi decidida",
   "invalid_cnpj": "CNPJ inválido",
-  "routing_target_required": "A estratégia {strategy} exige um grupo alvo ativo"
+  "routing_target_required": "A estratégia {strategy} exige um grupo alvo ativo",
+  "ticket_requires_company": "O usuário precisa estar vinculado a uma empresa para abrir tickets",
+  "beneficiary_invalid": "Beneficiário inválido ou de outra empresa",
+  "invalid_transition": "Transição inválida de {from} para {to}",
+  "reopen_window": "Reabertura permitida apenas em até 24h após o fechamento",
+  "ticket_closed": "Ticket fechado não aceita novos comentários",
+  "ticket_already_claimed": "Este ticket já foi assumido por um agente",
+  "ticket_not_in_queue": "Este ticket não está na fila do grupo informado",
+  "escalation_only": "Agentes só podem escalar para grupos de nível maior ou igual",
+  "attachment_type": "Tipo de arquivo não permitido: {type}",
+  "attachment_required": "Nenhum arquivo enviado"
 }

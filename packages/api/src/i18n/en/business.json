@@ -14,5 +14,15 @@
   "change_requires_approval": "This change requires approval before scheduling",
   "approval_already_decided": "This approval has already been decided",
   "invalid_cnpj": "Invalid CNPJ",
-  "routing_target_required": "Strategy {strategy} requires an active target group"
+  "routing_target_required": "Strategy {strategy} requires an active target group",
+  "ticket_requires_company": "The user must belong to a company to open tickets",
+  "beneficiary_invalid": "Invalid beneficiary or from another company",
+  "invalid_transition": "Invalid transition from {from} to {to}",
+  "reopen_window": "Reopening is only allowed within 24h after closing",
+  "ticket_closed": "Closed tickets do not accept new comments",
+  "ticket_already_claimed": "This ticket has already been claimed by an agent",
+  "ticket_not_in_queue": "This ticket is not in the given group's queue",
+  "escalation_only": "Agents may only escalate to groups of equal or higher level",
+  "attachment_type": "File type not allowed: {type}",
+  "attachment_required": "No file was uploaded"
 }
