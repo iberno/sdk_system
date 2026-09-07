@@ -113,19 +113,19 @@ são pendentes. **`[x]`** são concluídos.
 ### 2.3 Migrations e Seed
 
 - [x] Rodar `prisma migrate dev` (primeira migration)  → `20260907223317_init` aplicada
-- [ ] Criar `prisma/seed.ts`
-  - [ ] Seed: Empresas (3)
-  - [ ] Seed: Grupos Solucionadores (N1, N2, N3, REDES, INFRA, DEVOPS) - cada um com min. 1 agente
-  - [ ] Seed: Usuários (Admin, Manager, Agent ×4, User ×3) - agentes vinculados aos grupos
-  - [ ] Seed: Routing Rules exemplo (TO_GROUP N1, ROUND_ROBIN N1, LEAST_LOADED INFRA)
-  - [ ] Seed: Sequências iniciais (SequenceCounter: TICKET/ano atual = 0)
-  - [ ] Seed: Tickets de exemplo (10+)
-  - [ ] Seed: Políticas SLA
-  - [ ] Seed: Artigos Knowledge Base
-  - [ ] Seed: Approval Flows exemplo
-  - [ ] Hash de senha com bcryptjs
-- [ ] Configurar `prisma` no `package.json` para seed
-- [ ] Rodar e validar seed
+- [x] Criar `prisma/seed.ts`
+  - [x] Seed: Empresas (3)
+  - [x] Seed: Grupos Solucionadores (N1, N2, N3, REDES, INFRA, DEVOPS) - cada um com min. 1 agente
+  - [x] Seed: Usuários (Admin, Manager, Agent ×6, User ×3) - agentes vinculados aos grupos
+  - [x] Seed: Routing Rules exemplo (TO_GROUP N1, ROUND_ROBIN N1, LEAST_LOADED INFRA)
+  - [x] Seed: Sequências iniciais (SequenceCounter: TICKET/ano atual = 12, alinhado aos 12 tickets semeados — se usar 0, o próximo ticket colidiria no UNIQUE)
+  - [x] Seed: Tickets de exemplo (12)
+  - [x] Seed: Políticas SLA
+  - [x] Seed: Artigos Knowledge Base
+  - [x] Seed: Approval Flows exemplo
+  - [x] Hash de senha com bcryptjs
+- [x] Configurar `prisma` no `package.json` para seed
+- [x] Rodar e validar seed (idempotente, 6/6 grupos com agente)
 
 **Referência:** docs/ERD.md, docs/FLUXOS.md (seção 0)
 
