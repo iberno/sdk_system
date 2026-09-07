@@ -6,16 +6,23 @@ import {
 } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 
+export interface PaginationMeta {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+export interface PaginatedResult<T> {
+  items: T[];
+  pagination: PaginationMeta;
+}
+
 export interface ApiResponse<T> {
   statusCode: number;
   message: string;
   data: T;
-  pagination?: {
-    page: number;
-    pageSize: number;
-    totalItems: number;
-    totalPages: number;
-  };
+  pagination?: PaginationMeta;
 }
 
 @Injectable()
@@ -29,11 +36,21 @@ export class TransformInterceptor<T>
     return next.handle().pipe(
       map((data) => {
         const statusCode = context.switchToHttp().getResponse().statusCode;
-        return {
-          statusCode,
-          message: 'success',
-          data,
-        };
+        if (
+          data &&
+          typeof data === 'object' &&
+          'items' in data &&
+          'pagination' in data
+        ) {
+          const { items, pagination } = data as PaginatedResult<unknown>;
+          return {
+            statusCode,
+            message: 'success',
+            data: items as T,
+            pagination,
+          };
+        }
+        return { statusCode, message: 'success', data };
       }),
     );
   }

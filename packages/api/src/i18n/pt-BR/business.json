@@ -1,6 +1,7 @@
 {
   "group_min_one_agent": "O grupo solucionador precisa de pelo menos 1 agente",
   "agent_one_group": "O agente já pertence a outro grupo solucionador",
+  "agent_role_required": "O usuário precisa ter a role AGENT para pertencer a um grupo",
   "agent_not_in_group": "O agente informado não pertence ao grupo {group}",
   "group_inactive": "O grupo solucionador está inativo",
   "agent_inactive": "O agente informado está inativo",
@@ -11,5 +12,7 @@
   "ticket_not_in_my_group": "Esse ticket não está na fila do seu grupo",
   "ticket_internal_comment_forbidden": "Apenas a equipe de atendimento pode criar comentários internos",
   "change_requires_approval": "Esta mudança requer aprovação antes de agendar",
-  "approval_already_decided": "Esta aprovação já foi decidida"
+  "approval_already_decided": "Esta aprovação já foi decidida",
+  "invalid_cnpj": "CNPJ inválido",
+  "routing_target_required": "A estratégia {strategy} exige um grupo alvo ativo"
 }

@@ -20,6 +20,11 @@ import { AppService } from './app.service.js';
 import { PrismaModule } from './modules/prisma/prisma.module.js';
 import { PermissionsModule } from './modules/permissions/permissions.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
+import { UsersModule } from './modules/users/users.module.js';
+import { CompaniesModule } from './modules/companies/companies.module.js';
+import { SolverGroupsModule } from './modules/solver-groups/solver-groups.module.js';
+import { RoutingRulesModule } from './modules/routing-rules/routing-rules.module.js';
+import { SlaModule } from './modules/sla/sla.module.js';
 import { FallbackModule } from './common/modules/fallback/fallback.module.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -29,6 +34,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     PrismaModule,
     PermissionsModule,
     AuthModule,
+    UsersModule,
+    CompaniesModule,
+    SolverGroupsModule,
+    RoutingRulesModule,
+    SlaModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env'],

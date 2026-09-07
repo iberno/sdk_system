@@ -41,8 +41,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const body = exception.getResponse();
 
       let key = DEFAULT_ERROR_KEY;
+      let args: Record<string, unknown> | undefined;
       if (typeof body === 'object' && body !== null && 'key' in body) {
         key = (body as { key: string }).key;
+      }
+      if (typeof body === 'object' && body !== null && 'args' in body) {
+        args = (body as { args?: Record<string, unknown> }).args;
       }
 
       void response.status(status).json({
@@ -52,8 +56,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
           typeof body === 'object' && body !== null && 'error' in body
             ? (body as { error: string }).error
             : exception.name,
-        i18n: { key },
-        message: i18n ? i18n.t(key) : undefined,
+        i18n: { key, ...(args ? { args } : {}) },
+        message: i18n ? i18n.t(key, { args }) : undefined,
       });
       return;
     }

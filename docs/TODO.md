@@ -173,45 +173,45 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 4.1 Módulo Users
 
-- [ ] CRUD completo: listar, criar, detalhes, atualizar
-- [ ] Filtros por: role, company, solverGroup, status, search
-- [ ] Paginação
-- [ ] Alteração de status (soft disable)
-- [ ] Proteção: apenas ADMIN altera role/solverGroup
+- [x] CRUD completo: listar, criar, detalhes, atualizar
+- [x] Filtros por: role, company, solverGroup, status, search
+- [x] Paginação
+- [x] Alteração de status (soft disable)
+- [x] Proteção: apenas ADMIN altera role/solverGroup
 
 ### 4.2 Módulo Companies
 
-- [ ] CRUD completo
-- [ ] Soft delete (status = INACTIVE)
-- [ ] Validação de CNPJ
+- [x] CRUD completo
+- [x] Soft delete (status = INACTIVE)
+- [x] Validação de CNPJ
 
 ### 4.3 Módulo SolverGroups
 
-- [ ] CRUD completo
-- [ ] Níveis: N1, N2, N3, N4, REDES, INFRA, DEVOPS, DATABASE, SECURITY
-- [ ] Contagem de agentes e tickets abertos
-- [ ] **Validação: mínimo 1 agente** por grupo (criação/edição)
-- [ ] **PUT /solver-groups/:id/agents** (substituição da lista de agentes)
-- [ ] Agente pertence a 1 grupo apenas (validação de unicidade)
-- [ ] Grupo inativo não recebe tickets (guard no roteamento)
+- [x] CRUD completo
+- [x] Níveis: N1, N2, N3, N4, REDES, INFRA, DEVOPS, DATABASE, SECURITY
+- [x] Contagem de agentes e tickets abertos
+- [x] **Validação: mínimo 1 agente** por grupo (criação/edição)
+- [x] **PUT /solver-groups/:id/agents** (substituição da lista de agentes)
+- [x] Agente pertence a 1 grupo apenas (validação de unicidade)
+- [x] Grupo inativo não recebe tickets (guard no roteamento)
 
 ### 4.4 Módulo RoutingRules
 
-- [ ] CRUD completo de regras de roteamento
-- [ ] `POST /routing-rules` com validação de estratégia + grupo alvo
-- [ ] Estratégias: TO_GROUP, ROUND_ROBIN, LEAST_LOADED, MANUAL
-- [ ] Ordenação: `POST /routing-rules/reorder`
-- [ ] Avaliação na criação do ticket (tipo + prioridade + categoria)
-- [ ] ROUND_ROBIN: ponteiro de próximo agente + contador por grupo
-- [ ] LEAST_LOADED: seleção do agente com menos tickets abertos (ACTIVE)
-- [ ] Fallback: grupo padrão da empresa quando nenhuma regra casa
+- [x] CRUD completo de regras de roteamento
+- [x] `POST /routing-rules` com validação de estratégia + grupo alvo
+- [x] Estratégias: TO_GROUP, ROUND_ROBIN, LEAST_LOADED, MANUAL
+- [x] Ordenação: `POST /routing-rules/reorder`
+- [ ] Avaliação na criação do ticket (tipo + prioridade + categoria) — aplicada na Fase 5
+- [x] ROUND_ROBIN: ponteiro de próximo agente + contador por grupo
+- [x] LEAST_LOADED: seleção do agente com menos tickets abertos (ACTIVE)
+- [x] Fallback: grupo padrão da empresa quando nenhuma regra casa
 
 ### 4.5 Módulo SLA
 
-- [ ] CRUD de SLAPolicy
-- [ ] Matriz SLA: tipo + prioridade → tempos
-- [ ] Serviço de cálculo: `calculateSla(type, priority)`
-- [ ] Atualização automática de `slaResponseAt` e `slaResolveAt`
+- [x] CRUD de SLAPolicy
+- [x] Matriz SLA: tipo + prioridade → tempos
+- [x] Serviço de cálculo: `calculateSla(type, priority)`
+- [ ] Atualização automática de `slaResponseAt` e `slaResolveAt` — aplicada na Fase 5 (criação de ticket)
 
 **Referência:** docs/API.md (seções Users, Companies, SolverGroups, RoutingRules, SLA), docs/FLUXOS.md (seção 0)
 
