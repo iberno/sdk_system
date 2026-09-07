@@ -135,33 +135,35 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 3.1 Módulo Auth
 
-- [ ] Instalar: `@nestjs/jwt`, `@nestjs/passport`, `passport`, `passport-jwt`
-- [ ] Instalar: `bcryptjs`, `class-validator`, `class-transformer`
-- [ ] Criar `src/modules/auth/auth.module.ts`
-- [ ] Criar `src/modules/auth/auth.controller.ts`
-- [ ] Criar `src/modules/auth/auth.service.ts`
-- [ ] Criar `src/modules/auth/strategies/jwt.strategy.ts`
-- [ ] Criar `src/modules/auth/strategies/local.strategy.ts`
-- [ ] Criar DTOs: `login.dto.ts`
-- [ ] Endpoint `POST /api/auth/login`
-- [ ] Endpoint `POST /api/auth/refresh`
-- [ ] Endpoint `POST /api/auth/logout`
+- [x] Instalar: `@nestjs/jwt`, `@nestjs/passport`, `passport`, `passport-jwt` (+ `passport-local`, `@types/passport-local`)
+- [x] Instalar: `bcryptjs`, `class-validator`, `class-transformer`
+- [x] Criar `src/modules/auth/auth.module.ts`
+- [x] Criar `src/modules/auth/auth.controller.ts`
+- [x] Criar `src/modules/auth/auth.service.ts`
+- [x] Criar `src/modules/auth/strategies/jwt.strategy.ts`
+- [x] Criar `src/modules/auth/strategies/local.strategy.ts`
+- [x] Criar DTOs: `login.dto.ts` (+ refresh/logout)
+- [x] Endpoint `POST /api/auth/login`
+- [x] Endpoint `POST /api/auth/refresh` (rotação de refresh token)
+- [x] Endpoint `POST /api/auth/logout` (revoga refresh token)
 
 ### 3.2 Guards e Decorators
 
-- [ ] Criar `src/common/guards/jwt-auth.guard.ts`
-- [ ] Criar `src/common/guards/roles.guard.ts`
-- [ ] Criar `src/common/decorators/roles.decorator.ts`
-- [ ] Criar `src/common/decorators/current-user.decorator.ts`
-- [ ] Aplicar guard global para proteger todos os endpoints
+- [x] Criar `src/common/guards/jwt-auth.guard.ts`
+- [x] Criar `src/common/guards/roles.guard.ts`
+- [x] Criar `src/common/decorators/roles.decorator.ts`
+- [x] Criar `src/common/decorators/current-user.decorator.ts`
+- [x] Aplicar guard global para proteger todos os endpoints (JwtAuthGuard + RolesGuard globais; `@Public()` para exceções)
+- [x] Refactor: catch-all 404 movido para `FallbackModule` importado por último (rota `@All('*')` no AppController engolia `/auth/login`)
 
 ### 3.3 Autorização Dinâmica
 
-- [ ] Criar serviço de permissões dinâmicas (consulta a DB)
-- [ ] Implementar role base (ADMIN, MANAGER, AGENT, USER)
-- [ ] Implementar permissões por SolverGroup
-- [ ] Implementar permissões por ApprovalFlow
-- [ ] Criar `PermissionService` injectável nos módulos
+- [x] Criar serviço de permissões dinâmicas (consulta a DB) — `src/modules/permissions/permission.service.ts`
+- [x] Implementar role base (ADMIN, MANAGER, AGENT, USER)
+- [x] Implementar permissões por SolverGroup
+- [x] Implementar permissões por ApprovalFlow
+- [x] Criar `PermissionService` injectável nos módulos (módulo global)
+- [x] Módulo Prisma global (`PrismaService`)
 
 **Referência:** ADR-003, ADR-005
 

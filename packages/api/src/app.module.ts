@@ -13,13 +13,22 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor.js';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
+import { RolesGuard } from './common/guards/roles.guard.js';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { PrismaModule } from './modules/prisma/prisma.module.js';
+import { PermissionsModule } from './modules/permissions/permissions.module.js';
+import { AuthModule } from './modules/auth/auth.module.js';
+import { FallbackModule } from './common/modules/fallback/fallback.module.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 @Module({
   imports: [
+    PrismaModule,
+    PermissionsModule,
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env'],
@@ -48,6 +57,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
         AcceptLanguageResolver,
       ],
     }),
+    FallbackModule,
   ],
   controllers: [AppController],
   providers: [
@@ -55,6 +65,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
     {
       provide: APP_PIPE,

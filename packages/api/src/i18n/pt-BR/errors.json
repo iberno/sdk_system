@@ -7,5 +7,6 @@
   "too_many_requests": "Muitas requisições. Tente novamente em instantes",
   "invalid_credentials": "E-mail ou senha inválidos",
   "account_inactive": "Sua conta está inativa",
-  "email_taken": "Este e-mail já está em uso"
+  "email_taken": "Este e-mail já está em uso",
+  "invalid_refresh_token": "Token de atualização inválido ou expirado"
 }
