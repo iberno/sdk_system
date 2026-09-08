@@ -41,7 +41,7 @@ export function Card({
           {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
         </div>
       )}
-      <div className={cn('px-5 pb-5', title ? 'pt-0' : undefined, bodyClassName)}>{children}</div>
+      <div className={cn('px-5 pb-5', title ? 'pt-0' : 'pt-5', bodyClassName)}>{children}</div>
     </div>
   )
 }
