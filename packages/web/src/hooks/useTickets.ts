@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { api } from '@/lib/api'
-import type { ApiListResponse, TicketListItem } from '@/types/ticket'
+import type { ApiListResponse, TicketListItem, TicketDetail } from '@/types/ticket'
 
 type TicketParams = Record<string, string | number | boolean | undefined>
 
@@ -15,5 +15,18 @@ export function useTickets(params?: TicketParams) {
       )
       return { items: body.data, pagination: body.pagination }
     },
+  })
+}
+
+export function useTicket(id: string | undefined) {
+  return useQuery({
+    queryKey: ['ticket', id],
+    queryFn: async () => {
+      const { data: body } = await api.get<{ statusCode: number; message: string; data: TicketDetail }>(
+        `/tickets/${id}`,
+      )
+      return body.data
+    },
+    enabled: Boolean(id),
   })
 }

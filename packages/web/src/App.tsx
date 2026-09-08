@@ -9,7 +9,10 @@ import DashboardPage from '@/pages/DashboardPage'
 import ErrorPage from '@/pages/ErrorPage'
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage'
 import LoginPage from '@/pages/LoginPage'
+import NewTicketPage from '@/pages/NewTicketPage'
 import PlaceholderPage from '@/pages/PlaceholderPage'
+import TicketDetailPage from '@/pages/TicketDetailPage'
+import TicketsPage from '@/pages/TicketsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,7 +51,9 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <DashboardPage /> },
-      { path: 'tickets', element: <PlaceholderPage /> },
+      { path: 'tickets', element: <TicketsPage /> },
+      { path: 'tickets/new', element: <NewTicketPage /> },
+      { path: 'tickets/:id', element: <TicketDetailPage /> },
       { path: 'approvals', element: <PlaceholderPage /> },
       { path: 'changes', element: <PlaceholderPage /> },
       { path: 'problems', element: <PlaceholderPage /> },

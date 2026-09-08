@@ -469,45 +469,50 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 - [x] Responsivo
 - [x] Estados de loading (skeleton), erro (retry) e vazio
 
+> **Nota:** gráfico de tendência, distribuição por prioridade (pie) e por grupo ficarão na página **Relatórios**
+> (decisão do usuário). O backend já expõe `GET /dashboard/summary` (roles team): totals, byPriority, byStatus,
+> byType, byGroup, trend 30d, avgFirstResponseMin e avgResolutionHours — usar nessa fase.
+
 ---
 
 ## FASE 14 - Frontend: Tickets
 
 ### 14.1 Lista
 
-- [ ] Tabela de tickets com paginação
-- [ ] Filtros: status, tipo, prioridade, grupo, busca (título ou ticketNumber)
-- [ ] Badge com número do ticket (SD-2026-000124)
-- [ ] Sorting
-- [ ] Badges de prioridade e status
-- [ ] Link para detalhes
+- [x] Tabela de tickets com paginação (server-side, `Pagination`)
+- [x] Filtros: status, tipo, prioridade, grupo (team), busca (título ou ticketNumber, debounce)
+- [x] Badge com número do ticket (SD-2026-000124)
+- [x] Sorting (server-side via sortBy/order)
+- [x] Badges de prioridade, status, tipo e chip de SLA
+- [x] Link para detalhes
 
 ### 14.2 Criar
 
-- [ ] Form com: título, descrição, tipo
-- [ ] Solicitante automático (usuário logado) + campo Beneficiário (opcional, default = solicitante)
-- [ ] Seleção de prioridade (default Medium)
-- [ ] Upload de anexo (opcional)
-- [ ] Preview SLA após salvar
-- [ ] Preview do destino automático (grupo/agente) via RoutingRule
+- [x] Form com: título, descrição, tipo
+- [ ] Solicitante automático (usuário logado) + campo Beneficiário (opcional, default = solicitante) — **pendente:** `GET /users` é restrito a ADMIN/MANAGER; beneficiário fica default = solicitante por enquanto
+- [x] Seleção de prioridade (default Medium; fixa p/ USER, editável p/ team)
+- [x] Upload de anexo (opcional; team, enviado após a criação)
+- [x] Preview SLA após salvar
+- [x] Preview do destino automático (grupo/agente via routedBy) — painel de sucesso pós-criação
 
 ### 14.3 Detalhes
 
-- [ ] Header: título, número, badges
-- [ ] Personas visíveis: Solicitante, Beneficiário e Aprovadores (se houver)
-- [ ] Timeline de eventos
-- [ ] Comentários com seletor PUBLIC/INTERNAL (INTERNAL só para equipe, com aviso visual)
-- [ ] Comentários INTERNAL ocultos para solicitante/beneficiário/aprovadores
-- [ ] Histórico de mudanças
-- [ ] Atribuição (agente + grupo) com validação de pertencimento
-- [ ] Botão "Assumir" (pickup) para tickets na fila do MEU grupo
-- [ ] Indicador de auto-atribuição (routedBy: regra + estratégia)
-- [ ] Ações contextuais por role:
-  - AGENT: assumir, resolver, comentar (PUBLIC/INTERNAL), escalar
-  - MANAGER/ADMIN: atribuir a qualquer agente/grupo, tudo
-  - USER: comentar (apenas PUBLIC), fechar
-- [ ] Anexos (upload/visualizar)
+- [x] Header: título, número, badges (status/tipo/prioridade/breach)
+- [x] Personas: Solicitante, Beneficiário, Agente, Grupo + card de Aprovações (se houver)
+- [x] Timeline de eventos (criado/primeira resposta/resolvido/fechado) no card de SLA
+- [x] Comentários com seletor PUBLIC/INTERNAL (INTERNAL só para equipe, com aviso de visibilidade)
+- [x] Comentários INTERNAL ocultos para solicitante/beneficiário (server-side — verificado via API)
+- [x] Histórico de mudanças (campo, de → para)
+- [x] Atribuição (agente + grupo) — MANAGER/ADMIN (filtro de agentes por grupo)
+- [x] Botão "Assumir" (pickup) para AGENT com o grupo do ticket = meu grupo, sem agente
+- [x] Indicador de roteamento (routedBy: estratégia/regra)
+- [x] Ações contextuais por role:
+  - AGENT: assumir, iniciar/resolver/fechar, comentar PUBLIC/INTERNAL
+  - MANAGER/ADMIN: atribuir a qualquer agente/grupo + tudo do AGENT
+  - USER: comentar (apenas PUBLIC), fechar (RESOLVED→CLOSED) e reabrir (CLOSED→IN_PROGRESS)
+- [x] Anexos: visualizar/baixar via `/tickets/:id/attachments/:aid/download` (axios + blob); upload na criação (team)
 - [ ] Links: problema, mudança, artigos KB
+- [ ] Upload de anexo direto no detalhe
 
 ---
 
