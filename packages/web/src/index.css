@@ -20,7 +20,7 @@
 
   /* Texto */
   --color-body: #455a68;
-  --color-bodydark: #c7d3dc;
+  --color-bodydark: #e2e8f0;
   --color-bodystroke: #93a4b0;
 
   /* Superfícies light — Meta 3 */
@@ -29,11 +29,11 @@
   --color-graylight: #f8fafc;
   --color-graydark: #1c2b33;
 
-  /* Superfícies dark — Meta 4 (azul quase preto) */
-  --color-boxdark: #243542;
-  --color-boxdark-2: #1c2b33;
+  /* Superfícies dark — slate azulado (estilo shadcn) */
+  --color-boxdark: #0f172a;
+  --color-boxdark-2: #020817;
   --color-stroke: #d8e1e8;
-  --color-strokedark: #33464f;
+  --color-strokedark: #1e293b;
 
   /* Semânticas harmonizadas com a paleta */
   --color-success: #23a55a;
@@ -42,8 +42,8 @@
   --color-error-dark: #c92a2a;
   --color-info: #0082fb;
 
-  --shadow-card: 0px 1px 3px 0px rgba(28, 43, 51, 0.08);
-  --shadow-dropdown: 0px 6px 16px rgba(28, 43, 51, 0.16);
+  --shadow-card: 0px 1px 3px 0px rgba(2, 8, 23, 0.25);
+  --shadow-dropdown: 0px 6px 16px rgba(2, 8, 23, 0.35);
 }
 
 @layer base {
