@@ -24,6 +24,11 @@ export class QueryUsersDto extends PaginationDto {
   @IsString()
   solverGroupId?: string;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  department?: string;
+
   @ApiPropertyOptional({ enum: Status })
   @IsOptional()
   @IsEnum(Status)

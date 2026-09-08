@@ -95,6 +95,40 @@ export class UsersService {
     return { items: users, pagination: paginationMeta(page, pageSize, totalItems) };
   }
 
+  async findDirectory(query: QueryUsersDto, actor: UserContext) {
+    const companyId =
+      actor.role === 'USER' ? actor.companyId : (query.companyId ?? actor.companyId);
+    const where: Prisma.UserWhereInput = {
+      status: Status.ACTIVE,
+      ...(companyId ? { companyId } : {}),
+      ...(query.search
+        ? {
+            OR: [
+              { name: { contains: query.search, mode: 'insensitive' } },
+              { email: { contains: query.search, mode: 'insensitive' } },
+            ],
+          }
+        : {}),
+      ...(query.department
+        ? { department: { contains: query.department, mode: 'insensitive' } }
+        : {}),
+    };
+
+    const users = await this.prisma.user.findMany({
+      where,
+      orderBy: { name: 'asc' },
+      take: 50,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        department: true,
+        companyId: true,
+      },
+    });
+    return users;
+  }
+
   async findOne(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },

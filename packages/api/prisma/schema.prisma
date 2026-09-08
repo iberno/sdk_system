@@ -157,6 +157,26 @@ model Company {
   sequenceCounters SequenceCounter[]
 }
 
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  parentId  String?
+  path      String
+  depth     Int      @default(0)
+  status    Status   @default(ACTIVE)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parent   Category? @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+  tickets  Ticket[]
+
+  @@index([parentId])
+  @@index([status])
+  @@index([name])
+}
+
 model SolverGroup {
   id          String     @id @default(uuid())
   name        String     @unique
@@ -181,6 +201,7 @@ model User {
   status        Status   @default(PENDING)
   locale        String   @default("pt-BR")
   avatar        String?
+  department    String?
   companyId     String?
   solverGroupId String?
   createdAt     DateTime @default(now())
@@ -226,6 +247,7 @@ model Ticket {
   assigneeId    String?
   companyId     String
   solverGroupId String?
+  categoryId    String?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   resolvedAt    DateTime?
@@ -239,6 +261,7 @@ model Ticket {
   beneficiary User?        @relation("Beneficiary", fields: [beneficiaryId], references: [id])
   assignee    User?        @relation("Assignee", fields: [assigneeId], references: [id])
   solverGroup SolverGroup? @relation(fields: [solverGroupId], references: [id])
+  category    Category?    @relation(fields: [categoryId], references: [id])
 
   comments  TicketComment[]
   history   TicketHistory[]
@@ -255,6 +278,7 @@ model Ticket {
   @@index([assigneeId])
   @@index([companyId])
   @@index([solverGroupId])
+  @@index([categoryId])
   @@index([createdAt(sort: Desc)])
 }
 

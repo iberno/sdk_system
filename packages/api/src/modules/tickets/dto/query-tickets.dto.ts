@@ -62,6 +62,11 @@ export class QueryTicketsDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @Type(() => Boolean)
   @IsBoolean()
   slaBreached?: boolean;

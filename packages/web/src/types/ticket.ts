@@ -15,6 +15,7 @@ export interface TicketListItem {
   assignee: { id: string; name: string } | null
   solverGroup: { id: string; name: string } | null
   company: { id: string; name: string } | null
+  category: { id: string; name: string; path: string } | null
   createdAt: string
   resolvedAt: string | null
 }
@@ -93,6 +94,7 @@ export interface TicketDetail {
   assignee: { id: string; name: string; solverGroupId: string | null } | null
   solverGroup: { id: string; name: string; level: string } | null
   company: { id: string; name: string } | null
+  category: { id: string; name: string; path: string } | null
   routedBy: {
     auto: boolean
     strategy: string | null

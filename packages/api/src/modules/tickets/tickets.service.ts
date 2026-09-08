@@ -31,6 +31,7 @@ const TICKET_INCLUDE = {
   assignee: { select: { id: true, name: true, email: true, solverGroupId: true } },
   solverGroup: { select: { id: true, name: true, level: true } },
   company: { select: { id: true, name: true } },
+  category: { select: { id: true, name: true, path: true } },
 } satisfies Prisma.TicketInclude;
 
 const DETAIL_INCLUDE = {
@@ -137,19 +138,43 @@ export class TicketsService {
       });
     }
 
+    const isTeam = actor.role === 'AGENT' || actor.role === 'MANAGER' || actor.role === 'ADMIN';
+    const companyId = isTeam ? (dto.companyId ?? requester.companyId) : requester.companyId;
+
+    if (companyId !== requester.companyId) {
+      const company = await this.prisma.company.findUnique({ where: { id: companyId } });
+      if (!company || company.status !== Status.ACTIVE) {
+        throw new UnprocessableEntityException({
+          key: 'business.company_invalid',
+          error: 'UnprocessableEntity',
+        });
+      }
+    }
+
+    let categoryId: string | null = null;
+    if (dto.categoryId) {
+      const category = await this.prisma.category.findUnique({ where: { id: dto.categoryId } });
+      if (!category || category.status !== Status.ACTIVE) {
+        throw new UnprocessableEntityException({
+          key: 'business.category_invalid',
+          error: 'UnprocessableEntity',
+        });
+      }
+      categoryId = category.id;
+    }
+
     const beneficiaryId = await this.resolveBeneficiary(
       dto.beneficiaryId ?? requester.id,
       requester.id,
-      requester.companyId,
+      companyId,
     );
 
-    const isTeam = actor.role === 'AGENT' || actor.role === 'MANAGER' || actor.role === 'ADMIN';
     const priority = dto.priority && isTeam ? dto.priority : Priority.MEDIUM;
     const impact = dto.impact && isTeam ? dto.impact : 'MEDIUM';
     const urgency = dto.urgency && isTeam ? dto.urgency : 'MEDIUM';
 
     const { slaResponseAt, slaResolveAt } = await this.sla.calculate(dto.type, priority);
-    const { formatted: ticketNumber } = await this.sequence.next('TICKET', requester.companyId);
+    const { formatted: ticketNumber } = await this.sequence.next('TICKET', companyId);
 
     const destination = await this.routing.resolveDestination(dto.type, priority);
 
@@ -171,9 +196,10 @@ export class TicketsService {
         slaResolveAt,
         requesterId: requester.id,
         beneficiaryId,
-        companyId: requester.companyId,
+        companyId,
         solverGroupId,
         assigneeId,
+        categoryId,
         routedByAuto: destination !== null,
         routedStrategy: destination?.strategy ?? null,
         routedRuleId: destination?.routingRuleId ?? null,
@@ -717,6 +743,7 @@ export class TicketsService {
     if (filters.beneficiaryId) where.beneficiaryId = filters.beneficiaryId;
     if (filters.companyId) where.companyId = filters.companyId;
     if (filters.solverGroupId) where.solverGroupId = filters.solverGroupId;
+    if (filters.categoryId) where.categoryId = filters.categoryId;
 
     if (filters.slaBreached) {
       where.AND = [
@@ -818,6 +845,7 @@ export class TicketsService {
       assignee: t.assignee ? { id: t.assignee.id, name: t.assignee.name } : null,
       solverGroup: t.solverGroup ? { id: t.solverGroup.id, name: t.solverGroup.name } : null,
       company: t.company ? { id: t.company.id, name: t.company.name } : null,
+      category: t.category ? { id: t.category.id, name: t.category.name, path: t.category.path } : null,
       createdAt: t.createdAt,
       resolvedAt: t.resolvedAt,
     };
@@ -860,6 +888,7 @@ export class TicketsService {
         ? { id: t.solverGroup.id, name: t.solverGroup.name, level: t.solverGroup.level }
         : null,
       company: t.company ? { id: t.company.id, name: t.company.name } : null,
+      category: t.category ? { id: t.category.id, name: t.category.name, path: t.category.path } : null,
       routedBy: {
         auto: t.routedByAuto,
         strategy: t.routedStrategy,

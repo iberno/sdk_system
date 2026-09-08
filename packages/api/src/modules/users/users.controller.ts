@@ -26,6 +26,13 @@ export class UsersController {
     return this.usersService.create(dto, actor);
   }
 
+  @Get('directory')
+  @Roles('ADMIN', 'MANAGER', 'AGENT', 'USER')
+  @ApiOperation({ summary: 'Diretório de usuários (busca por empresa/departamento/nome)' })
+  directory(@Query() query: QueryUsersDto, @CurrentUser() actor: UserContext) {
+    return this.usersService.findDirectory(query, actor);
+  }
+
   @Get(':id')
   @Roles('ADMIN', 'MANAGER')
   @ApiOperation({ summary: 'Detalhes do usuário com permissões efetivas' })

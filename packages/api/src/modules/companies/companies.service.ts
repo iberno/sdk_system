@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateCompanyDto, UpdateCompanyDto, isValidCnpj } from './dto/company.dto.js';
 import { PaginationDto, paginationArgs, paginationMeta } from '../../common/dto/pagination.dto.js';
 import { PaginatedResult } from '../../common/interceptors/transform.interceptor.js';
+import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 
 const companySelect = {
   id: true,
@@ -22,6 +23,22 @@ const companySelect = {
 @Injectable()
 export class CompaniesService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async options(actor: UserContext) {
+    if (actor.role === 'USER') {
+      if (!actor.companyId) return [];
+      const company = await this.prisma.company.findUnique({
+        where: { id: actor.companyId },
+        select: { id: true, name: true },
+      });
+      return company ? [company] : [];
+    }
+    return this.prisma.company.findMany({
+      where: { status: Status.ACTIVE },
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true },
+    });
+  }
 
   private serialize(row: {
     id: string;

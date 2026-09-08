@@ -46,4 +46,16 @@ export class CreateTicketDto {
   @IsOptional()
   @IsEnum(Urgency)
   urgency?: Urgency;
+
+  @ApiPropertyOptional({
+    description: 'Empresa do chamado (default: a do usuário logado). Equipe pode abrir para qualquer empresa ATIVA.',
+  })
+  @IsOptional()
+  @IsString()
+  companyId?: string;
+
+  @ApiPropertyOptional({ description: 'Categoria hierárquica (folha da árvore de categorias)' })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
 }
