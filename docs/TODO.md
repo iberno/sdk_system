@@ -354,23 +354,23 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 9.1 Socket.IO
 
-- [ ] Instalar `@nestjs/websockets` + `@nestjs/platform-socket.io`
-- [ ] Gateway para tickets (rooms por company)
-- [ ] Evento `ticket.created`
-- [ ] Evento `ticket.updated`
-- [ ] Evento `ticket.commented`
-- [ ] Evento `approval.pending`
-- [ ] Evento `sla.breached`
-- [ ] Autenticação via JWT no socket
-- [ ] Rooms: `company:{id}`, `user:{id}`, `group:{id}`
+- [x] Instalar `@nestjs/websockets` + `@nestjs/platform-socket.io`
+- [x] Gateway para tickets (rooms por company)
+- [x] Evento `ticket.created`
+- [x] Evento `ticket.updated`
+- [x] Evento `ticket.commented`
+- [x] Evento `approval.pending`
+- [x] Evento `sla.breached`
+- [x] Autenticação via JWT no socket
+- [x] Rooms: `company:{id}`, `user:{id}`, `group:{id}`
 
 ### 9.2 Dashboard
 
-- [ ] `GET /dashboard/summary`
-- [ ] KPI: abertos, em progresso, resolvidos, SLA breach
-- [ ] Por prioridade, status, tipo, grupo
-- [ ] Tendência diária (últimos 30 dias)
-- [ ] Média de primeiro atendimento e resolução
+- [x] `GET /dashboard/summary`
+- [x] KPI: abertos, em progresso, resolvidos, SLA breach
+- [x] Por prioridade, status, tipo, grupo
+- [x] Tendência diária (últimos 30 dias)
+- [x] Média de primeiro atendimento e resolução
 
 **Referência:** docs/API.md (Dashboard)
 

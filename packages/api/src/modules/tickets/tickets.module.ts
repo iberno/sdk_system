@@ -5,9 +5,10 @@ import { RoutingRulesModule } from '../routing-rules/routing-rules.module.js';
 import { SlaModule } from '../sla/sla.module.js';
 import { ApprovalsModule } from '../approvals/approvals.module.js';
 import { AuditModule } from '../audit/audit.module.js';
+import { RealtimeModule } from '../realtime/realtime.module.js';
 
 @Module({
-  imports: [RoutingRulesModule, SlaModule, ApprovalsModule, AuditModule],
+  imports: [RoutingRulesModule, SlaModule, ApprovalsModule, AuditModule, RealtimeModule],
   controllers: [TicketsController],
   providers: [TicketsService],
   exports: [TicketsService],

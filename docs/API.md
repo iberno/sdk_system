@@ -931,6 +931,36 @@ Resumo operacional para o dashboard.
 
 ---
 
+## Realtime (WebSocket)
+
+### Conexão
+
+`GET /socket.io` (namespace raiz). Autenticação via `auth.token` ou `query.token` com o **mesmo JWT** de acesso (`LoginResponse.accessToken`). Conexões sem token ou com token inválido são desconectadas.
+
+```js
+const socket = io('http://localhost:3000', { auth: { token: accessToken } });
+```
+
+### Rooms
+
+| Room | Destino | Quem entra |
+|------|---------|-----------|
+| `company:{companyId}` | todos da empresa | qualquer usuário com a empresa |
+| `user:{userId}` | um usuário específico | o próprio usuário |
+| `group:{solverGroupId}` | grupo solucionador | usuários com `solverGroupId` |
+
+### Eventos emitidos
+
+| Evento | Emissão | Payload principal |
+|--------|---------|-------------------|
+| `ticket.created` | empresa + grupo + requester/beneficiary | `{ ticketId, ticketNumber, title, type, priority, status, companyId, requesterId, beneficiaryId, solverGroupId, assigneeId, createdAt }` |
+| `ticket.updated` | empresa | `{ ticketId, ticketNumber, title, status, priority, companyId, updatedAt }` |
+| `ticket.commented` | empresa | `{ ticketId, ticketNumber, commentId, authorId, companyId, visibility, content, createdAt }` |
+| `approval.pending` | room do aprovador (`user:{approverId}`) | `{ approvalId, order, flowName, entityType, ticketId?, changeId? }` |
+| `sla.breached` | empresa + grupo | `{ ticketId, ticketNumber, companyId, solverGroupId, slaResolveAt }` |
+
+---
+
 ## Resumo de Endpoints
 
 | Área | Métodos | Total |

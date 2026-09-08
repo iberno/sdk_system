@@ -17,6 +17,7 @@ import { SequenceService } from '../sequence/sequence.service.js';
 import { SlaService } from '../sla/sla.service.js';
 import { RoutingRulesService } from '../routing-rules/routing-rules.service.js';
 import { AuditService } from '../audit/audit.service.js';
+import { RealtimeGateway } from '../realtime/realtime.gateway.js';
 import { paginationArgs, paginationMeta } from '../../common/dto/pagination.dto.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 import { CreateTicketDto } from './dto/create-ticket.dto.js';
@@ -90,6 +91,7 @@ export class TicketsService {
     private readonly sla: SlaService,
     private readonly routing: RoutingRulesService,
     private readonly audit: AuditService,
+    private readonly realtime: RealtimeGateway,
   ) {}
 
   async findAll(query: QueryTicketsDto, actor: UserContext) {
@@ -201,6 +203,22 @@ export class TicketsService {
       },
     });
 
+    this.realtime.emitTicketCreated({
+      ticketId: ticket.id,
+      ticketNumber: ticket.ticketNumber,
+      title: ticket.title,
+      type: ticket.type,
+      priority: ticket.priority,
+      status: ticket.status,
+      companyId: ticket.companyId,
+      requesterId: ticket.requesterId,
+      beneficiaryId: ticket.beneficiaryId,
+      solverGroupId: ticket.solverGroupId,
+      assigneeId: ticket.assigneeId,
+      createdAt: ticket.createdAt.toISOString(),
+    });
+    await this.checkSlaState(ticket);
+
     return this.mapDetail(ticket, actor);
   }
 
@@ -275,6 +293,16 @@ export class TicketsService {
         (acc, h) => ({ ...acc, [h.field]: h.newValue ?? null }),
         {},
       ),
+    });
+    await this.checkSlaState(updated);
+    this.realtime.emitTicketUpdated({
+      ticketId: updated.id,
+      ticketNumber: updated.ticketNumber,
+      title: updated.title,
+      status: updated.status,
+      priority: updated.priority,
+      companyId: updated.companyId,
+      updatedAt: updated.updatedAt.toISOString(),
     });
     return this.mapDetail(updated, actor);
   }
@@ -427,6 +455,16 @@ export class TicketsService {
       oldData: { status: ticket.status },
       newData: { status: dto.status },
     });
+    await this.checkSlaState(updated);
+    this.realtime.emitTicketUpdated({
+      ticketId: updated.id,
+      ticketNumber: updated.ticketNumber,
+      title: updated.title,
+      status: updated.status,
+      priority: updated.priority,
+      companyId: updated.companyId,
+      updatedAt: updated.updatedAt.toISOString(),
+    });
     return this.mapDetail(updated, actor);
   }
 
@@ -467,6 +505,16 @@ export class TicketsService {
       entityId: id,
       userId: actor.sub,
       newData: { visibility: comment.visibility, commentId: comment.id },
+    });
+    this.realtime.emitTicketCommented({
+      ticketId: id,
+      ticketNumber: ticket.ticketNumber,
+      commentId: comment.id,
+      authorId: actor.sub,
+      companyId: ticket.companyId,
+      visibility: comment.visibility,
+      content: comment.content,
+      createdAt: comment.createdAt.toISOString(),
     });
     return comment;
   }
@@ -600,7 +648,16 @@ export class TicketsService {
         {},
       ),
     });
-
+    await this.checkSlaState(updated);
+    this.realtime.emitTicketUpdated({
+      ticketId: updated.id,
+      ticketNumber: updated.ticketNumber,
+      title: updated.title,
+      status: updated.status,
+      priority: updated.priority,
+      companyId: updated.companyId,
+      updatedAt: updated.updatedAt.toISOString(),
+    });
     return this.mapDetail(updated, actor);
   }
 
@@ -855,6 +912,41 @@ export class TicketsService {
         userId,
       })),
     });
+  }
+
+  private async checkSlaState(ticket: {
+    id: string;
+    ticketNumber: string;
+    status: string;
+    slaResolveAt: Date | null;
+    resolvedAt: Date | null;
+    closedAt: Date | null;
+    slaBreached: boolean;
+    companyId: string;
+    solverGroupId: string | null;
+  }): Promise<boolean> {
+    if (ticket.slaBreached) return false;
+    const end = ticket.slaResolveAt;
+    if (
+      !end ||
+      ticket.status === 'RESOLVED' ||
+      ticket.status === 'CLOSED'
+    ) {
+      return false;
+    }
+    if (end.getTime() > Date.now()) return false;
+    await this.prisma.ticket.update({
+      where: { id: ticket.id },
+      data: { slaBreached: true },
+    });
+    this.realtime.emitSlaBreached({
+      ticketId: ticket.id,
+      ticketNumber: ticket.ticketNumber,
+      companyId: ticket.companyId,
+      solverGroupId: ticket.solverGroupId,
+      slaResolveAt: end.toISOString(),
+    });
+    return true;
   }
 
   private async getTicketDetail(id: string): Promise<TicketRow> {

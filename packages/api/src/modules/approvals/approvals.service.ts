@@ -16,6 +16,7 @@ import {
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { AuditService } from '../audit/audit.service.js';
+import { RealtimeGateway } from '../realtime/realtime.gateway.js';
 import { RoutingRulesService } from '../routing-rules/routing-rules.service.js';
 import {
   validateStages,
@@ -47,6 +48,7 @@ export class ApprovalsService {
     private readonly prisma: PrismaService,
     private readonly routing: RoutingRulesService,
     private readonly audit: AuditService,
+    private readonly realtime: RealtimeGateway,
   ) {}
 
   async list(actor: UserContext, query: QueryApprovalsDto) {
@@ -145,6 +147,10 @@ export class ApprovalsService {
       });
     });
 
+    await this.emitApprovalsPending(
+      { ticketId, flowName: flow.name, entityType: flow.entityType },
+    );
+
     return {
       ticketId,
       flowName: flow.name,
@@ -220,6 +226,10 @@ export class ApprovalsService {
         })),
       });
     });
+
+    await this.emitApprovalsPending(
+      { changeId, flowName: flow.name, entityType: flow.entityType },
+    );
 
     return {
       changeId,
@@ -469,6 +479,28 @@ export class ApprovalsService {
             : {}),
       },
     });
+  }
+
+  private async emitApprovalsPending(
+    target: { ticketId?: string; changeId?: string; flowName: string; entityType: string },
+  ) {
+    const where = target.ticketId
+      ? { ticketId: target.ticketId, status: ApprovalStatus.PENDING }
+      : { changeId: target.changeId, status: ApprovalStatus.PENDING };
+    const rows = await this.prisma.approval.findMany({
+      where,
+      select: { id: true, order: true, approverId: true },
+    });
+    for (const row of rows) {
+      this.realtime.emitApprovalPending(row.approverId, {
+        approvalId: row.id,
+        order: row.order,
+        flowName: target.flowName,
+        entityType: target.entityType,
+        ticketId: target.ticketId,
+        changeId: target.changeId,
+      });
+    }
   }
 
   private async resolveStages(

@@ -34,6 +34,8 @@ import { ChangesModule } from './modules/changes/changes.module.js';
 import { AuditModule } from './modules/audit/audit.module.js';
 import { AuditContextInterceptor } from './modules/audit/audit-context.interceptor.js';
 import { KnowledgeModule } from './modules/knowledge/knowledge.module.js';
+import { RealtimeModule } from './modules/realtime/realtime.module.js';
+import { DashboardModule } from './modules/dashboard/dashboard.module.js';
 import { FallbackModule } from './common/modules/fallback/fallback.module.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -56,6 +58,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     ChangesModule,
     AuditModule,
     KnowledgeModule,
+    RealtimeModule,
+    DashboardModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env'],
