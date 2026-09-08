@@ -133,3 +133,26 @@ export interface UserOption {
   status: string
   solverGroupId: string | null
 }
+
+export interface CompanyOption {
+  id: string
+  name: string
+}
+
+export interface CategoryOption {
+  id: string
+  name: string
+  parentId: string | null
+  path: string
+  depth: number
+  status: string
+  order: number
+}
+
+export interface DirectoryUser {
+  id: string
+  name: string
+  email: string
+  department: string | null
+  companyId: string | null
+}

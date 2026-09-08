@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Send,
   Sparkles,
+  Tag,
   UserCheck,
   Users,
 } from 'lucide-react'
@@ -279,6 +280,12 @@ export default function TicketDetailPage() {
                 <span className="inline-flex items-center gap-1">
                   <Building2 className="size-3.5" />
                   {ticket.company.name}
+                </span>
+              )}
+              {ticket.category && (
+                <span className="inline-flex items-center gap-1">
+                  <Tag className="size-3.5" />
+                  {ticket.category.path}
                 </span>
               )}
             </div>

@@ -93,6 +93,7 @@ são pendentes. **`[x]`** são concluídos.
 - [x] Enum → `CommentVisibility` (PUBLIC, INTERNAL)
 - [x] Model `User` (role, status, locale)
 - [x] Model `Company`
+- [x] Model `Category` (árvore hierárquica global: parentId, path, depth, ordem)
 - [x] Model `SolverGroup`
 - [x] Model `Ticket` (requesterId + beneficiaryId + ticketNumber)
 - [x] Model `TicketComment` (visibility)
@@ -116,7 +117,8 @@ são pendentes. **`[x]`** são concluídos.
 - [x] Criar `prisma/seed.ts`
   - [x] Seed: Empresas (3)
   - [x] Seed: Grupos Solucionadores (N1, N2, N3, REDES, INFRA, DEVOPS) - cada um com min. 1 agente
-  - [x] Seed: Usuários (Admin, Manager, Agent ×6, User ×3) - agentes vinculados aos grupos
+  - [x] Seed: Usuários (Admin, Manager, Agent ×6, User ×3) - agentes vinculados aos grupos + `department`
+  - [x] Seed: Categorias em árvore (34; ex: Software > Windows > Instalar Windows) + vínculo nos tickets
   - [x] Seed: Routing Rules exemplo (TO_GROUP N1, ROUND_ROBIN N1, LEAST_LOADED INFRA)
   - [x] Seed: Sequências iniciais (SequenceCounter: TICKET/ano atual = 12, alinhado aos 12 tickets semeados — se usar 0, o próximo ticket colidiria no UNIQUE)
   - [x] Seed: Tickets de exemplo (12)
@@ -178,12 +180,14 @@ são pendentes. **`[x]`** são concluídos.
 - [x] Paginação
 - [x] Alteração de status (soft disable)
 - [x] Proteção: apenas ADMIN altera role/solverGroup
+- [x] Campo `department` + `GET /users/directory` (busca por empresa/departamento/nome; USER vê só a própria empresa)
 
 ### 4.2 Módulo Companies
 
 - [x] CRUD completo
 - [x] Soft delete (status = INACTIVE)
 - [x] Validação de CNPJ
+- [x] `GET /companies/options` (team: todas ATIVAS; USER: só a própria)
 
 ### 4.3 Módulo SolverGroups
 
@@ -222,7 +226,7 @@ são pendentes. **`[x]`** são concluídos.
 ### 5.1 CRUD Básico
 
 - [x] `GET /tickets` com filtros avançados (inclui requesterId, beneficiaryId e ticketNumber)
-- [x] `POST /tickets` criação (auto: requester, company, status, SLA; beneficiary ← requester se omitido)
+- [x] `POST /tickets` criação (auto: requester, company, status, SLA; beneficiary ← requester se omitido; `companyId`/`categoryId` com validação de empresa/categoria ATIVA)
 - [x] **Gerar `ticketNumber`** atomicamente (SequenceCounter: `SD-{ano}-{000001}`)
 - [x] Serviço `SequenceService` reutilizável (TICKET, CHANGE, PROBLEM)
 - [x] `GET /tickets/:id` detalhe com personas (solicitante/beneficiário/aprovadores) + timeline, comments, history
@@ -489,7 +493,9 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 ### 14.2 Criar
 
 - [x] Form com: título, descrição, tipo
-- [ ] Solicitante automático (usuário logado) + campo Beneficiário (opcional, default = solicitante) — **pendente:** `GET /users` é restrito a ADMIN/MANAGER; beneficiário fica default = solicitante por enquanto
+- [x] Solicitante automático (usuário logado, exibido no form) + campo Beneficiário (opcional, default = solicitante; busca em `GET /users/directory` por empresa)
+- [x] Seleção de Empresa (`GET /companies/options`; team escolhe qualquer ATIVA, USER fica fixo na própria)
+- [x] Seleção de Categoria hierárquica (`GET /categories`, somente folhas, exibida via path)
 - [x] Seleção de prioridade (default Medium; fixa p/ USER, editável p/ team)
 - [x] Upload de anexo (opcional; team, enviado após a criação)
 - [x] Preview SLA após salvar
@@ -497,7 +503,7 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 
 ### 14.3 Detalhes
 
-- [x] Header: título, número, badges (status/tipo/prioridade/breach)
+- [x] Header: título, número, badges (status/tipo/prioridade/breach) + chips de empresa e categoria (path)
 - [x] Personas: Solicitante, Beneficiário, Agente, Grupo + card de Aprovações (se houver)
 - [x] Timeline de eventos (criado/primeira resposta/resolvido/fechado) no card de SLA
 - [x] Comentários com seletor PUBLIC/INTERNAL (INTERNAL só para equipe, com aviso de visibilidade)
@@ -613,10 +619,10 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 |------|-----------|-------|
 | 0 | Configuração do Ambiente | 7 |
 | 1 | Backend: Setup NestJS | 16 |
-| 2 | Backend: Banco + Prisma | 26 |
+| 2 | Backend: Banco + Prisma | 28 |
 | 3 | Backend: Auth + Autorização | 18 |
-| 4 | Backend: Módulos Core | 24 |
-| 5 | Backend: Tickets | 22 |
+| 4 | Backend: Módulos Core | 26 |
+| 5 | Backend: Tickets | 23 |
 | 6 | Backend: Aprovações | 11 |
 | 7 | Backend: Problemas/Mudanças | 15 |
 | 8 | Backend: KB + Auditoria | 8 |
@@ -625,9 +631,9 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 | 11 | Frontend: Setup | 27 |
 | 12 | Frontend: Auth | 8 |
 | 13 | Frontend: Dashboard | 8 |
-| 14 | Frontend: Tickets | 16 |
+| 14 | Frontend: Tickets | 18 |
 | 15 | Frontend: Administração | 16 |
 | 16 | Frontend: Realtime | 4 |
 | 17 | Integração completa | 8 |
 | 18 | Qualidade e Entrega | 9 |
-| | **Total** | **264** |
+| | **Total** | **271** |

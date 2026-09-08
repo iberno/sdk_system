@@ -8,6 +8,9 @@ export interface CreateTicketPayload {
   description: string
   type: string
   priority?: string
+  companyId?: string
+  categoryId?: string
+  beneficiaryId?: string
 }
 
 function invalidateTicket(queryClient: ReturnType<typeof useQueryClient>, id: string) {

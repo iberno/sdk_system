@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CheckCircle2, Paperclip, Send } from 'lucide-react'
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { FormField } from '@/components/ui/FormField'
 import { Input } from '@/components/ui/Input'
+import { SearchableSelect, type SelectOption } from '@/components/ui/SearchableSelect'
 import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { useAuthStore } from '@/stores/authStore'
@@ -15,6 +16,7 @@ import { PRIORITY_ORDER, TYPE_ORDER } from '@/lib/domain'
 import type { TicketDetail } from '@/types/ticket'
 import { toast } from '@/components/ui/toast-store'
 import { useCreateTicket, useUploadAttachment } from '@/hooks/useTicketMutations'
+import { useCategories, useCompanyOptions, useUserDirectory } from '@/hooks/useTicketFormData'
 import { cn } from '@/lib/utils'
 
 const formatDateTime = (iso: string) =>
@@ -30,10 +32,40 @@ export default function NewTicketPage() {
   const [description, setDescription] = useState('')
   const [type, setType] = useState('INCIDENT')
   const [priority, setPriority] = useState('MEDIUM')
+  const [companyId, setCompanyId] = useState<string | null>(user?.companyId ?? null)
+  const [beneficiaryId, setBeneficiaryId] = useState<string | null>(null)
+  const [categoryId, setCategoryId] = useState<string | null>(null)
   const [attachment, setAttachment] = useState<File | null>(null)
   const [errors, setErrors] = useState<{ title?: string; description?: string }>({})
 
   const [created, setCreated] = useState<TicketDetail | null>(null)
+
+  const companiesQuery = useCompanyOptions()
+  const categoriesQuery = useCategories()
+  const directoryQuery = useUserDirectory(companyId)
+
+  const companyOptions = useMemo<SelectOption[]>(
+    () => (companiesQuery.data ?? []).map((c) => ({ value: c.id, label: c.name })),
+    [companiesQuery.data],
+  )
+
+  const beneficiaryOptions = useMemo<SelectOption[]>(
+    () =>
+      (directoryQuery.data ?? []).map((u) => ({
+        value: u.id,
+        label: u.department ? `${u.name} — ${u.department}` : u.name,
+      })),
+    [directoryQuery.data],
+  )
+
+  const categoryOptions = useMemo<SelectOption[]>(() => {
+    const categories = categoriesQuery.data ?? []
+    const parentIds = new Set(categories.map((c) => c.parentId).filter(Boolean))
+    return categories
+      .filter((c) => !parentIds.has(c.id))
+      .map((c) => ({ value: c.id, label: c.path }))
+      .sort((a, b) => a.label.localeCompare(b.label))
+  }, [categoriesQuery.data])
 
   const createMutation = useCreateTicket()
   const uploadMutation = useUploadAttachment(created?.id ?? '')
@@ -51,6 +83,9 @@ export default function NewTicketPage() {
         description: description.trim(),
         type,
         ...(isTeam ? { priority } : {}),
+        ...(companyId ? { companyId } : {}),
+        ...(categoryId ? { categoryId } : {}),
+        ...(beneficiaryId ? { beneficiaryId } : {}),
       })
       if (attachment && ticket.id) {
         try {
@@ -71,6 +106,9 @@ export default function NewTicketPage() {
     setDescription('')
     setType('INCIDENT')
     setPriority('MEDIUM')
+    setCompanyId(user?.companyId ?? null)
+    setBeneficiaryId(null)
+    setCategoryId(null)
     setAttachment(null)
     setErrors({})
     setCreated(null)
@@ -104,6 +142,18 @@ export default function NewTicketPage() {
               <dt className="text-xs text-bodystroke">{t('common.status')}</dt>
               <dd>
                 <Badge tone="success">{t(`domain.status.${created.status}`)}</Badge>
+              </dd>
+            </div>
+            <div className="flex flex-col gap-1 bg-white p-4 dark:bg-boxdark">
+              <dt className="text-xs text-bodystroke">{t('tickets.companyField')}</dt>
+              <dd className="text-sm text-body dark:text-bodydark">
+                {created.company?.name ?? '—'}
+              </dd>
+            </div>
+            <div className="flex flex-col gap-1 bg-white p-4 dark:bg-boxdark">
+              <dt className="text-xs text-bodystroke">{t('tickets.categoryField')}</dt>
+              <dd className="text-sm text-body dark:text-bodydark">
+                {created.category?.path ?? '—'}
               </dd>
             </div>
             <div className="flex flex-col gap-1 bg-white p-4 dark:bg-boxdark">
@@ -157,6 +207,18 @@ export default function NewTicketPage() {
       </div>
 
       <Card bodyClassName="flex flex-col gap-4">
+        <FormField label={t('tickets.requester')}>
+          <div
+            className={cn(
+              'flex items-center gap-2 rounded-lg border border-stroke bg-graylight px-3.5 py-2.5',
+              'dark:border-strokedark dark:bg-boxdark-3',
+            )}
+          >
+            <span className="text-sm font-medium text-graydark dark:text-white">{user?.name}</span>
+            <span className="text-sm text-bodystroke">{user?.email}</span>
+          </div>
+        </FormField>
+
         <FormField label={t('tickets.titleField')} required error={errors.title}>
           <Input
             value={title}
@@ -175,6 +237,38 @@ export default function NewTicketPage() {
             maxLength={4000}
           />
         </FormField>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField label={t('tickets.companyField')} required>
+            <SearchableSelect
+              options={companyOptions}
+              value={companyId}
+              onChange={(value) => {
+                setCompanyId(value)
+                setBeneficiaryId(null)
+              }}
+              placeholder={t('tickets.companyPlaceholder')}
+              emptyMessage={t('common.noResults')}
+              disabled={!isTeam || companiesQuery.isLoading}
+              clearable={isTeam}
+            />
+          </FormField>
+
+          <FormField
+            label={t('tickets.beneficiary')}
+            hint={t('tickets.beneficiaryHint')}
+          >
+            <SearchableSelect
+              options={beneficiaryOptions}
+              value={beneficiaryId}
+              onChange={setBeneficiaryId}
+              placeholder={t('tickets.beneficiaryPlaceholder')}
+              emptyMessage={t('common.noResults')}
+              disabled={!companyId || directoryQuery.isLoading}
+              clearable
+            />
+          </FormField>
+        </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField label={t('tickets.typeField')} required>
@@ -204,6 +298,18 @@ export default function NewTicketPage() {
             </Select>
           </FormField>
         </div>
+
+        <FormField label={t('tickets.categoryField')} hint={t('tickets.categoryHint')}>
+          <SearchableSelect
+            options={categoryOptions}
+            value={categoryId}
+            onChange={setCategoryId}
+            placeholder={t('tickets.categoryPlaceholder')}
+            emptyMessage={t('common.noResults')}
+            disabled={categoriesQuery.isLoading}
+            clearable
+          />
+        </FormField>
 
         {isTeam && (
           <FormField label={t('tickets.attachmentField')} hint={t('tickets.attachHint')}>
