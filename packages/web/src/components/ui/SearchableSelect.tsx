@@ -152,7 +152,7 @@ export function SearchableSelect({
                 className={cn(
                   'flex w-full items-center justify-between gap-2 px-3.5 py-2 text-left text-sm',
                   index === highlighted
-                    ? 'bg-primary-light text-primary dark:bg-primary/10 dark:text-indigo-400'
+                    ? 'bg-primary-soft text-primary dark:bg-primary/15 dark:text-accent'
                     : 'text-graydark dark:text-white',
                 )}
               >

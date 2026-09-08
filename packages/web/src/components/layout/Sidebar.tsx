@@ -21,10 +21,12 @@ export function Sidebar({ collapsed, sections, currentPath }: SidebarProps) {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-30 flex ${width} flex-col overflow-y-auto bg-boxdark-2 text-white transition-[width] duration-200`}
+      className={`fixed inset-y-0 left-0 z-30 flex ${width} flex-col overflow-y-auto bg-gradient-to-b from-boxdark-2 to-boxdark text-white transition-[width] duration-200`}
     >
       <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-strokedark px-5">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold">SD</div>
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-sm font-bold shadow-card">
+          SD
+        </div>
         {!collapsed && (
           <span className="truncate text-lg font-semibold">{t('app.name')}</span>
         )}
@@ -48,8 +50,8 @@ export function Sidebar({ collapsed, sections, currentPath }: SidebarProps) {
                       title={collapsed ? item.label : undefined}
                       className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                         active
-                          ? 'bg-primary text-white'
-                          : 'text-bodydark hover:bg-boxdark hover:text-white'
+                          ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-card'
+                          : 'text-bodydark hover:bg-white/5 hover:text-white'
                       }`}
                     >
                       <span className="shrink-0">{item.icon}</span>

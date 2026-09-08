@@ -342,6 +342,10 @@ Criar o frontend **do zero** seguindo os padrões do TailAdmin:
 - Dark/Light mode
 - Responsividade mobile-first
 
+**Paleta de cores: Sailing** (`#33678a` / `#78a6c9` / `#eaeff3` / `#e65c4f`) aplicada
+via tokens `@theme` no CSS, com derivações de tonalidade para hover e dark mode
+(azuis profundos `#2a465b`/`#1c3042`).
+
 ### Consequências
 
 **Positivas:**

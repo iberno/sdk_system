@@ -10,7 +10,7 @@ const tones: Record<BadgeTone, string> = {
   warning: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
   error: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400',
   neutral: 'bg-slate-100 text-slate-600 dark:bg-slate-500/10 dark:text-slate-400',
-  primary: 'bg-indigo-50 text-primary dark:bg-primary/10 dark:text-indigo-400',
+  primary: 'bg-sky-50 text-primary dark:bg-primary/15 dark:text-accent',
 }
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {

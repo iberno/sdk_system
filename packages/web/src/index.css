@@ -4,35 +4,46 @@
 /* Dark mode por classe (TailAdmin) */
 @custom-variant dark (&:is(.dark *));
 
-/* Tokens do tema (padrão TailAdmin) */
+/* Tokens do tema — paleta Sailing (#33678a / #78a6c9 / #eaeff3 / #e65c4f)
+   com derivações de tonalidade para hover e dark mode */
 @theme {
   --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
 
-  --color-primary: #4650ea;
-  --color-primary-dark: #3540d6;
-  --color-primary-light: #eef2ff;
+  /* Sailing 1 — primária */
+  --color-primary: #33678a;
+  --color-primary-dark: #2a5673;
+  --color-primary-soft: #dce8f1;
 
-  --color-body: #637381;
-  --color-bodydark: #aeb7c0;
-  --color-bodystroke: #c3cad3;
+  /* Sailing 2 — acento / primary clara */
+  --color-primary-light: #78a6c9;
+  --color-accent: #78a6c9;
 
+  /* Texto */
+  --color-body: #4a6073;
+  --color-bodydark: #c6d4e0;
+  --color-bodystroke: #8fa2b3;
+
+  /* Superfícies light */
   --color-white: #ffffff;
-  --color-whiten: #f1f5f9;
-  --color-graylight: #f9fafb;
-  --color-graydark: #333a48;
+  --color-whiten: #eaeff3;
+  --color-graylight: #f1f6fa;
+  --color-graydark: #2c3e50;
 
-  --color-boxdark: #24303f;
-  --color-boxdark-2: #1a222c;
-  --color-stroke: #e2e8f0;
-  --color-strokedark: #2e3a47;
+  /* Superfícies dark (azuis profundos derivados de #33678a) */
+  --color-boxdark: #2a465b;
+  --color-boxdark-2: #1c3042;
+  --color-stroke: #d3dee8;
+  --color-strokedark: #3a586e;
 
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #0ea5e9;
+  /* Semânticas — Sailing 4 para ações de erro/destaque */
+  --color-success: #2f9e78;
+  --color-warning: #d9822b;
+  --color-error: #e65c4f;
+  --color-error-dark: #cf4b3f;
+  --color-info: #4a8fb8;
 
-  --shadow-card: 0px 1px 3px 0px rgba(0, 0, 0, 0.08);
-  --shadow-dropdown: 0px 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-card: 0px 1px 3px 0px rgba(16, 42, 67, 0.08);
+  --shadow-dropdown: 0px 6px 16px rgba(16, 42, 67, 0.14);
 }
 
 @layer base {
