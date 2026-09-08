@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { FolderClock, Plus, Search } from 'lucide-react'
+import { Building2, FolderClock, Plus, Search, Tag } from 'lucide-react'
 
 import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
@@ -136,6 +136,32 @@ export default function TicketsPage() {
               <Avatar name={row.requester.name} size="sm" />
               <span className="text-sm text-body dark:text-bodydark">{row.requester.name}</span>
             </div>
+          ) : (
+            <span className="text-bodystroke">—</span>
+          ),
+      },
+      {
+        key: 'company',
+        header: t('tickets.companyField'),
+        render: (row) =>
+          row.company ? (
+            <Badge tone="neutral">
+              <Building2 className="size-3.5" />
+              {row.company.name}
+            </Badge>
+          ) : (
+            <span className="text-bodystroke">—</span>
+          ),
+      },
+      {
+        key: 'category',
+        header: t('tickets.categoryField'),
+        render: (row) =>
+          row.category ? (
+            <Badge tone="neutral" title={row.category.path}>
+              <Tag className="size-3.5" />
+              {row.category.path.split(' > ').pop()}
+            </Badge>
           ) : (
             <span className="text-bodystroke">—</span>
           ),
