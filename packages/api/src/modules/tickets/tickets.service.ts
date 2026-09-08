@@ -35,7 +35,10 @@ const DETAIL_INCLUDE = {
   ...TICKET_INCLUDE,
   approvals: {
     orderBy: [{ order: 'asc' }],
-    include: { approver: { select: { id: true, name: true, email: true } } },
+    include: {
+      approver: { select: { id: true, name: true, email: true } },
+      flow: { select: { id: true, name: true } },
+    },
   },
   comments: {
     orderBy: { createdAt: 'asc' },
@@ -734,7 +737,9 @@ export class TicketsService {
         id: a.id,
         status: a.status,
         order: a.order,
+        comment: a.comment,
         approver: a.approver ? { id: a.approver.id, name: a.approver.name } : null,
+        flowName: a.flow?.name ?? null,
       })),
       timeline,
       comments: comments.map((c) => ({

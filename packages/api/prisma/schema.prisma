@@ -376,23 +376,27 @@ model ChangeTicket {
 // ============================================================
 
 model Approval {
-  id        String         @id @default(uuid())
-  status    ApprovalStatus @default(PENDING)
-  comment   String?
-  order     Int            @default(1)
-  ticketId  String?
-  changeId  String?
+  id         String         @id @default(uuid())
+  status     ApprovalStatus @default(PENDING)
+  comment    String?
+  order      Int            @default(1)
+  ticketId   String?
+  changeId   String?
+  flowId     String?
+  prevStatus String?
   approverId String
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 
-  ticket   Ticket?  @relation(fields: [ticketId], references: [id])
-  change   Change?  @relation(fields: [changeId], references: [id])
-  approver User     @relation(fields: [approverId], references: [id])
+  ticket   Ticket?       @relation(fields: [ticketId], references: [id])
+  change   Change?       @relation(fields: [changeId], references: [id])
+  flow     ApprovalFlow? @relation(fields: [flowId], references: [id])
+  approver User          @relation(fields: [approverId], references: [id])
 
   @@index([status])
   @@index([ticketId])
   @@index([changeId])
+  @@index([flowId])
   @@index([approverId])
 }
 
@@ -407,7 +411,8 @@ model ApprovalFlow {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  company Company? @relation(fields: [companyId], references: [id])
+  company   Company?   @relation(fields: [companyId], references: [id])
+  approvals Approval[]
 }
 
 // ============================================================

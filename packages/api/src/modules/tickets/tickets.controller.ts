@@ -23,6 +23,8 @@ import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { TicketsService } from './tickets.service.js';
+import { ApprovalsService } from '../approvals/approvals.service.js';
+import { RequestTicketApprovalDto } from '../approvals/dto/approval.dto.js';
 import { QueryTicketsDto } from './dto/query-tickets.dto.js';
 import { CreateTicketDto } from './dto/create-ticket.dto.js';
 import { UpdateTicketDto } from './dto/update-ticket.dto.js';
@@ -55,7 +57,10 @@ const ALLOWED_MIMETYPES = new Set([
 @ApiTags('Tickets')
 @Controller('tickets')
 export class TicketsController {
-  constructor(private readonly tickets: TicketsService) {}
+  constructor(
+    private readonly tickets: TicketsService,
+    private readonly approvals: ApprovalsService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Lista tickets com filtros avançados' })
@@ -126,6 +131,18 @@ export class TicketsController {
     @CurrentUser() actor: UserContext,
   ) {
     return this.tickets.pickup(id, dto.solverGroupId, actor);
+  }
+
+  @Post(':id/request-approval')
+  @HttpCode(HttpStatus.OK)
+  @Roles('AGENT', 'MANAGER', 'ADMIN')
+  @ApiOperation({ summary: 'Submete ticket a um fluxo de aprovação (WAITING_APPROVAL)' })
+  requestApproval(
+    @Param('id') id: string,
+    @Body() dto: RequestTicketApprovalDto,
+    @CurrentUser() actor: UserContext,
+  ) {
+    return this.approvals.requestForTicket(dto.flowId, id, actor);
   }
 
   @Post(':id/status')

@@ -24,5 +24,18 @@
   "ticket_not_in_queue": "This ticket is not in the given group's queue",
   "escalation_only": "Agents may only escalate to groups of equal or higher level",
   "attachment_type": "File type not allowed: {type}",
-  "attachment_required": "No file was uploaded"
+  "attachment_required": "No file was uploaded",
+  "approval_flow_invalid": "Approval flow not found",
+  "approval_flow_inactive": "The approval flow is inactive",
+  "approval_flow_company": "The approval flow does not belong to the entity's company",
+  "approval_flow_required": "Please specify the approval flow (flowId)",
+  "approval_stages_required": "The flow must have at least 1 stage",
+  "approval_stage_invalid": "Each stage must define an approver (userId, solverGroupId or approverRole)",
+  "approval_no_approver": "No approver available for stage {order}",
+  "approval_not_pending": "This approval is no longer pending",
+  "approval_not_yours": "You are not the approver of this stage",
+  "approval_in_approval": "This record is already awaiting approval",
+  "approval_entity_closed": "The entity is closed and cannot be submitted for approval",
+  "approval_entity_mismatch": "The given flow is not of type TICKET",
+  "approval_stage_prior_pending": "Prior stage pending: approve stage {order} first"
 }

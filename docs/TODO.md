@@ -271,25 +271,25 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 6.1 ApprovalFlow
 
-- [ ] CRUD de fluxos de aprovação
-- [ ] Regras em JSON: etapas, ordem, aprovador por role/grupo
-- [ ] Validação de entidade vinculada (Ticket ou Change)
+- [x] CRUD de fluxos de aprovação
+- [x] Regras em JSON: etapas, ordem, aprovador por role/grupo (`{stages:[{order, approverRole|solverGroupId|userId}]}`)
+- [x] Validação de entidade vinculada (TICKET hoje; CHANGE será acionado na Fase 7)
 
 ### 6.2 Aprovações
 
-- [ ] `GET /approvals` (minhas aprovações)
-- [ ] `POST /approvals/:id/approve`
-- [ ] `POST /approvals/:id/reject`
-- [ ] Ordenação por etapas (order)
-- [ ] Bloqueio de etapa seguinte até aprovação anterior
-- [ ] Retomada do fluxo ao aprovar/rejeitar
+- [x] `GET /approvals` (minhas aprovações, filtro por status)
+- [x] `POST /approvals/:id/approve`
+- [x] `POST /approvals/:id/reject`
+- [x] Ordenação por etapas (order)
+- [x] Bloqueio de etapa seguinte até aprovação anterior (422 se etapa anterior pendente)
+- [x] Retomada do fluxo ao aprovar/rejeitar (restaura status anterior + auto-assign)
 
 ### 6.3 Integração
 
-- [ ] Ticket muda para `WAITING_APPROVAL` quando precisa de aprovação
-- [ ] Change muda para `PENDING_APPROVAL`
-- [ ] Notificação ao aprovador
-- [ ] Atualização em tempo real via Socket.IO
+- [x] Ticket muda para `WAITING_APPROVAL` quando precisa de aprovação (`POST /tickets/:id/request-approval`, MANAGER/AGENT/ADMIN)
+- [ ] Change muda para `PENDING_APPROVAL` — na Fase 7 (módulo Changes)
+- [ ] Notificação ao aprovador — na Fase 10 (Realtime)
+- [ ] Atualização em tempo real via Socket.IO — na Fase 10 (Realtime)
 
 **Referência:** docs/FLUXOS.md (Fluxo 5)
 

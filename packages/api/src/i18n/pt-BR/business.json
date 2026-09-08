@@ -24,5 +24,18 @@
   "ticket_not_in_queue": "Este ticket não está na fila do grupo informado",
   "escalation_only": "Agentes só podem escalar para grupos de nível maior ou igual",
   "attachment_type": "Tipo de arquivo não permitido: {type}",
-  "attachment_required": "Nenhum arquivo enviado"
+  "attachment_required": "Nenhum arquivo enviado",
+  "approval_flow_invalid": "Fluxo de aprovação não encontrado",
+  "approval_flow_inactive": "O fluxo de aprovação está inativo",
+  "approval_flow_company": "O fluxo de aprovação não pertence à empresa da entidade",
+  "approval_flow_required": "Informe o fluxo de aprovação (flowId)",
+  "approval_stages_required": "O fluxo precisa de ao menos 1 etapa",
+  "approval_stage_invalid": "Cada etapa deve ter um aprovador (userId, solverGroupId ou approverRole)",
+  "approval_no_approver": "Nenhum aprovador disponível para a etapa {order}",
+  "approval_not_pending": "Esta aprovação não está mais pendente",
+  "approval_not_yours": "Você não é o aprovador desta etapa",
+  "approval_in_approval": "O registro já está aguardando aprovação",
+  "approval_entity_closed": "A entidade está encerrada e não pode ser submetida a aprovação",
+  "approval_entity_mismatch": "O fluxo informado não é do tipo TICKET",
+  "approval_stage_prior_pending": "Etapa anterior pendente: aprove primeiro a etapa {order}"
 }

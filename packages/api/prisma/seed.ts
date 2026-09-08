@@ -186,10 +186,12 @@ async function main() {
         name: 'Aprovação de Mudança - TI',
         description: 'NORMAL/EMERGENCY exigem aprovação gerencial em 2 etapas',
         entityType: 'CHANGE',
-        rules: [
-          { step: 1, approverRole: 'MANAGER', type: 'OR' },
-          { step: 2, approverRole: 'ADMIN', type: 'OR' },
-        ] as Prisma.InputJsonValue[],
+        rules: {
+          stages: [
+            { order: 1, approverRole: 'MANAGER' },
+            { order: 2, approverRole: 'ADMIN' },
+          ],
+        } as Prisma.InputJsonValue,
         status: 'ACTIVE',
         companyId: acme.id,
       },
@@ -197,7 +199,9 @@ async function main() {
         name: 'Aprovação de Ticket VIP',
         description: 'Tickets de prioridade CRITICAL exigem aval do gestor',
         entityType: 'TICKET',
-        rules: [{ step: 1, approverRole: 'MANAGER', type: 'OR' }] as Prisma.InputJsonValue[],
+        rules: {
+          stages: [{ order: 1, approverRole: 'MANAGER' }],
+        } as Prisma.InputJsonValue,
         status: 'ACTIVE',
         companyId: acme.id,
       },
