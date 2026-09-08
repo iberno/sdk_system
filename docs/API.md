@@ -685,6 +685,7 @@ Exporta CSV/Excel com filtros atuais.
 | POST | `/problems/:id/link-ticket` | Vincula ticket |
 | DELETE | `/problems/:id/unlink-ticket` | Desvincula ticket |
 | POST | `/problems/:id/propose-change` | Cria proposta de mudança a partir do problema |
+| POST | `/problems/:id/publish-article` | Gera artigo de conhecimento a partir de problema RESOLVED/CLOSED |
 
 **Request POST:**
 ```json

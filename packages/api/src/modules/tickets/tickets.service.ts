@@ -16,6 +16,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { SequenceService } from '../sequence/sequence.service.js';
 import { SlaService } from '../sla/sla.service.js';
 import { RoutingRulesService } from '../routing-rules/routing-rules.service.js';
+import { AuditService } from '../audit/audit.service.js';
 import { paginationArgs, paginationMeta } from '../../common/dto/pagination.dto.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 import { CreateTicketDto } from './dto/create-ticket.dto.js';
@@ -88,6 +89,7 @@ export class TicketsService {
     private readonly sequence: SequenceService,
     private readonly sla: SlaService,
     private readonly routing: RoutingRulesService,
+    private readonly audit: AuditService,
   ) {}
 
   async findAll(query: QueryTicketsDto, actor: UserContext) {
@@ -185,6 +187,20 @@ export class TicketsService {
       ...(assigneeId ? [{ field: 'assigneeId', oldValue: null, newValue: assigneeId }] : []),
     ]);
 
+    await this.audit.log({
+      action: 'CREATE',
+      entity: 'Ticket',
+      entityId: ticket.id,
+      userId: actor.sub,
+      newData: {
+        ticketNumber,
+        title: ticket.title,
+        type: ticket.type,
+        priority,
+        status,
+      },
+    });
+
     return this.mapDetail(ticket, actor);
   }
 
@@ -246,6 +262,20 @@ export class TicketsService {
       include: DETAIL_INCLUDE,
     });
     await this.recordHistory(id, actor.sub, history);
+    await this.audit.log({
+      action: 'UPDATE',
+      entity: 'Ticket',
+      entityId: id,
+      userId: actor.sub,
+      oldData: history.reduce<Record<string, unknown>>(
+        (acc, h) => ({ ...acc, [h.field]: h.oldValue ?? null }),
+        {},
+      ),
+      newData: history.reduce<Record<string, unknown>>(
+        (acc, h) => ({ ...acc, [h.field]: h.newValue ?? null }),
+        {},
+      ),
+    });
     return this.mapDetail(updated, actor);
   }
 
@@ -389,6 +419,14 @@ export class TicketsService {
 
     const updated = await this.prisma.ticket.update({ where: { id }, data, include: DETAIL_INCLUDE });
     await this.recordHistory(id, actor.sub, history);
+    await this.audit.log({
+      action: 'UPDATE',
+      entity: 'Ticket',
+      entityId: id,
+      userId: actor.sub,
+      oldData: { status: ticket.status },
+      newData: { status: dto.status },
+    });
     return this.mapDetail(updated, actor);
   }
 
@@ -422,6 +460,13 @@ export class TicketsService {
         authorId: actor.sub,
       },
       include: { author: { select: { id: true, name: true, role: true } } },
+    });
+    await this.audit.log({
+      action: 'COMMENT',
+      entity: 'Ticket',
+      entityId: id,
+      userId: actor.sub,
+      newData: { visibility: comment.visibility, commentId: comment.id },
     });
     return comment;
   }
@@ -539,6 +584,21 @@ export class TicketsService {
         });
       }
       return tx.ticket.update({ where: { id }, data, include: DETAIL_INCLUDE });
+    });
+
+    await this.audit.log({
+      action: 'UPDATE',
+      entity: 'Ticket',
+      entityId: id,
+      userId: actor.sub,
+      oldData: history.reduce<Record<string, unknown>>(
+        (acc, h) => ({ ...acc, [h.field]: h.oldValue ?? null }),
+        {},
+      ),
+      newData: history.reduce<Record<string, unknown>>(
+        (acc, h) => ({ ...acc, [h.field]: h.newValue ?? null }),
+        {},
+      ),
     });
 
     return this.mapDetail(updated, actor);

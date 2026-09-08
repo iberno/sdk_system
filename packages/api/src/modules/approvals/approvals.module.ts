@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { ApprovalsController } from './approvals.controller.js';
 import { ApprovalsService } from './approvals.service.js';
 import { RoutingRulesModule } from '../routing-rules/routing-rules.module.js';
+import { AuditModule } from '../audit/audit.module.js';
 
 @Module({
-  imports: [RoutingRulesModule],
+  imports: [RoutingRulesModule, AuditModule],
   controllers: [ApprovalsController],
   providers: [ApprovalsService],
   exports: [ApprovalsService],

@@ -8,6 +8,7 @@ import { ChangeStatus, Prisma, Status } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { paginationArgs, paginationMeta } from '../../common/dto/pagination.dto.js';
 import { ApprovalsService } from '../approvals/approvals.service.js';
+import { AuditService } from '../audit/audit.service.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 import {
   CreateChangeDto,
@@ -63,6 +64,7 @@ export class ChangesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly approvals: ApprovalsService,
+    private readonly audit: AuditService,
   ) {}
 
   async findAll(query: QueryChangesDto, actor: UserContext) {
@@ -144,6 +146,19 @@ export class ChangesService {
       },
       include: DETAIL_INCLUDE,
     });
+    await this.audit.log({
+      action: 'CREATE',
+      entity: 'Change',
+      entityId: change.id,
+      userId: actor.sub,
+      newData: {
+        title: change.title,
+        type: change.type,
+        risk: change.risk,
+        status: change.status,
+        companyId: change.companyId,
+      },
+    });
     return this.mapDetail(change);
   }
 
@@ -183,6 +198,24 @@ export class ChangesService {
       },
       include: DETAIL_INCLUDE,
     });
+    await this.audit.log({
+      action: 'UPDATE',
+      entity: 'Change',
+      entityId: id,
+      userId: actor.sub,
+      oldData: {
+        title: prev.title,
+        type: prev.type,
+        risk: prev.risk,
+        status: prev.status,
+      },
+      newData: {
+        title: updated.title,
+        type: updated.type,
+        risk: updated.risk,
+        status: updated.status,
+      },
+    });
     return this.mapDetail(updated);
   }
 
@@ -205,6 +238,14 @@ export class ChangesService {
         data: { status: ChangeStatus.SCHEDULED },
         include: DETAIL_INCLUDE,
       });
+      await this.audit.log({
+        action: 'SUBMIT',
+        entity: 'Change',
+        entityId: id,
+        userId: actor.sub,
+        oldData: { status: change.status },
+        newData: { status: updated.status },
+      });
       return this.mapDetail(updated);
     }
 
@@ -224,6 +265,14 @@ export class ChangesService {
     }
 
     await this.approvals.requestForChange(flow.id, change.id);
+    await this.audit.log({
+      action: 'SUBMIT',
+      entity: 'Change',
+      entityId: id,
+      userId: actor.sub,
+      oldData: { status: change.status },
+      newData: { status: 'PENDING_APPROVAL', flowId: flow.id },
+    });
     return this.findOne(id, actor);
   }
 
@@ -239,6 +288,14 @@ export class ChangesService {
         data: { status: ChangeStatus.IN_PROGRESS },
         include: DETAIL_INCLUDE,
       });
+      await this.audit.log({
+        action: 'EXECUTE',
+        entity: 'Change',
+        entityId: id,
+        userId: actor.sub,
+        oldData: { status: change.status },
+        newData: { status: updated.status },
+      });
       return this.mapDetail(updated);
     }
     if (change.status === 'IN_PROGRESS') {
@@ -246,6 +303,14 @@ export class ChangesService {
         where: { id },
         data: { status: ChangeStatus.COMPLETED },
         include: DETAIL_INCLUDE,
+      });
+      await this.audit.log({
+        action: 'EXECUTE',
+        entity: 'Change',
+        entityId: id,
+        userId: actor.sub,
+        oldData: { status: change.status },
+        newData: { status: updated.status },
       });
       return this.mapDetail(updated);
     }
@@ -273,6 +338,14 @@ export class ChangesService {
       data: { status: ChangeStatus.ROLLED_BACK },
       include: DETAIL_INCLUDE,
     });
+    await this.audit.log({
+      action: 'ROLLBACK',
+      entity: 'Change',
+      entityId: id,
+      userId: actor.sub,
+      oldData: { status: change.status },
+      newData: { status: updated.status },
+    });
     return this.mapDetail(updated);
   }
 
@@ -297,6 +370,13 @@ export class ChangesService {
         data: { changeId: id, ticketId: ticket.id },
       });
     }
+    await this.audit.log({
+      action: 'LINK',
+      entity: 'Change',
+      entityId: id,
+      userId: actor.sub,
+      newData: { ticketId: ticket.id },
+    });
     return this.findOne(id, actor);
   }
 
@@ -324,8 +404,8 @@ export class ChangesService {
       });
     }
 
-    await this.prisma.$transaction(async (tx) => {
-      await tx.change.create({
+    const changeId = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.change.create({
         data: {
           title: `Proposta: ${problem.title}`,
           description: problem.description,
@@ -339,6 +419,15 @@ export class ChangesService {
           problemProposal: { connect: { id: problem.id } },
         },
       });
+      return created.id;
+    });
+
+    await this.audit.log({
+      action: 'CREATE',
+      entity: 'Change',
+      entityId: changeId,
+      userId: actor.sub,
+      newData: { sourceProblemId: problem.id, type: 'NORMAL', status: 'DRAFT' },
     });
 
     const full = await this.prisma.change.findFirst({

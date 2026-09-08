@@ -8,6 +8,7 @@ import {
 import { Prisma, Status, UserRole } from '@prisma/client';
 import { hash } from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { AuditService } from '../audit/audit.service.js';
 import { CreateUserDto, UpdateUserDto } from './dto/update-user.dto.js';
 import { QueryUsersDto } from './dto/query-users.dto.js';
 import { PaginatedResult } from '../../common/interceptors/transform.interceptor.js';
@@ -47,7 +48,10 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+  ) {}
 
   async findAll(query: QueryUsersDto): Promise<PaginatedResult<unknown>> {
     const { page, pageSize, search, role, companyId, solverGroupId, status } = query;
@@ -153,6 +157,13 @@ export class UsersService {
         createdAt: true,
       },
     });
+    await this.audit.log({
+      action: 'CREATE',
+      entity: 'User',
+      entityId: user.id,
+      userId: actor.sub,
+      newData: { name: user.name, email: user.email, role: user.role, companyId: user.companyId },
+    });
     return user;
   }
 
@@ -202,6 +213,26 @@ export class UsersService {
         createdAt: true,
       },
     });
+    await this.audit.log({
+      action: 'UPDATE',
+      entity: 'User',
+      entityId: id,
+      userId: actor.sub,
+      oldData: {
+        ...(dto.name ? { name: existing.name } : {}),
+        ...(dto.role && dto.role !== existing.role ? { role: existing.role } : {}),
+        ...(dto.solverGroupId !== undefined && dto.solverGroupId !== existing.solverGroupId
+          ? { solverGroupId: existing.solverGroupId }
+          : {}),
+      },
+      newData: {
+        ...(dto.name ? { name: dto.name } : {}),
+        ...(dto.role && dto.role !== existing.role ? { role: dto.role } : {}),
+        ...(dto.solverGroupId !== undefined && dto.solverGroupId !== existing.solverGroupId
+          ? { solverGroupId: dto.solverGroupId }
+          : {}),
+      },
+    });
     return user;
   }
 
@@ -213,11 +244,20 @@ export class UsersService {
     if (existing.role === UserRole.ADMIN && actor.role !== UserRole.ADMIN) {
       throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
     }
-    return this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id },
       data: { status },
       select: { id: true, name: true, email: true, role: true, status: true },
     });
+    await this.audit.log({
+      action: 'UPDATE',
+      entity: 'User',
+      entityId: id,
+      userId: actor.sub,
+      oldData: { status: existing.status },
+      newData: { status: updated.status },
+    });
+    return updated;
   }
 
   private async findEntity(id: string) {

@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { ProblemStatus, Prisma, Status } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { AuditService } from '../audit/audit.service.js';
 import { paginationArgs, paginationMeta } from '../../common/dto/pagination.dto.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 import {
@@ -50,7 +51,10 @@ type ProblemRow = Prisma.ProblemGetPayload<{ include: typeof DETAIL_INCLUDE }>;
 
 @Injectable()
 export class ProblemsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+  ) {}
 
   async findAll(query: QueryProblemsDto, actor: UserContext) {
     this.assertTeam(actor);
@@ -113,6 +117,18 @@ export class ProblemsService {
       },
       include: DETAIL_INCLUDE,
     });
+    await this.audit.log({
+      action: 'CREATE',
+      entity: 'Problem',
+      entityId: problem.id,
+      userId: actor.sub,
+      newData: {
+        title: problem.title,
+        impact: problem.impact,
+        status: problem.status,
+        companyId: problem.companyId,
+      },
+    });
     return this.mapDetail(problem);
   }
 
@@ -153,6 +169,24 @@ export class ProblemsService {
       },
       include: DETAIL_INCLUDE,
     });
+    await this.audit.log({
+      action: 'UPDATE',
+      entity: 'Problem',
+      entityId: id,
+      userId: actor.sub,
+      oldData: {
+        title: prev.title,
+        status: prev.status,
+        ...(dto.rootCause !== undefined ? { rootCause: prev.rootCause ?? null } : {}),
+        ...(dto.solution !== undefined ? { solution: prev.solution ?? null } : {}),
+      },
+      newData: {
+        title: updated.title,
+        status: updated.status,
+        ...(dto.rootCause !== undefined ? { rootCause: updated.rootCause ?? null } : {}),
+        ...(dto.solution !== undefined ? { solution: updated.solution ?? null } : {}),
+      },
+    });
     return this.mapDetail(updated);
   }
 
@@ -177,6 +211,13 @@ export class ProblemsService {
         data: { problemId: id, ticketId: ticket.id },
       });
     }
+    await this.audit.log({
+      action: 'LINK',
+      entity: 'Problem',
+      entityId: id,
+      userId: actor.sub,
+      newData: { ticketId: ticket.id },
+    });
     return this.findOne(id, actor);
   }
 
@@ -188,6 +229,13 @@ export class ProblemsService {
     }
     await this.prisma.problemTicket.deleteMany({
       where: { problemId: id, ticketId },
+    });
+    await this.audit.log({
+      action: 'UNLINK',
+      entity: 'Problem',
+      entityId: id,
+      userId: actor.sub,
+      newData: { ticketId },
     });
     return this.findOne(id, actor);
   }

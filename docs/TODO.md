@@ -317,7 +317,7 @@ são pendentes. **`[x]`** são concluídos.
 
 - [x] Problem → Change (proposta de mudança)
 - [x] Change → Ticket (execução afeta tickets)
-- [ ] Knowledge Article a partir de Problema resolvido (pende do módulo `knowledge` — Fase 8)
+- [x] Knowledge Article a partir de Problema resolvido (implementado na Fase 8)
 
 **Referência:** docs/FLUXOS.md (Fluxo 3 e 4)
 
@@ -332,18 +332,19 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 8.1 Knowledge Base
 
-- [ ] CRUD de artigos
-- [ ] Publicação: rascunho → publicado
-- [ ] Categorias e tags
-- [ ] Busca por texto
+- [x] CRUD de artigos
+- [x] Publicação: rascunho → publicado
+- [x] Categorias e tags
+- [x] Busca por texto
+- [x] Artigo gerado de problema resolvido (`POST /problems/:id/publish-article`)
 
 ### 8.2 Auditoria
 
-- [ ] `AuditLog` integrado aos módulos existentes
-- [ ] Registro: action, entity, entityId, oldData, newData
-- [ ] Captura: userId, IP, userAgent
-- [ ] `GET /audit` com filtros
-- [ ] Associação a Login/Logout
+- [x] `AuditLog` integrado aos módulos existentes
+- [x] Registro: action, entity, entityId, oldData, newData
+- [x] Captura: userId, IP, userAgent
+- [x] `GET /audit` com filtros
+- [x] Associação a Login/Logout
 
 **Referência:** docs/FLUXOS.md (Fluxo 7), docs/API.md
 

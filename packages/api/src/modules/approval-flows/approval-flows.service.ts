@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, Status } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { AuditService } from '../audit/audit.service.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 import {
   CreateApprovalFlowDto,
@@ -65,7 +66,10 @@ export function validateStages(rules: unknown): ApprovalStage[] {
 
 @Injectable()
 export class ApprovalFlowsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+  ) {}
 
   async findAll(query: QueryApprovalFlowsDto, actor: UserContext) {
     const where: Prisma.ApprovalFlowWhereInput = {};
@@ -90,7 +94,7 @@ export class ApprovalFlowsService {
   async create(dto: CreateApprovalFlowDto, actor: UserContext) {
     validateStages(dto.rules);
     const companyId = await this.resolveCompany(dto, actor);
-    return this.prisma.approvalFlow.create({
+    const flow = await this.prisma.approvalFlow.create({
       data: {
         name: dto.name,
         description: dto.description,
@@ -101,6 +105,14 @@ export class ApprovalFlowsService {
       },
       include: FLOW_INCLUDE,
     });
+    await this.audit.log({
+      action: 'CREATE',
+      entity: 'ApprovalFlow',
+      entityId: flow.id,
+      userId: actor.sub,
+      newData: { name: flow.name, entityType: flow.entityType, companyId: flow.companyId },
+    });
+    return flow;
   }
 
   async update(id: string, dto: UpdateApprovalFlowDto) {

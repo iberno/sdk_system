@@ -15,6 +15,7 @@ import {
   UserRole,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { AuditService } from '../audit/audit.service.js';
 import { RoutingRulesService } from '../routing-rules/routing-rules.service.js';
 import {
   validateStages,
@@ -45,6 +46,7 @@ export class ApprovalsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly routing: RoutingRulesService,
+    private readonly audit: AuditService,
   ) {}
 
   async list(actor: UserContext, query: QueryApprovalsDto) {
@@ -305,6 +307,20 @@ export class ApprovalsService {
         }
       }
       return row;
+    });
+
+    await this.audit.log({
+      action: result === ApprovalStatus.APPROVED ? 'APPROVE' : 'REJECT',
+      entity: approval.ticketId ? 'Ticket' : 'Change',
+      entityId: approval.ticketId ?? approval.changeId ?? null,
+      userId: actor.sub,
+      newData: {
+        approvalId: updated.id,
+        order: updated.order,
+        entityType: approval.flow?.entityType ?? null,
+        flow: approval.flow?.name ?? null,
+        comment: updated.comment,
+      },
     });
 
     return {

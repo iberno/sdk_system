@@ -31,6 +31,9 @@ import { ApprovalFlowsModule } from './modules/approval-flows/approval-flows.mod
 import { ApprovalsModule } from './modules/approvals/approvals.module.js';
 import { ProblemsModule } from './modules/problems/problems.module.js';
 import { ChangesModule } from './modules/changes/changes.module.js';
+import { AuditModule } from './modules/audit/audit.module.js';
+import { AuditContextInterceptor } from './modules/audit/audit-context.interceptor.js';
+import { KnowledgeModule } from './modules/knowledge/knowledge.module.js';
 import { FallbackModule } from './common/modules/fallback/fallback.module.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -51,6 +54,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     ApprovalsModule,
     ProblemsModule,
     ChangesModule,
+    AuditModule,
+    KnowledgeModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env'],
@@ -111,6 +116,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditContextInterceptor,
     },
   ],
 })

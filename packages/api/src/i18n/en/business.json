@@ -45,5 +45,6 @@
   "change_rollback_status": "Only IN_PROGRESS changes can be rolled back",
   "problem_has_proposal": "This problem already has a proposed change",
   "change_locked": "Change in {status} cannot be edited",
-  "group_invalid": "Invalid solver group for the company"
+  "group_invalid": "Invalid solver group for the company",
+  "knowledge_problem_resolved": "Problem must be RESOLVED or CLOSED to generate a knowledge article"
 }

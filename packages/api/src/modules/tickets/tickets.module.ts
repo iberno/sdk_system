@@ -4,9 +4,10 @@ import { TicketsService } from './tickets.service.js';
 import { RoutingRulesModule } from '../routing-rules/routing-rules.module.js';
 import { SlaModule } from '../sla/sla.module.js';
 import { ApprovalsModule } from '../approvals/approvals.module.js';
+import { AuditModule } from '../audit/audit.module.js';
 
 @Module({
-  imports: [RoutingRulesModule, SlaModule, ApprovalsModule],
+  imports: [RoutingRulesModule, SlaModule, ApprovalsModule, AuditModule],
   controllers: [TicketsController],
   providers: [TicketsService],
   exports: [TicketsService],

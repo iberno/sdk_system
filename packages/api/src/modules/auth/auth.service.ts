@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { createHash, randomBytes } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { AuditService } from '../audit/audit.service.js';
 import { compare } from 'bcryptjs';
 import { UserRoleType, UserContext } from './interfaces/auth-user.interface.js';
 
@@ -30,6 +31,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly audit: AuditService,
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -127,6 +129,14 @@ export class AuthService {
     const refreshToken = await this.createRefreshToken(user.id);
     const expiresIn = ttlToSeconds(this.config.get<string>('JWT_ACCESS_EXPIRES_IN') ?? '15m');
 
+    await this.audit.log({
+      action: 'LOGIN',
+      entity: 'User',
+      entityId: user.id,
+      userId: user.id,
+      newData: { email: user.email },
+    });
+
     return {
       accessToken,
       refreshToken,
@@ -175,9 +185,20 @@ export class AuthService {
   }
 
   async logout(refreshToken: string) {
+    const hash = sha256(refreshToken);
+    const stored = await this.prisma.refreshToken.findUnique({
+      where: { token: hash },
+      select: { userId: true },
+    });
     await this.prisma.refreshToken.updateMany({
-      where: { token: sha256(refreshToken), revoked: false },
+      where: { token: hash, revoked: false },
       data: { revoked: true },
+    });
+    await this.audit.log({
+      action: 'LOGOUT',
+      entity: 'User',
+      entityId: stored?.userId ?? null,
+      userId: stored?.userId ?? null,
     });
     return { success: true };
   }

@@ -13,6 +13,7 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ProblemsService } from './problems.service.js';
 import { ChangesService } from '../changes/changes.service.js';
+import { KnowledgeService } from '../knowledge/knowledge.service.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
@@ -31,6 +32,7 @@ export class ProblemsController {
   constructor(
     private readonly problemsService: ProblemsService,
     private readonly changesService: ChangesService,
+    private readonly knowledge: KnowledgeService,
   ) {}
 
   @Get()
@@ -81,5 +83,11 @@ export class ProblemsController {
   @HttpCode(HttpStatus.OK)
   proposeChange(@Param('id') id: string, @CurrentUser() actor: UserContext) {
     return this.changesService.proposeFromProblem(id, actor);
+  }
+
+  @Post(':id/publish-article')
+  @HttpCode(HttpStatus.OK)
+  publishArticle(@Param('id') id: string, @CurrentUser() actor: UserContext) {
+    return this.knowledge.publishFromProblem(id, actor);
   }
 }

@@ -45,5 +45,6 @@
   "change_rollback_status": "Somente mudanças em IN_PROGRESS podem sofrer rollback",
   "problem_has_proposal": "Este problema já possui uma proposta de mudança",
   "change_locked": "Mudança em {status} não pode ser editada",
-  "group_invalid": "Grupo de atendimento inválido para a empresa"
+  "group_invalid": "Grupo de atendimento inválido para a empresa",
+  "knowledge_problem_resolved": "Problema precisa estar RESOLVIDO ou CLOSED para gerar artigo de conhecimento"
 }
