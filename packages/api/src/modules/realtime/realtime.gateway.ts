@@ -43,6 +43,18 @@ export interface TicketCommentedPayload {
   visibility: string;
   content: string;
   createdAt: string;
+  exceptUserIds?: string[];
+}
+
+export interface TicketAssignedPayload {
+  ticketId: string;
+  ticketNumber: string;
+  title: string;
+  type: string;
+  priority: string;
+  companyId: string;
+  assignedBy: string;
+  assignedAt: string;
 }
 
 export interface ApprovalPendingPayload {
@@ -113,9 +125,17 @@ export class RealtimeGateway implements OnGatewayConnection {
   }
 
   emitTicketCommented(payload: TicketCommentedPayload) {
+    if (payload.visibility === 'INTERNAL') {
+      void this.#emitToCompanyExceptParticipants(payload);
+      return;
+    }
     this.server
       .to(`company:${payload.companyId}`)
       .emit('ticket.commented', payload);
+  }
+
+  emitTicketAssigned(userId: string, payload: TicketAssignedPayload) {
+    this.server.to(`user:${userId}`).emit('ticket.assigned', payload);
   }
 
   emitApprovalPending(userId: string, payload: ApprovalPendingPayload) {
@@ -126,6 +146,18 @@ export class RealtimeGateway implements OnGatewayConnection {
     this.server
       .to(this.roomsFor(payload.companyId, payload.solverGroupId))
       .emit('sla.breached', payload);
+  }
+
+  async #emitToCompanyExceptParticipants(payload: TicketCommentedPayload) {
+    const except = new Set(payload.exceptUserIds ?? []);
+    const sockets = await this.server.in(`company:${payload.companyId}`).fetchSockets();
+    for (const socket of sockets) {
+      const user = socket.data?.user as UserContext | undefined;
+      if (!user) continue;
+      if (user.role === 'USER') continue;
+      if (except.has(user.sub)) continue;
+      socket.emit('ticket.commented', payload);
+    }
   }
 
   private roomsFor(companyId: string, solverGroupId: string | null): string[] {

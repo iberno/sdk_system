@@ -955,9 +955,12 @@ const socket = io('http://localhost:3000', { auth: { token: accessToken } });
 |--------|---------|-------------------|
 | `ticket.created` | empresa + grupo + requester/beneficiary | `{ ticketId, ticketNumber, title, type, priority, status, companyId, requesterId, beneficiaryId, solverGroupId, assigneeId, createdAt }` |
 | `ticket.updated` | empresa | `{ ticketId, ticketNumber, title, status, priority, companyId, updatedAt }` |
-| `ticket.commented` | empresa | `{ ticketId, ticketNumber, commentId, authorId, companyId, visibility, content, createdAt }` |
+| `ticket.assigned` | room do agente (`user:{assigneeId}`) | `{ ticketId, ticketNumber, title, type, priority, companyId, assignedBy, assignedAt }` |
+| `ticket.commented` | empresa (público) / equipe não-participante (INTERNAL) | `{ ticketId, ticketNumber, commentId, authorId, companyId, visibility, content, createdAt, exceptUserIds? }` |
 | `approval.pending` | room do aprovador (`user:{approverId}`) | `{ approvalId, order, flowName, entityType, ticketId?, changeId? }` |
 | `sla.breached` | empresa + grupo | `{ ticketId, ticketNumber, companyId, solverGroupId, slaResolveAt }` |
+
+**Filtro de participação no Socket.IO:** para `visibility: INTERNAL`, o evento `ticket.commented` **não** é emitido para `company:{companyId}` de forma indiscriminada — é entregue apenas a sockets de usuários não-`USER` e que **não** são participantes do ticket (requesters, beneficiário e aprovadores, de acordo com `exceptUserIds`). Comentários `PUBLIC` seguem emitidos para a empresa toda.
 
 ---
 

@@ -515,6 +515,11 @@ export class TicketsService {
       visibility: comment.visibility,
       content: comment.content,
       createdAt: comment.createdAt.toISOString(),
+      exceptUserIds: [
+        ticket.requesterId,
+        ...(ticket.beneficiaryId ? [ticket.beneficiaryId] : []),
+        ...(ticket.approvals ?? []).map((a) => a.approverId),
+      ],
     });
     return comment;
   }
@@ -633,7 +638,6 @@ export class TicketsService {
       }
       return tx.ticket.update({ where: { id }, data, include: DETAIL_INCLUDE });
     });
-
     await this.audit.log({
       action: 'UPDATE',
       entity: 'Ticket',
@@ -658,6 +662,18 @@ export class TicketsService {
       companyId: updated.companyId,
       updatedAt: updated.updatedAt.toISOString(),
     });
+    if (assigneeId) {
+      this.realtime.emitTicketAssigned(assigneeId, {
+        ticketId: updated.id,
+        ticketNumber: updated.ticketNumber,
+        title: updated.title,
+        type: updated.type,
+        priority: updated.priority,
+        companyId: updated.companyId,
+        assignedBy: actor.sub,
+        assignedAt: updated.updatedAt.toISOString(),
+      });
+    }
     return this.mapDetail(updated, actor);
   }
 

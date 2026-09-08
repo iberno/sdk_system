@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { appConfig } from './config/app.config.js';
+import { databaseConfig } from './config/database.config.js';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE, APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import {
@@ -63,6 +65,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env'],
+      load: [appConfig, databaseConfig],
     }),
     ThrottlerModule.forRoot([
       {

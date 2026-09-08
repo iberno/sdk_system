@@ -30,7 +30,7 @@ são pendentes. **`[x]`** são concluídos.
 - [x] Criar `.gitignore` raiz
 - [x] Criar `tsconfig.base.json` (config compartilhada)
 - [x] Inicializar git (`git init`)
-- [ ] Criar commit inicial  → aguardando autorização do usuário
+- [x] Criar commit inicial  → commits publicados ao longo das fases
 
 **Referência:** ADR-001 (pnpm workspaces)
 
@@ -49,8 +49,8 @@ são pendentes. **`[x]`** são concluídos.
 
 - [x] Instalar `@nestjs/config` e `dotenv`
 - [x] Criar `.env` e `.env.example`
-- [ ] Criar `src/config/app.config.ts`
-- [ ] Criar `src/config/database.config.ts`
+- [x] Criar `src/config/app.config.ts`  → Fase 11 (registerAs + ConfigModule.forRoot load; CORS/port via ConfigService)
+- [x] Criar `src/config/database.config.ts`  → Fase 11 (registerAs; colocado no load do ConfigModule)
 - [x] Configurar CORS para frontend (porta 5173)
 - [x] Configurar global prefix `/api`
 - [x] Configurar ValidationPipe global  → I18nValidationPipe
@@ -201,7 +201,7 @@ são pendentes. **`[x]`** são concluídos.
 - [x] `POST /routing-rules` com validação de estratégia + grupo alvo
 - [x] Estratégias: TO_GROUP, ROUND_ROBIN, LEAST_LOADED, MANUAL
 - [x] Ordenação: `POST /routing-rules/reorder`
-- [ ] Avaliação na criação do ticket (tipo + prioridade + categoria) — aplicada na Fase 5
+- [x] Avaliação na criação do ticket (tipo + prioridade + categoria) — aplicada na Fase 5
 - [x] ROUND_ROBIN: ponteiro de próximo agente + contador por grupo
 - [x] LEAST_LOADED: seleção do agente com menos tickets abertos (ACTIVE)
 - [x] Fallback: grupo padrão da empresa quando nenhuma regra casa
@@ -211,7 +211,7 @@ são pendentes. **`[x]`** são concluídos.
 - [x] CRUD de SLAPolicy
 - [x] Matriz SLA: tipo + prioridade → tempos
 - [x] Serviço de cálculo: `calculateSla(type, priority)`
-- [ ] Atualização automática de `slaResponseAt` e `slaResolveAt` — aplicada na Fase 5 (criação de ticket)
+- [x] Atualização automática de `slaResponseAt` e `slaResolveAt` — aplicada na Fase 5 (criação de ticket)
 
 **Referência:** docs/API.md (seções Users, Companies, SolverGroups, RoutingRules, SLA), docs/FLUXOS.md (seção 0)
 
@@ -235,7 +235,7 @@ são pendentes. **`[x]`** são concluídos.
 - [x] `INTERNAL` apenas para equipe criar (AGENT/MANAGER/ADMIN ou grupo solucionador)
 - [x] **Filtro por participação:** solicitante/beneficiário/aprovadores NUNCA recebem `INTERNAL` (ADR-007)
 - [x] Proteção vale por participação no ticket, não por role
-- [ ] Mesmo filtro aplicado no Socket.IO (evento `ticket.commented`) — na Fase 10 (Realtime)
+- [x] Mesmo filtro aplicado no Socket.IO (evento `ticket.commented`) — Fase 11: `INTERNAL` emitido só para sockets não-USER e não-participantes (`exceptUserIds` no payload + `fetchSockets`)
 
 ### 5.3 Atribuição e Direcionamento
 
@@ -248,13 +248,13 @@ são pendentes. **`[x]`** são concluídos.
 - [x] Registro de `routedBy` (auto/estrategia/regra) no ticket
 - [x] Auto-atribuição na criação via RoutingRule
 - [x] Escala: regra de nível crescente (N1 → N2 → N3) — AGENT só escala p/ nível ≥; MANAGER/ADMIN livres
-- [ ] Notificação ao agente atribuído (Socket + Email) — na Fase 10 (Realtime)
+- [x] Notificação ao agente atribuído (Socket) — Fase 11: evento `ticket.assigned` para room `user:{assigneeId}` em `applyAssignment`; Email fica para o Frontend/notificações (sem infra de SMTP no backend)
 - [x] TicketHistory em toda atribuição (AuditLog dedicado na Fase 8)
 
 ### 5.4 Histórico
 
 - [x] Registrar alterações em `TicketHistory`
-- [ ] Unificar com Auditoria — integração AuditLog na Fase 8
+- [x] Unificar com Auditoria — integração AuditLog na Fase 8
 - [x] Timeline de eventos do ticket
 
 ### 5.5 Anexos
@@ -287,9 +287,9 @@ são pendentes. **`[x]`** são concluídos.
 ### 6.3 Integração
 
 - [x] Ticket muda para `WAITING_APPROVAL` quando precisa de aprovação (`POST /tickets/:id/request-approval`, MANAGER/AGENT/ADMIN)
-- [ ] Change muda para `PENDING_APPROVAL` — na Fase 7 (módulo Changes)
-- [ ] Notificação ao aprovador — na Fase 10 (Realtime)
-- [ ] Atualização em tempo real via Socket.IO — na Fase 10 (Realtime)
+- [x] Change muda para `PENDING_APPROVAL` — Fase 7 (`requestForChange`) / Fase 9 (emit `approval.pending`)
+- [x] Notificação ao aprovador — Fase 9 (Realtime): `approval.pending` para room `user:{approverId}`
+- [x] Atualização em tempo real via Socket.IO — Fase 9 (Realtime)
 
 **Referência:** docs/FLUXOS.md (Fluxo 5)
 
