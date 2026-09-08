@@ -443,14 +443,15 @@ são pendentes. **`[x]`** são concluídos.
 
 ## FASE 12 - Frontend: Auth
 
-- [ ] Página de Login
-- [ ] Página de Esqueci minha senha
-- [ ] Store `authStore` (Zustand): token, user, refresh logic
-- [ ] Axios interceptor: attach token + 401 refresh retry
-- [ ] Socket.IO com auth (JWT)
-- [ ] Route guard: proteger rotas privadas
-- [ ] Persistência de sessão (localStorage)
-- [ ] Redirect baseado em role (ADMIN → /login → /dashboard)
+- [x] Página de Login (split-screen com imagem do Unsplash, atalhos de credenciais demo)
+- [x] Página de Esqueci minha senha
+- [x] Store `authStore` (Zustand): token, user, refresh logic (ação `login`)
+- [x] Axios interceptor: attach token + 401 refresh retry
+- [x] Socket.IO com auth (JWT) — `lib/socket.ts`, conecta no `AppLayout`
+- [x] Route guard: proteger rotas privadas (`RequireAuth`/`GuestRoute`)
+- [x] Persistência de sessão (localStorage)
+- [x] Redirect baseado em role (login → `/`; preserva rota alvo via `state.from`)
+- [x] Transições de página (direcional, forward/back, `prefers-reduced-motion`) — `PageTransition`
 
 ---
 

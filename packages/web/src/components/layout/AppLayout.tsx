@@ -1,11 +1,14 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 
 import { Header } from '@/components/layout/Header'
+import { PageTransition } from '@/components/layout/PageTransition'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { NAV_SECTIONS } from '@/config/nav'
+import { connectSocket, disconnectSocket } from '@/lib/socket'
+import { useAuthStore } from '@/stores/authStore'
 import { useUiStore } from '@/stores/uiStore'
 
 export default function AppLayout() {
@@ -13,6 +16,18 @@ export default function AppLayout() {
   const collapsed = useUiStore((s) => s.collapsed)
   const toggleSidebar = useUiStore((s) => s.toggleSidebar)
   const { pathname } = useLocation()
+  const accessToken = useAuthStore((s) => s.accessToken)
+
+  useEffect(() => {
+    if (!accessToken) {
+      disconnectSocket()
+      return
+    }
+    connectSocket()
+    return () => {
+      disconnectSocket()
+    }
+  }, [accessToken])
 
   const sections = useMemo(
     () =>
@@ -33,7 +48,9 @@ export default function AppLayout() {
       <div className={`flex min-h-dvh flex-col transition-[padding] duration-200 ${collapsed ? 'pl-20' : 'pl-64'}`}>
         <Header onToggleSidebar={toggleSidebar} />
         <main className="flex-1 p-4 sm:p-6">
-          <Outlet />
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
         </main>
       </div>
     </div>

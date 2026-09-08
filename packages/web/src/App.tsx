@@ -1,10 +1,14 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
+import { GuestRoute } from '@/components/auth/GuestRoute'
+import { RequireAuth } from '@/components/auth/RequireAuth'
 import { Toaster } from '@/components/ui/Toast'
 import AppLayout from '@/components/layout/AppLayout'
 import DashboardPage from '@/pages/DashboardPage'
 import ErrorPage from '@/pages/ErrorPage'
+import ForgotPasswordPage from '@/pages/ForgotPasswordPage'
+import LoginPage from '@/pages/LoginPage'
 import PlaceholderPage from '@/pages/PlaceholderPage'
 
 const queryClient = new QueryClient({
@@ -19,8 +23,28 @@ const queryClient = new QueryClient({
 
 const router = createBrowserRouter([
   {
+    path: '/login',
+    element: (
+      <GuestRoute>
+        <LoginPage />
+      </GuestRoute>
+    ),
+  },
+  {
+    path: '/forgot-password',
+    element: (
+      <GuestRoute>
+        <ForgotPasswordPage />
+      </GuestRoute>
+    ),
+  },
+  {
     path: '/',
-    element: <AppLayout />,
+    element: (
+      <RequireAuth>
+        <AppLayout />
+      </RequireAuth>
+    ),
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <DashboardPage /> },

@@ -67,3 +67,41 @@
     color-scheme: dark;
   }
 }
+
+/* Transições de página (direcional) */
+@keyframes page-enter-forward {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes page-enter-back {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.page-enter-forward {
+  animation: page-enter-forward 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.page-enter-back {
+  animation: page-enter-back 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-forward,
+  .page-enter-back {
+    animation: none;
+  }
+}
