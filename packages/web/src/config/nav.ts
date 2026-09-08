@@ -1,11 +1,14 @@
 import {
   BookOpen,
+  Building2,
   CheckSquare,
   GitBranch,
   LayoutDashboard,
-  Settings,
   Ticket,
+  Timer,
   TrendingUp,
+  Users,
+  UsersRound,
   Wrench,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -14,6 +17,7 @@ export interface NavItem {
   labelKey: string
   href: string
   icon: LucideIcon
+  roles?: string[]
 }
 
 export interface NavSection {
@@ -45,9 +49,15 @@ export const NAV_SECTIONS: NavSection[] = [
   },
   {
     sectionKey: 'nav.reports',
+    items: [{ labelKey: 'nav.reports', href: '/reports', icon: TrendingUp }],
+  },
+  {
+    sectionKey: 'nav.admin',
     items: [
-      { labelKey: 'nav.reports', href: '/reports', icon: TrendingUp },
-      { labelKey: 'nav.admin', href: '/admin', icon: Settings },
+      { labelKey: 'nav.users', href: '/admin/users', icon: Users, roles: ['ADMIN', 'MANAGER'] },
+      { labelKey: 'nav.companies', href: '/admin/companies', icon: Building2, roles: ['ADMIN'] },
+      { labelKey: 'nav.groups', href: '/admin/groups', icon: UsersRound, roles: ['ADMIN', 'MANAGER'] },
+      { labelKey: 'nav.sla', href: '/admin/sla', icon: Timer, roles: ['ADMIN', 'MANAGER'] },
     ],
   },
 ]

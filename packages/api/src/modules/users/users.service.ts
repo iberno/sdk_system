@@ -230,6 +230,7 @@ export class UsersService {
       ...(dto.locale ? { locale: dto.locale } : {}),
       ...(dto.role ? { role: dto.role } : {}),
       ...(dto.solverGroupId !== undefined ? { solverGroupId: dto.solverGroupId } : {}),
+      ...(dto.companyId !== undefined ? { companyId: dto.companyId } : {}),
     };
 
     const user = await this.prisma.user.update({
@@ -258,12 +259,18 @@ export class UsersService {
         ...(dto.solverGroupId !== undefined && dto.solverGroupId !== existing.solverGroupId
           ? { solverGroupId: existing.solverGroupId }
           : {}),
+        ...(dto.companyId !== undefined && dto.companyId !== existing.companyId
+          ? { companyId: existing.companyId }
+          : {}),
       },
       newData: {
         ...(dto.name ? { name: dto.name } : {}),
         ...(dto.role && dto.role !== existing.role ? { role: dto.role } : {}),
         ...(dto.solverGroupId !== undefined && dto.solverGroupId !== existing.solverGroupId
           ? { solverGroupId: dto.solverGroupId }
+          : {}),
+        ...(dto.companyId !== undefined && dto.companyId !== existing.companyId
+          ? { companyId: dto.companyId }
           : {}),
       },
     });

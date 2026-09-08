@@ -17,6 +17,7 @@ export default function AppLayout() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar)
   const { pathname } = useLocation()
   const accessToken = useAuthStore((s) => s.accessToken)
+  const role = useAuthStore((s) => s.user?.role)
 
   useEffect(() => {
     if (!accessToken) {
@@ -33,13 +34,15 @@ export default function AppLayout() {
     () =>
       NAV_SECTIONS.map((section) => ({
         section: section.sectionKey ? t(section.sectionKey) : undefined,
-        items: section.items.map((item) => ({
-          label: t(item.labelKey),
-          href: item.href,
-          icon: <item.icon className="size-5" />,
-        })),
-      })),
-    [t],
+        items: section.items
+          .filter((item) => !item.roles || (role && item.roles.includes(role)))
+          .map((item) => ({
+            label: t(item.labelKey),
+            href: item.href,
+            icon: <item.icon className="size-5" />,
+          })),
+      })).filter((section) => section.items.length > 0),
+    [t, role],
   )
 
   return (

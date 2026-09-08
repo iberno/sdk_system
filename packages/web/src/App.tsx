@@ -1,8 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
 import { GuestRoute } from '@/components/auth/GuestRoute'
 import { RequireAuth } from '@/components/auth/RequireAuth'
+import { RequireRole } from '@/components/auth/RequireRole'
+import AdminLayout from '@/components/layout/AdminLayout'
 import { Toaster } from '@/components/ui/Toast'
 import AppLayout from '@/components/layout/AppLayout'
 import DashboardPage from '@/pages/DashboardPage'
@@ -13,6 +15,10 @@ import NewTicketPage from '@/pages/NewTicketPage'
 import PlaceholderPage from '@/pages/PlaceholderPage'
 import TicketDetailPage from '@/pages/TicketDetailPage'
 import TicketsPage from '@/pages/TicketsPage'
+import UsersAdminPage from '@/pages/admin/UsersAdminPage'
+import CompaniesAdminPage from '@/pages/admin/CompaniesAdminPage'
+import GroupsAdminPage from '@/pages/admin/GroupsAdminPage'
+import SlaAdminPage from '@/pages/admin/SlaAdminPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,7 +65,21 @@ const router = createBrowserRouter([
       { path: 'problems', element: <PlaceholderPage /> },
       { path: 'knowledge', element: <PlaceholderPage /> },
       { path: 'reports', element: <PlaceholderPage /> },
-      { path: 'admin', element: <PlaceholderPage /> },
+      {
+        path: 'admin',
+        element: (
+          <RequireRole roles={['ADMIN', 'MANAGER']}>
+            <AdminLayout />
+          </RequireRole>
+        ),
+        children: [
+          { index: true, element: <Navigate to="/admin/users" replace /> },
+          { path: 'users', element: <UsersAdminPage /> },
+          { path: 'companies', element: <CompaniesAdminPage /> },
+          { path: 'groups', element: <GroupsAdminPage /> },
+          { path: 'sla', element: <SlaAdminPage /> },
+        ],
+      },
     ],
   },
 ])

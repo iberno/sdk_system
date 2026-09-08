@@ -526,20 +526,20 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 
 ### 15.1 Usuários
 
-- [ ] Tabela de usuários + busca
-- [ ] Form de criação/edição
-- [ ] Alteração de role, grupo, empresa
-- [ ] Ativar/desativar
+- [x] Tabela de usuários + busca (server-side) + filtros por perfil/status
+- [x] Form de criação/edição (modal; senha só na criação; edição com regras por role)
+- [x] Alteração de role, grupo, empresa (role/grupo restrito a ADMIN; empresa corrigida no backend p/ funcionar no PUT)
+- [x] Ativar/desativar (soft, com confirmação)
 
 ### 15.2 Empresas
 
-- [ ] CRUD completo
+- [x] CRUD completo (validação de CNPJ server-side) + ativar/desativar
 
 ### 15.3 Grupos Solucionadores
 
-- [ ] CRUD completo
-- [ ] Gestão de membros (adicionar/remover agentes, mínimo 1)
-- [ ] Visualização de membros e tickets
+- [x] CRUD completo (nível, descrição, mínimo 1 agente)
+- [x] Gestão de membros (adicionar/remover agentes via substituição da lista, mínimo 1)
+- [x] Visualização de membros, contagem de agentes e tickets abertos
 
 ### 15.3b Routing Rules
 
@@ -551,8 +551,8 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 
 ### 15.4 SLA
 
-- [ ] CRUD de políticas
-- [ ] Matriz visual
+- [x] CRUD de políticas
+- [x] Matriz visual (tipo × prioridade, tempos em minutos, criação por célula vazia)
 
 ### 15.5 Approval Flows
 
