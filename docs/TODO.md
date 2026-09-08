@@ -556,8 +556,8 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 
 ### 15.5 Approval Flows
 
-- [ ] CRUD de fluxos
-- [ ] Editor visual de etapas (drag & drop de aprovadores)
+- [x] CRUD de fluxos (entidade TICKET/CHANGE; validação de etapas server-side)
+- [x] Editor visual de etapas (aprovador por papel/grupo/usuário, reordenação por setas, remover/adicionar)
 
 ### 15.6 Base de Conhecimento
 

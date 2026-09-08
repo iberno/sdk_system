@@ -51,6 +51,26 @@ export interface RoutingRule {
   targetGroup: { id: string; name: string; level: string } | null
 }
 
+export interface ApprovalStageData {
+  order: number
+  approverRole?: string
+  approverCategory?: string
+  solverGroupId?: string
+  userId?: string
+}
+
+export interface ApprovalFlow {
+  id: string
+  name: string
+  description: string | null
+  entityType: string
+  rules: { stages?: ApprovalStageData[] }
+  status: string
+  createdAt: string
+  companyId: string | null
+  company: { id: string; name: string } | null
+}
+
 export interface AuditLogEntry {
   id: string
   action: string

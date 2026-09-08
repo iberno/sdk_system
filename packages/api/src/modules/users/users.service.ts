@@ -122,6 +122,7 @@ export class UsersService {
         id: true,
         name: true,
         email: true,
+        role: true,
         department: true,
         companyId: true,
       },

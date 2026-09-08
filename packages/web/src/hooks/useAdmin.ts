@@ -7,10 +7,12 @@ import type {
   AdminGroup,
   AdminGroupDetail,
   AdminUser,
+  ApprovalFlow,
   AuditLogEntry,
   RoutingRule,
   SlaPolicy,
 } from '@/types/admin'
+import type { DirectoryUser } from '@/types/ticket'
 
 const invalidate = (queryClient: ReturnType<typeof useQueryClient>, keys: string[][]) => {
   for (const key of keys) void queryClient.invalidateQueries({ queryKey: key })
@@ -211,6 +213,63 @@ export function useReorderRoutingRules() {
     mutationFn: async (rules: { id: string; order: number }[]) =>
       (await api.post('/routing-rules/reorder', { rules })).data,
     onSuccess: () => invalidate(queryClient, [['admin', 'routing-rules']]),
+  })
+}
+
+// ---------- Approval flows ----------
+
+export function useApprovalFlows(params?: Record<string, string | undefined>) {
+  return useQuery({
+    queryKey: ['admin', 'approval-flows', params],
+    queryFn: async () => {
+      const { data: body } = await api.get<{
+        statusCode: number
+        message: string
+        data: ApprovalFlow[]
+      }>('/approval-flows', { params })
+      return body.data
+    },
+  })
+}
+
+export function useCreateApprovalFlow() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: Record<string, unknown>) =>
+      (await api.post('/approval-flows', payload)).data,
+    onSuccess: () => invalidate(queryClient, [['admin', 'approval-flows']]),
+  })
+}
+
+export function useUpdateApprovalFlow() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...payload }: { id: string } & Record<string, unknown>) =>
+      (await api.put(`/approval-flows/${id}`, payload)).data,
+    onSuccess: () => invalidate(queryClient, [['admin', 'approval-flows']]),
+  })
+}
+
+export function useUpdateApprovalFlowStatus() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) =>
+      (await api.patch(`/approval-flows/${id}/status`, { status })).data,
+    onSuccess: () => invalidate(queryClient, [['admin', 'approval-flows']]),
+  })
+}
+
+export function useApproverCandidates() {
+  return useQuery({
+    queryKey: ['users', 'directory', 'approvers'],
+    queryFn: async () => {
+      const { data: body } = await api.get<{
+        statusCode: number
+        message: string
+        data: DirectoryUser[]
+      }>('/users/directory')
+      return body.data
+    },
   })
 }
 

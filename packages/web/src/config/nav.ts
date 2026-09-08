@@ -62,6 +62,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { labelKey: 'nav.sla', href: '/admin/sla', icon: Timer, roles: ['ADMIN', 'MANAGER'] },
       { labelKey: 'nav.routingRules', href: '/admin/routing-rules', icon: Route, roles: ['ADMIN', 'MANAGER'] },
       { labelKey: 'nav.audit', href: '/admin/audit', icon: ScrollText, roles: ['ADMIN', 'MANAGER'] },
+      { labelKey: 'nav.approvalFlows', href: '/admin/approval-flows', icon: CheckSquare, roles: ['ADMIN', 'MANAGER'] },
     ],
   },
 ]

@@ -153,6 +153,7 @@ export interface DirectoryUser {
   id: string
   name: string
   email: string
+  role: string
   department: string | null
   companyId: string | null
 }
