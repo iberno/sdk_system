@@ -380,18 +380,18 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 10.1 Unit Tests
 
-- [ ] Testes para `AuthService`
-- [ ] Testes para `TicketService`
-- [ ] Testes para `SLAService`
-- [ ] Testes para `ApprovalService`
-- [ ] Testes para guards e decorators
+- [x] Testes para `AuthService`
+- [x] Testes para `TicketService`
+- [x] Testes para `SLAService`
+- [x] Testes para `ApprovalService`
+- [x] Testes para guards e decorators
 
 ### 10.2 E2E Tests
 
-- [ ] Fluxo de autenticação
-- [ ] CRUD de tickets
-- [ ] Fluxo de aprovação completo
-- [ ] Escala de grupos solucionadores
+- [x] Fluxo de autenticação
+- [x] CRUD de tickets
+- [x] Fluxo de aprovação completo
+- [x] Escala de grupos solucionadores
 
 ---
 
