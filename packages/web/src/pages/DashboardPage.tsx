@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  ArrowDownRight,
-  ArrowUpRight,
   CheckCircle2,
+  ClipboardList,
   Clock,
   Inbox,
   ListFilter,
@@ -12,17 +11,24 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
+import { useTickets } from '@/hooks/useTickets'
 import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
 import type { BadgeTone } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { Table } from '@/components/ui/Table'
 import type { Column, SortDirection } from '@/components/ui/Table'
+import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
+import type { TicketListItem } from '@/types/ticket'
 
 const STATUS_TONE: Record<string, BadgeTone> = {
   OPEN: 'info',
   IN_PROGRESS: 'warning',
+  PENDING: 'neutral',
+  WAITING_USER: 'info',
   WAITING_APPROVAL: 'primary',
   RESOLVED: 'success',
   CLOSED: 'neutral',
@@ -35,62 +41,81 @@ const PRIORITY_TONE: Record<string, BadgeTone> = {
   CRITICAL: 'error',
 }
 
-interface TicketRow {
-  id: string
-  number: string
-  title: string
-  type: string
-  status: string
-  priority: string
-  requester: { name: string; initials: string }
-  createdAt: string
+const TYPE_TONE: Record<string, BadgeTone> = {
+  INCIDENT: 'warning',
+  SERVICE_REQUEST: 'primary',
+  CHANGE_REQUEST: 'info',
+  PROBLEM: 'neutral',
 }
 
-const TICKETS: TicketRow[] = [
-  { id: '1', number: 'SD-2026-000067', title: 'Acesso ao VPN recusado após reset', type: 'INCIDENT', status: 'OPEN', priority: 'HIGH', requester: { name: 'Gustavo Lima', initials: 'GL' }, createdAt: '2026-09-08T09:12:00' },
-  { id: '2', number: 'SD-2026-000065', title: 'Solicitação de novo notebook', type: 'SERVICE_REQUEST', status: 'WAITING_APPROVAL', priority: 'MEDIUM', requester: { name: 'Ana Souza', initials: 'AS' }, createdAt: '2026-09-07T15:40:00' },
-  { id: '3', number: 'SD-2026-000064', title: 'Email corporativo sem sincronizar', type: 'INCIDENT', status: 'IN_PROGRESS', priority: 'MEDIUM', requester: { name: 'Bruno Costa', initials: 'BC' }, createdAt: '2026-09-07T11:05:00' },
-  { id: '4', number: 'SD-2026-000061', title: 'Notebook com lentidão extrema', type: 'INCIDENT', status: 'IN_PROGRESS', priority: 'CRITICAL', requester: { name: 'Mariana Pires', initials: 'MP' }, createdAt: '2026-09-06T18:22:00' },
-  { id: '5', number: 'SD-2026-000058', title: 'Instalação do pacote Office', type: 'SERVICE_REQUEST', status: 'RESOLVED', priority: 'LOW', requester: { name: 'Carlos Dias', initials: 'CD' }, createdAt: '2026-09-05T14:03:00' },
-  { id: '6', number: 'SD-2026-000055', title: 'Falha ao imprimir em rede', type: 'INCIDENT', status: 'CLOSED', priority: 'LOW', requester: { name: 'Fernanda Reis', initials: 'FR' }, createdAt: '2026-09-04T10:31:00' },
-]
+const PRIORITY_ORDER = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] as const
+const STATUS_ORDER = [
+  'OPEN',
+  'IN_PROGRESS',
+  'PENDING',
+  'WAITING_USER',
+  'WAITING_APPROVAL',
+  'RESOLVED',
+  'CLOSED',
+] as const
 
-const WEEK_BARS = [38, 52, 44, 67, 58, 80, 72]
+const CLOSED_STATES = new Set(['CLOSED', 'RESOLVED'])
+const WAITING_STATES = new Set(['WAITING_APPROVAL', 'WAITING_USER', 'PENDING'])
 
-const WEEK_LABELS = WEEK_BARS.map((_, index) =>
-  new Intl.DateTimeFormat('pt-BR', { weekday: 'short' })
-    .format(new Date(Date.now() - (WEEK_BARS.length - 1 - index) * 86_400_000))
-    .replace('.', ''),
-)
+const isOpen = (status: string) => !CLOSED_STATES.has(status)
 
-const PRIORITY_DIST = [
-  { label: 'CRITICAL', value: 4, tone: 'error' },
-  { label: 'HIGH', value: 11, tone: 'warning' },
-  { label: 'MEDIUM', value: 22, tone: 'info' },
-  { label: 'LOW', value: 9, tone: 'neutral' },
-]
+interface Stats {
+  total: number
+  open: number
+  inProgress: number
+  waiting: number
+  resolved: number
+  closed: number
+  breached: number
+  slaPct: number
+  byPriority: { label: string; value: number }[]
+  byStatus: { label: string; value: number }[]
+}
+
+function computeStats(tickets: TicketListItem[]): Stats {
+  const openTickets = tickets.filter((t) => isOpen(t.status))
+  const breached = openTickets.filter((t) => t.slaBreached)
+  const byPriority = PRIORITY_ORDER.map((label) => ({
+    label,
+    value: openTickets.filter((t) => t.priority === label).length,
+  })).filter((item) => item.value > 0)
+  const byStatus = STATUS_ORDER.map((label) => ({
+    label,
+    value: tickets.filter((t) => t.status === label).length,
+  })).filter((item) => item.value > 0)
+  return {
+    total: tickets.length,
+    open: openTickets.length,
+    inProgress: tickets.filter((t) => t.status === 'IN_PROGRESS').length,
+    waiting: tickets.filter((t) => WAITING_STATES.has(t.status)).length,
+    resolved: tickets.filter((t) => CLOSED_STATES.has(t.status)).length,
+    closed: tickets.filter((t) => t.status === 'CLOSED').length,
+    breached: breached.length,
+    slaPct: openTickets.length
+      ? Math.round(((openTickets.length - breached.length) / openTickets.length) * 100)
+      : 100,
+    byPriority,
+    byStatus,
+  }
+}
 
 interface Metric {
   label: string
   value: string | number
   icon: LucideIcon
   iconClass: string
-  delta: string
-  trend: 'up' | 'down'
+  subtitle: string
 }
 
-const METRICS: Metric[] = [
-  { label: 'Tickets abertos', value: 28, icon: Inbox, iconClass: 'bg-primary/10 text-primary', delta: '+12% vs semana', trend: 'up' },
-  { label: 'Em andamento', value: 11, icon: Clock, iconClass: 'bg-amber-500/10 text-warning', delta: '+3 nesta semana', trend: 'up' },
-  { label: 'Resolvidos', value: 46, icon: CheckCircle2, iconClass: 'bg-emerald-500/10 text-success', delta: '+18% vs mês', trend: 'up' },
-  { label: 'Tempo médio (SLA)', value: '1h 24m', icon: Timer, iconClass: 'bg-sky-500/10 text-info', delta: '-8% vs mês', trend: 'down' },
-]
-
 function MetricCard({ metric }: { metric: Metric }) {
-  const { t } = useTranslation()
   const Icon = metric.icon
   return (
-    <Card className="group relative overflow-hidden">
+    <Card>
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-2.5">
           <span className="text-xs font-medium text-bodystroke">{metric.label}</span>
@@ -102,29 +127,21 @@ function MetricCard({ metric }: { metric: Metric }) {
           <Icon className="size-4.5" />
         </div>
       </div>
-      <div className="mt-4 flex items-center gap-1.5 text-xs">
-        <span
-          className={cn(
-            'inline-flex items-center gap-0.5 font-medium',
-            metric.trend === 'up' ? 'text-success' : 'text-error',
-          )}
-        >
-          {metric.trend === 'up' ? (
-            <ArrowUpRight className="size-3.5" />
-          ) : (
-            <ArrowDownRight className="size-3.5" />
-          )}
-          {metric.delta}
-        </span>
-        <span className="text-bodystroke">{t('nav.dashboard')}</span>
-      </div>
+      <p className="mt-4 text-xs text-bodystroke">{metric.subtitle}</p>
     </Card>
   )
 }
 
-const TYPE_TONE: Record<string, BadgeTone> = {
-  INCIDENT: 'warning',
-  SERVICE_REQUEST: 'primary',
+function MetricSkeleton() {
+  return (
+    <Card>
+      <div className="flex flex-col gap-2.5">
+        <Skeleton className="h-3.5 w-24" />
+        <Skeleton className="h-8 w-16" />
+      </div>
+      <Skeleton className="mt-4 h-3 w-28" />
+    </Card>
+  )
 }
 
 export default function DashboardPage() {
@@ -132,15 +149,22 @@ export default function DashboardPage() {
   const [sortBy, setSortBy] = useState<string | null>('createdAt')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
+  const { data, isLoading, isError, refetch } = useTickets({ pageSize: 100 })
+
+  const tickets = useMemo(() => data?.items ?? [], [data])
+  const stats = useMemo(() => computeStats(tickets), [tickets])
+
   const sorted = useMemo(() => {
-    if (!sortBy) return TICKETS
-    return [...TICKETS].sort((a, b) => {
-      const aV = a[sortBy as keyof TicketRow] as string
-      const bV = b[sortBy as keyof TicketRow] as string
+    const next = [...tickets]
+    next.sort((a, b) => {
+      if (!sortBy) return b.createdAt.localeCompare(a.createdAt)
+      const aV = String(a[sortBy as keyof TicketListItem] ?? '')
+      const bV = String(b[sortBy as keyof TicketListItem] ?? '')
       const result = aV.localeCompare(bV)
       return sortDirection === 'asc' ? result : -result
     })
-  }, [sortBy, sortDirection])
+    return next.slice(0, 8)
+  }, [tickets, sortBy, sortDirection])
 
   const handleSort = (key: string) => {
     if (key === sortBy) {
@@ -154,24 +178,22 @@ export default function DashboardPage() {
   const formatDate = (iso: string) =>
     new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit' }).format(new Date(iso))
 
-  const columns: Array<Column<TicketRow>> = [
+  const columns: Array<Column<TicketListItem>> = [
     {
-      key: 'number',
+      key: 'ticketNumber',
       header: t('nav.tickets'),
       sortable: true,
       render: (row) => (
         <div className="flex flex-col">
           <span className="font-medium text-graydark dark:text-white">{row.title}</span>
-          <span className="text-xs tabular-nums text-bodystroke">{row.number}</span>
+          <span className="text-xs tabular-nums text-bodystroke">{row.ticketNumber}</span>
         </div>
       ),
     },
     {
       key: 'type',
-      header: 'Tipo',
-      render: (row) => (
-        <Badge tone={TYPE_TONE[row.type]}>{t(`domain.type.${row.type}`)}</Badge>
-      ),
+      header: t('dashboard.type'),
+      render: (row) => <Badge tone={TYPE_TONE[row.type]}>{t(`domain.type.${row.type}`)}</Badge>,
     },
     {
       key: 'status',
@@ -185,7 +207,7 @@ export default function DashboardPage() {
     },
     {
       key: 'priority',
-      header: 'Prioridade',
+      header: t('dashboard.priority'),
       sortable: true,
       render: (row) => (
         <Badge tone={PRIORITY_TONE[row.priority]}>{t(`domain.priority.${row.priority}`)}</Badge>
@@ -193,17 +215,20 @@ export default function DashboardPage() {
     },
     {
       key: 'requester',
-      header: 'Solicitante',
-      render: (row) => (
-        <div className="flex items-center gap-2.5">
-          <Avatar name={row.requester.name} size="sm" />
-          <span className="text-sm text-body dark:text-bodydark">{row.requester.name}</span>
-        </div>
-      ),
+      header: t('dashboard.requester'),
+      render: (row) =>
+        row.requester ? (
+          <div className="flex items-center gap-2.5">
+            <Avatar name={row.requester.name} size="sm" />
+            <span className="text-sm text-body dark:text-bodydark">{row.requester.name}</span>
+          </div>
+        ) : (
+          <span className="text-bodystroke">—</span>
+        ),
     },
     {
       key: 'createdAt',
-      header: 'Criado',
+      header: t('dashboard.created'),
       align: 'right',
       sortable: true,
       render: (row) => (
@@ -212,7 +237,41 @@ export default function DashboardPage() {
     },
   ]
 
-  const maxPriorities = Math.max(...PRIORITY_DIST.map((p) => p.value))
+  const metrics: Metric[] = [
+    {
+      label: t('dashboard.open'),
+      value: stats.open,
+      icon: Inbox,
+      iconClass: 'bg-primary/10 text-primary',
+      subtitle: t('dashboard.total', { count: stats.total }),
+    },
+    {
+      label: t('dashboard.inProgress'),
+      value: stats.inProgress,
+      icon: Clock,
+      iconClass: 'bg-amber-500/10 text-warning',
+      subtitle: t('dashboard.waiting', { count: stats.waiting }),
+    },
+    {
+      label: t('dashboard.resolved'),
+      value: stats.resolved,
+      icon: CheckCircle2,
+      iconClass: 'bg-emerald-500/10 text-success',
+      subtitle: t('dashboard.closed', { count: stats.closed }),
+    },
+    {
+      label: t('dashboard.slaLabel'),
+      value: `${stats.slaPct}%`,
+      icon: Timer,
+      iconClass: 'bg-sky-500/10 text-info',
+      subtitle: stats.breached
+        ? t('dashboard.breach', { count: stats.breached })
+        : t('dashboard.noBreach'),
+    },
+  ]
+
+  const maxPriority = Math.max(1, ...stats.byPriority.map((p) => p.value))
+  const maxStatus = Math.max(1, ...stats.byStatus.map((s) => s.value))
 
   return (
     <div className="flex flex-col gap-5">
@@ -225,68 +284,111 @@ export default function DashboardPage() {
             {t('nav.dashboard')} · {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full' }).format(new Date())}
           </p>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3.5 py-2">
-          <TrendingUp className="size-4 text-primary" />
-          <span className="text-sm font-medium text-primary">SLA 96,2%</span>
-        </div>
+        {isLoading ? (
+          <Skeleton className="h-9 w-32 rounded-lg" />
+        ) : (
+          <div
+            className={cn(
+              'inline-flex items-center gap-2 rounded-lg border px-3.5 py-2',
+              stats.breached > 0
+                ? 'border-warning/30 bg-warning/10'
+                : 'border-primary/20 bg-primary/5',
+            )}
+          >
+            <TrendingUp
+              className={cn('size-4', stats.breached > 0 ? 'text-warning' : 'text-primary')}
+            />
+            <span
+              className={cn(
+                'text-sm font-medium tabular-nums',
+                stats.breached > 0 ? 'text-warning' : 'text-primary',
+              )}
+            >
+              {t('dashboard.sla')} {stats.slaPct}%
+            </span>
+          </div>
+        )}
       </div>
 
+      {isError && (
+        <Card>
+          <EmptyState
+            icon={<ClipboardList className="size-6 text-error" />}
+            title={t('common.error')}
+            description={t('dashboard.loadError')}
+            action={
+              <Button variant="secondary" onClick={() => void refetch()}>
+                {t('common.retry')}
+              </Button>
+            }
+          />
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {METRICS.map((metric) => (
-          <MetricCard key={metric.label} metric={metric} />
-        ))}
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, index) => <MetricSkeleton key={index} />)
+          : metrics.map((metric) => <MetricCard key={metric.label} metric={metric} />)}
       </div>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <Card
-          title="Tickets recentes"
-          subtitle={`${sorted.length} registros`}
+          title={t('dashboard.recent')}
+          subtitle={t('dashboard.records', { count: stats.total })}
           actions={
             <button
               type="button"
               className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
             >
               <ListFilter className="size-3.5" />
-              Filtrar
+              {t('dashboard.filter')}
             </button>
           }
           className="xl:col-span-2"
           bodyClassName="px-0 pb-0"
         >
-          <Table<TicketRow>
+          <Table<TicketListItem>
             columns={columns}
-            rows={sorted}
+            rows={isLoading ? [] : sorted}
             keyFor={(row) => row.id}
             sortBy={sortBy}
             sortDirection={sortDirection}
             onSort={handleSort}
+            loading={isLoading}
+            empty={t('common.empty')}
           />
         </Card>
 
         <div className="flex flex-col gap-5">
           <Card
-            title="Prioridades"
-            subtitle="Tickets abertos por severidade"
+            title={t('dashboard.priorities')}
+            subtitle={t('dashboard.prioritiesSub')}
             bodyClassName="flex flex-col gap-3.5"
           >
-            {PRIORITY_DIST.map((item) => (
-              <ProgressRow key={item.label} label={item.label} value={item.value} max={maxPriorities} tone={item.tone} />
+            {stats.byPriority.map((item) => (
+              <ProgressRow
+                key={item.label}
+                label={t(`domain.priority.${item.label}`)}
+                value={item.value}
+                max={maxPriority}
+                tone={PRIORITY_TONE[item.label] ?? 'neutral'}
+              />
             ))}
           </Card>
 
-          <Card title="Atividade da semana" subtitle="Tickets criados por dia" bodyClassName="flex items-end gap-2">
-            {WEEK_BARS.map((height, index) => (
-              <div key={index} className="flex flex-1 flex-col items-center gap-1.5">
-                <div
-                  className={cn(
-                    'w-full rounded-md bg-gradient-to-t from-primary to-primary-light transition-all hover:from-primary-dark',
-                    index === WEEK_BARS.length - 1 && 'from-primary-dark to-accent ring-1 ring-primary/40',
-                  )}
-                  style={{ height: `${height}px` }}
-                  title={`${height} tickets`}
-                />
-                <span className="text-[10px] tabular-nums text-bodystroke">{WEEK_LABELS[index]}</span>
-              </div>
+          <Card
+            title={t('dashboard.statusDist')}
+            subtitle={t('dashboard.records', { count: stats.total })}
+            bodyClassName="flex flex-col gap-3.5"
+          >
+            {stats.byStatus.map((item) => (
+              <ProgressRow
+                key={item.label}
+                label={t(`domain.status.${item.label}`)}
+                value={item.value}
+                max={maxStatus}
+                tone={STATUS_TONE[item.label] ?? 'neutral'}
+              />
             ))}
           </Card>
         </div>
@@ -303,18 +405,19 @@ interface ProgressRowProps {
 }
 
 function ProgressRow({ label, value, max, tone }: ProgressRowProps) {
-  const { t } = useTranslation()
   const percentage = Math.round((value / max) * 100)
   const barTone: Record<string, string> = {
     error: 'bg-error',
     warning: 'bg-warning',
     info: 'bg-info',
     neutral: 'bg-bodystroke',
+    success: 'bg-success',
+    primary: 'bg-primary',
   }
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between text-xs">
-        <span className="font-medium text-graydark dark:text-white">{t(`domain.priority.${label}`)}</span>
+        <span className="font-medium text-graydark dark:text-white">{label}</span>
         <span className="tabular-nums text-bodystroke">{value}</span>
       </div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-stroke/80 dark:bg-strokedark">

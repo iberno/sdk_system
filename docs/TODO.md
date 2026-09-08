@@ -457,14 +457,17 @@ são pendentes. **`[x]`** são concluídos.
 
 ## FASE 13 - Frontend: Dashboard
 
-- [ ] Cards de KPI (abertos, em progresso, resolvidos, SLA)
+Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dados reais do seed:
+
+- [x] Cards de KPI (abertos, em progresso, resolvidos, SLA) — computados dos tickets reais
 - [ ] Gráfico de tendência (últimos 30 dias)
-- [ ] Distribuição por prioridade (pie)
-- [ ] Distribuição por status (bar)
+- [ ] Distribuição por prioridade (pie) — atual: progress bars por severidade
+- [x] Distribuição por status (bar)
 - [ ] Distribuição por grupo (bar)
-- [ ] Lista de tickets recentes
-- [ ] Alertas SLA breach
-- [ ] Responsivo
+- [x] Lista de tickets recentes (8 recentes, sorting client-side)
+- [x] Alertas SLA breach (chip no topo + KPI com contagem)
+- [x] Responsivo
+- [x] Estados de loading (skeleton), erro (retry) e vazio
 
 ---
 
