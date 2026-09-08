@@ -399,42 +399,43 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 11.1 Scaffolding
 
-- [ ] Criar `packages/web` com Vite + React + TypeScript
-- [ ] Instalar: tailwindcss v4, postcss, autoprefixer
-- [ ] Instalar: react-router-dom, @tanstack/react-query, zustand
-- [ ] Instalar: axios, socket.io-client, lucide-react
-- [ ] **i18n:** instalar i18next, react-i18next
-- [ ] **i18n:** bundles `src/i18n/{pt-BR,en,es}` (UI + nomes de status/prioridade)
-- [ ] **i18n:** provider `I18nextProvider` + persistência localStorage
-- [ ] **i18n:** seletor de idioma no Header + sync com `User.locale`
-- [ ] Configurar `vite.config.ts` (proxy para API)
-- [ ] Configurar `tailwind.config.ts`
-- [ ] Configurar TypeScript paths
+- [x] Criar `packages/web` com Vite + React + TypeScript  → Vite 8, React 19, TS 6
+- [x] Instalar: tailwindcss v4 (+ plugin oficial `@tailwindcss/vite`; `postcss/autoprefixer` dispensáveis na v4)
+- [x] Instalar: react-router-dom, @tanstack/react-query, zustand
+- [x] Instalar: axios, socket.io-client, lucide-react
+- [x] **i18n:** instalar i18next, react-i18next
+- [x] **i18n:** bundles `src/i18n/{pt-BR,en,es}` (UI + nomes de status/prioridade)
+- [x] **i18n:** provider `I18nextProvider` + persistência localStorage
+- [x] **i18n:** seletor de idioma no Header + sync com `User.locale`
+- [x] Configurar `vite.config.ts` (proxy para API + socket.io via ws)
+- [x] Configurar `tailwind.config.ts` (v4, carregado via `@config`)
+- [x] Configurar TypeScript paths (`@/*`)
 
 ### 11.2 Estrutura Base (padrão TailAdmin)
 
-- [ ] Criar layout: `Sidebar + Header + MainContent`
-- [ ] Sidebar colapsável
-- [ ] Dark/Light mode
-- [ ] Página de Loading (splash)
-- [ ] Página de Erro
+- [x] Criar layout: `Sidebar + Header + MainContent`
+- [x] Sidebar colapsável
+- [x] Dark/Light mode (classe `.dark`, persistido)
+- [x] Página de Loading (splash)
+- [x] Página de Erro
 
 ### 11.3 Design System - Componentes Globais
 
-- [ ] `Button` (variants: primary, secondary, danger, ghost)
-- [ ] `Card`
-- [ ] `Badge` (variants: status colors)
-- [ ] `Input`, `Select`, `Textarea`
-- [ ] `Table` (com paginação, sorting)
-- [ ] `Modal`
-- [ ] `Dropdown`
-- [ ] `Toast` (notificações)
-- [ ] `ConfirmDialog`
-- [ ] `EmptyState`
-- [ ] `Skeleton`
-- [ ] `Tabs`
-- [ ] `Avatar`
-- [ ] `FormField` (label + erro + input)
+- [x] `Button` (variants: primary, secondary, danger, ghost)
+- [x] `Card`
+- [x] `Badge` (variants: status colors)
+- [x] `Input`, `Select`, `Textarea`
+- [x] `SearchableSelect` (busca com teclado, filtro sem acento, clearable)  ← adicionado a pedido
+- [x] `Table` (com paginação, sorting)
+- [x] `Modal`
+- [x] `Dropdown`
+- [x] `Toast` (notificações)
+- [x] `ConfirmDialog`
+- [x] `EmptyState`
+- [x] `Skeleton`
+- [x] `Tabs`
+- [x] `Avatar`
+- [x] `FormField` (label + erro + input)
 
 **Referência:** ADR-010
 

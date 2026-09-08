@@ -1,0 +1,52 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+/* Dark mode por classe (TailAdmin) */
+@custom-variant dark (&:is(.dark *));
+
+/* Tokens do tema (padrão TailAdmin) */
+@theme {
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  --color-primary: #4650ea;
+  --color-primary-dark: #3540d6;
+  --color-primary-light: #eef2ff;
+
+  --color-body: #637381;
+  --color-bodydark: #aeb7c0;
+  --color-bodystroke: #c3cad3;
+
+  --color-white: #ffffff;
+  --color-whiten: #f1f5f9;
+  --color-graylight: #f9fafb;
+  --color-graydark: #333a48;
+
+  --color-boxdark: #24303f;
+  --color-boxdark-2: #1a222c;
+  --color-stroke: #e2e8f0;
+  --color-strokedark: #2e3a47;
+
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #0ea5e9;
+
+  --shadow-card: 0px 1px 3px 0px rgba(0, 0, 0, 0.08);
+  --shadow-dropdown: 0px 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+@layer base {
+  * {
+    @apply border-stroke dark:border-strokedark;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-whiten text-body dark:bg-boxdark-2 dark:text-bodydark;
+  }
+}
