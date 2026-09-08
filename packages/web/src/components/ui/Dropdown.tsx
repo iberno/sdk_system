@@ -32,7 +32,7 @@ export function Dropdown({ trigger, children, align = 'right', className }: Drop
       {open && (
         <div
           className={cn(
-            'absolute z-40 mt-2 min-w-44 overflow-hidden rounded-lg border border-stroke bg-white py-1 shadow-dropdown dark:border-strokedark dark:bg-boxdark',
+            'absolute z-40 mt-2 min-w-44 overflow-hidden rounded-lg border border-stroke bg-white py-1 shadow-dropdown dark:border-strokedark dark:bg-boxdark-3',
             align === 'right' ? 'right-0' : 'left-0',
             className,
           )}

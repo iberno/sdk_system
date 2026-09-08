@@ -87,8 +87,8 @@ export function SearchableSelect({
       <div
         className={cn(
           'flex items-center gap-2 rounded-lg border border-stroke bg-graylight px-3.5 py-2.5',
-          'focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20',
-          'dark:border-strokedark dark:bg-boxdark',
+          'transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20',
+          'dark:border-strokedark dark:bg-boxdark-3',
           invalid && 'border-error focus-within:border-error focus-within:ring-error/20',
           disabled && 'cursor-not-allowed opacity-60',
         )}
@@ -134,7 +134,7 @@ export function SearchableSelect({
       {open && (
         <ul
           role="listbox"
-          className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-stroke bg-white py-1 shadow-dropdown dark:border-strokedark dark:bg-boxdark"
+          className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-stroke bg-white py-1 shadow-dropdown dark:border-strokedark dark:bg-boxdark-3"
         >
           {filtered.length === 0 && (
             <li className="px-3.5 py-2 text-sm text-bodystroke">

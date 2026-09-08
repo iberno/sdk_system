@@ -35,7 +35,7 @@ export function LanguageSelector() {
   return (
     <Dropdown
       trigger={
-        <span className="flex items-center gap-2 rounded-lg p-2 text-bodydark hover:bg-graylight hover:text-graydark dark:hover:bg-boxdark">
+        <span className="flex items-center gap-2 rounded-lg p-2 text-bodydark hover:bg-graylight hover:text-graydark dark:hover:bg-boxdark-2">
           <Globe className="size-5" />
         </span>
       }

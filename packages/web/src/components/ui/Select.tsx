@@ -15,8 +15,9 @@ export function Select({ invalid = false, className, options, children, ...props
       <select
         className={cn(
           'w-full appearance-none rounded-lg border border-stroke bg-graylight px-3.5 py-2.5 pr-9 text-sm text-graydark outline-none',
-          'focus:border-primary focus:ring-2 focus:ring-primary/20',
-          'dark:border-strokedark dark:bg-boxdark dark:text-white',
+          'transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20',
+          'disabled:cursor-not-allowed disabled:opacity-60',
+          'dark:border-strokedark dark:bg-boxdark-3 dark:text-white',
           invalid && 'border-error focus:border-error focus:ring-error/20',
           className,
         )}
