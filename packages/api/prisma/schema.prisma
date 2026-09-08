@@ -169,6 +169,7 @@ model SolverGroup {
   users        User[]
   tickets      Ticket[]
   routingRules RoutingRule[]
+  changes      Change[]
 }
 
 model User {
@@ -313,12 +314,14 @@ model Problem {
   workaround  String?
   solution    String?
   companyId   String
+  proposedChangeId String?    @unique
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   resolvedAt  DateTime?
 
-  company Company?        @relation(fields: [companyId], references: [id])
-  tickets ProblemTicket[]
+  company       Company?       @relation(fields: [companyId], references: [id])
+  tickets       ProblemTicket[]
+  proposedChange Change?       @relation("ProblemProposal", fields: [proposedChangeId], references: [id])
 }
 
 model ProblemTicket {
@@ -350,13 +353,16 @@ model Change {
   scheduledAt   DateTime?
   companyId     String
   requesterId   String
+  solverGroupId String?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 
-  company   Company?       @relation(fields: [companyId], references: [id])
-  requester User           @relation("ChangeRequester", fields: [requesterId], references: [id])
-  approvals Approval[]
-  tickets   ChangeTicket[]
+  company       Company?       @relation(fields: [companyId], references: [id])
+  requester     User           @relation("ChangeRequester", fields: [requesterId], references: [id])
+  solverGroup   SolverGroup?   @relation(fields: [solverGroupId], references: [id])
+  approvals     Approval[]
+  tickets       ChangeTicket[]
+  problemProposal Problem?     @relation("ProblemProposal")
 }
 
 model ChangeTicket {

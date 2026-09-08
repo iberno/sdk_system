@@ -37,5 +37,13 @@
   "approval_in_approval": "This record is already awaiting approval",
   "approval_entity_closed": "The entity is closed and cannot be submitted for approval",
   "approval_entity_mismatch": "The given flow is not of type TICKET",
-  "approval_stage_prior_pending": "Prior stage pending: approve stage {order} first"
+  "approval_stage_prior_pending": "Prior stage pending: approve stage {order} first",
+  "company_required": "User is not linked to a company",
+  "ticket_link_invalid": "Invalid ticket or from another company",
+  "change_submit_status": "Only DRAFT changes can be submitted for approval",
+  "change_execute_status": "The change must be APPROVED or SCHEDULED to be executed",
+  "change_rollback_status": "Only IN_PROGRESS changes can be rolled back",
+  "problem_has_proposal": "This problem already has a proposed change",
+  "change_locked": "Change in {status} cannot be edited",
+  "group_invalid": "Invalid solver group for the company"
 }

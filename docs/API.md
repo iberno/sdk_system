@@ -684,6 +684,7 @@ Exporta CSV/Excel com filtros atuais.
 | PUT | `/problems/:id` | Atualiza |
 | POST | `/problems/:id/link-ticket` | Vincula ticket |
 | DELETE | `/problems/:id/unlink-ticket` | Desvincula ticket |
+| POST | `/problems/:id/propose-change` | Cria proposta de mudança a partir do problema |
 
 **Request POST:**
 ```json
@@ -708,6 +709,7 @@ Exporta CSV/Excel com filtros atuais.
 | PUT | `/changes/:id` | Atualiza |
 | POST | `/changes/:id/submit` | Envia para aprovação |
 | POST | `/changes/:id/execute` | Executa mudança |
+| POST | `/changes/:id/complete` | Conclui mudança (`IN_PROGRESS -> COMPLETED`) |
 | POST | `/changes/:id/rollback` | Executa rollback |
 | POST | `/changes/:id/link-ticket` | Vincula ticket |
 

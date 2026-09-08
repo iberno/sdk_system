@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import {
   ApprovalStatus,
+  ChangeStatus,
   Priority,
   Prisma,
   Status,
@@ -151,6 +152,82 @@ export class ApprovalsService {
     };
   }
 
+  async requestForChange(flowId: string, changeId: string) {
+    const flow = await this.prisma.approvalFlow.findUnique({ where: { id: flowId } });
+    if (!flow) {
+      throw new UnprocessableEntityException({
+        key: 'business.approval_flow_invalid',
+        error: 'UnprocessableEntity',
+      });
+    }
+    if (flow.status !== Status.ACTIVE) {
+      throw new UnprocessableEntityException({
+        key: 'business.approval_flow_inactive',
+        error: 'UnprocessableEntity',
+      });
+    }
+    if (flow.entityType !== 'CHANGE') {
+      throw new UnprocessableEntityException({
+        key: 'business.approval_entity_mismatch',
+        error: 'UnprocessableEntity',
+      });
+    }
+
+    const change = await this.prisma.change.findUnique({ where: { id: changeId } });
+    if (!change) {
+      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+    }
+    if (flow.companyId !== change.companyId) {
+      throw new UnprocessableEntityException({
+        key: 'business.approval_flow_company',
+        error: 'UnprocessableEntity',
+      });
+    }
+    if (change.status === 'COMPLETED' || change.status === 'ROLLED_BACK') {
+      throw new UnprocessableEntityException({
+        key: 'business.approval_entity_closed',
+        error: 'UnprocessableEntity',
+      });
+    }
+    const inFlight = await this.prisma.approval.findFirst({
+      where: { changeId, status: 'PENDING' },
+    });
+    if (inFlight) {
+      throw new UnprocessableEntityException({
+        key: 'business.approval_in_approval',
+        error: 'UnprocessableEntity',
+      });
+    }
+
+    const stages = await this.resolveStages(flow.rules, change.companyId);
+    const prevStatus = change.status;
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.change.update({
+        where: { id: changeId },
+        data: { status: ChangeStatus.PENDING_APPROVAL },
+      });
+      await tx.approval.createMany({
+        data: stages.map((stage) => ({
+          changeId,
+          flowId: flow.id,
+          approverId: stage.approverId,
+          order: stage.order,
+          status: ApprovalStatus.PENDING,
+          prevStatus,
+        })),
+      });
+    });
+
+    return {
+      changeId,
+      flowName: flow.name,
+      status: ChangeStatus.PENDING_APPROVAL,
+      stages: stages.map((s) => ({ order: s.order, approverId: s.approverId })),
+      prevStatus,
+    };
+  }
+
   private async decide(
     id: string,
     result: ApprovalStatus,
@@ -194,6 +271,19 @@ export class ApprovalsService {
         });
       }
     }
+    if (result === ApprovalStatus.APPROVED && approval.changeId) {
+      const priorPending = await this.prisma.approval.findFirst({
+        where: { changeId: approval.changeId, status: 'PENDING', order: { lt: approval.order } },
+        select: { order: true },
+      });
+      if (priorPending) {
+        throw new UnprocessableEntityException({
+          key: 'business.approval_stage_prior_pending',
+          error: 'UnprocessableEntity',
+          args: { order: priorPending.order },
+        });
+      }
+    }
 
     const updated = await this.prisma.$transaction(async (tx) => {
       const row = await tx.approval.update({
@@ -201,7 +291,13 @@ export class ApprovalsService {
         data: { status: result, comment },
       });
 
-      if (approval.ticketId) {
+      if (approval.changeId) {
+        if (result === ApprovalStatus.APPROVED) {
+          await this.afterChangeApproved(tx, approval.changeId, row.comment);
+        } else {
+          await this.afterChangeRejected(tx, approval.changeId, row.comment);
+        }
+      } else if (approval.ticketId) {
         if (result === ApprovalStatus.APPROVED) {
           await this.afterTicketApproved(tx, approval.ticketId, actor.sub);
         } else {
@@ -229,6 +325,38 @@ export class ApprovalsService {
       decision: result === ApprovalStatus.APPROVED ? 'approved' : 'rejected',
       comment: updated.comment,
     };
+  }
+
+  private async afterChangeApproved(tx: Tx, changeId: string, _comment: string | null) {
+    const remaining = await tx.approval.count({
+      where: { changeId, status: 'PENDING' },
+    });
+    if (remaining > 0) return;
+
+    const change = await tx.change.findUnique({ where: { id: changeId } });
+    if (!change || change.status !== ChangeStatus.PENDING_APPROVAL) return;
+
+    const next =
+      change.scheduledAt != null
+        ? ChangeStatus.SCHEDULED
+        : ChangeStatus.APPROVED;
+    await tx.change.update({
+      where: { id: changeId },
+      data: { status: next },
+    });
+  }
+
+  private async afterChangeRejected(tx: Tx, changeId: string, _comment: string | null) {
+    await tx.approval.updateMany({
+      where: { changeId, status: 'PENDING' },
+      data: { status: ApprovalStatus.REJECTED },
+    });
+    const change = await tx.change.findUnique({ where: { id: changeId } });
+    if (!change || change.status !== ChangeStatus.PENDING_APPROVAL) return;
+    await tx.change.update({
+      where: { id: changeId },
+      data: { status: ChangeStatus.REJECTED },
+    });
   }
 
   private async afterTicketApproved(

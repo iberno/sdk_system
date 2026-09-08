@@ -29,6 +29,8 @@ import { SequenceModule } from './modules/sequence/sequence.module.js';
 import { TicketsModule } from './modules/tickets/tickets.module.js';
 import { ApprovalFlowsModule } from './modules/approval-flows/approval-flows.module.js';
 import { ApprovalsModule } from './modules/approvals/approvals.module.js';
+import { ProblemsModule } from './modules/problems/problems.module.js';
+import { ChangesModule } from './modules/changes/changes.module.js';
 import { FallbackModule } from './common/modules/fallback/fallback.module.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -47,6 +49,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     TicketsModule,
     ApprovalFlowsModule,
     ApprovalsModule,
+    ProblemsModule,
+    ChangesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env'],

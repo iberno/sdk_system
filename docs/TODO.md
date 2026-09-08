@@ -299,27 +299,32 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 7.1 Módulo Problems
 
-- [ ] CRUD de problemas
-- [ ] Vínculo M:N com tickets (`ProblemTicket`)
-- [ ] Campos: causa raiz, workaround, solução
-- [ ] Análise de incidentes recorrentes (agrupamento)
+- [x] CRUD de problemas
+- [x] Vínculo M:N com tickets (`ProblemTicket`)
+- [x] Campos: causa raiz, workaround, solução
+- [x] Análise de incidentes recorrentes (agrupamento)
 
 ### 7.2 Módulo Changes
 
-- [ ] CRUD de mudanças
-- [ ] Classificação: STANDARD, NORMAL, EMERGENCY
-- [ ] Campos: plano, rollback, risco, agendamento
-- [ ] Integração com aprovações
-- [ ] Ações: submit, execute, rollback
-- [ ] Transições de estado completas (state machine)
+- [x] CRUD de mudanças
+- [x] Classificação: STANDARD, NORMAL, EMERGENCY
+- [x] Campos: plano, rollback, risco, agendamento
+- [x] Integração com aprovações
+- [x] Ações: submit, execute, rollback
+- [x] Transições de estado completas (state machine)
 
 ### 7.3 Vínculo
 
-- [ ] Problem → Change (proposta de mudança)
-- [ ] Change → Ticket (execução afeta tickets)
-- [ ] Knowledge Article a partir de Problema resolvido
+- [x] Problem → Change (proposta de mudança)
+- [x] Change → Ticket (execução afeta tickets)
+- [ ] Knowledge Article a partir de Problema resolvido (pende do módulo `knowledge` — Fase 8)
 
 **Referência:** docs/FLUXOS.md (Fluxo 3 e 4)
+
+> **Notas Fase 7:** rota adicional `POST /changes/:id/complete` para fechar a transição
+> `IN_PROGRESS -> COMPLETED` (o contrato original só previa submit/execute/rollback); rota
+> `POST /problems/:id/propose-change` para o vínculo Problem → Change; Knowledge Article
+> adiado para a Fase 8 (requer o módulo `knowledge`).
 
 ---
 

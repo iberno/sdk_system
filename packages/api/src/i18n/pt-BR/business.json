@@ -37,5 +37,13 @@
   "approval_in_approval": "O registro já está aguardando aprovação",
   "approval_entity_closed": "A entidade está encerrada e não pode ser submetida a aprovação",
   "approval_entity_mismatch": "O fluxo informado não é do tipo TICKET",
-  "approval_stage_prior_pending": "Etapa anterior pendente: aprove primeiro a etapa {order}"
+  "approval_stage_prior_pending": "Etapa anterior pendente: aprove primeiro a etapa {order}",
+  "company_required": "Usuário não está vinculado a uma empresa",
+  "ticket_link_invalid": "Ticket inválido ou de outra empresa",
+  "change_submit_status": "Somente mudanças em DRAFT podem ser enviadas para aprovação",
+  "change_execute_status": "A mudança precisa estar APPROVED ou SCHEDULED para ser executada",
+  "change_rollback_status": "Somente mudanças em IN_PROGRESS podem sofrer rollback",
+  "problem_has_proposal": "Este problema já possui uma proposta de mudança",
+  "change_locked": "Mudança em {status} não pode ser editada",
+  "group_invalid": "Grupo de atendimento inválido para a empresa"
 }
