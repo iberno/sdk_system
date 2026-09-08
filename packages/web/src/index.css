@@ -4,46 +4,46 @@
 /* Dark mode por classe (TailAdmin) */
 @custom-variant dark (&:is(.dark *));
 
-/* Tokens do tema — paleta Sailing (#33678a / #78a6c9 / #eaeff3 / #e65c4f)
+/* Tokens do tema — paleta Meta (#0082fb / #0064e0 / #f1f5f8 / #1c2b33)
    com derivações de tonalidade para hover e dark mode */
 @theme {
   --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
 
-  /* Sailing 1 — primária */
-  --color-primary: #33678a;
-  --color-primary-dark: #2a5673;
-  --color-primary-soft: #dce8f1;
+  /* Meta 1 — primária viva */
+  --color-primary: #0082fb;
+  --color-primary-dark: #0064e0;
+  --color-primary-soft: #e0efff;
 
-  /* Sailing 2 — acento / primary clara */
-  --color-primary-light: #78a6c9;
-  --color-accent: #78a6c9;
+  /* Acento / primary clara (Meta hover + saltos) */
+  --color-primary-light: #54a6ff;
+  --color-accent: #54a6ff;
 
   /* Texto */
-  --color-body: #4a6073;
-  --color-bodydark: #c6d4e0;
-  --color-bodystroke: #8fa2b3;
+  --color-body: #455a68;
+  --color-bodydark: #c7d3dc;
+  --color-bodystroke: #93a4b0;
 
-  /* Superfícies light */
+  /* Superfícies light — Meta 3 */
   --color-white: #ffffff;
-  --color-whiten: #eaeff3;
-  --color-graylight: #f1f6fa;
-  --color-graydark: #2c3e50;
+  --color-whiten: #f1f5f8;
+  --color-graylight: #f8fafc;
+  --color-graydark: #1c2b33;
 
-  /* Superfícies dark (azuis profundos derivados de #33678a) */
-  --color-boxdark: #2a465b;
-  --color-boxdark-2: #1c3042;
-  --color-stroke: #d3dee8;
-  --color-strokedark: #3a586e;
+  /* Superfícies dark — Meta 4 (azul quase preto) */
+  --color-boxdark: #243542;
+  --color-boxdark-2: #1c2b33;
+  --color-stroke: #d8e1e8;
+  --color-strokedark: #33464f;
 
-  /* Semânticas — Sailing 4 para ações de erro/destaque */
-  --color-success: #2f9e78;
-  --color-warning: #d9822b;
-  --color-error: #e65c4f;
-  --color-error-dark: #cf4b3f;
-  --color-info: #4a8fb8;
+  /* Semânticas harmonizadas com a paleta */
+  --color-success: #23a55a;
+  --color-warning: #e8912d;
+  --color-error: #e03131;
+  --color-error-dark: #c92a2a;
+  --color-info: #0082fb;
 
-  --shadow-card: 0px 1px 3px 0px rgba(16, 42, 67, 0.08);
-  --shadow-dropdown: 0px 6px 16px rgba(16, 42, 67, 0.14);
+  --shadow-card: 0px 1px 3px 0px rgba(28, 43, 51, 0.08);
+  --shadow-dropdown: 0px 6px 16px rgba(28, 43, 51, 0.16);
 }
 
 @layer base {
@@ -59,5 +59,10 @@
 
   body {
     @apply bg-whiten text-body dark:bg-boxdark-2 dark:text-bodydark;
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
   }
 }
