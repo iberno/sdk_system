@@ -8,6 +8,7 @@ import { PageTransition } from '@/components/layout/PageTransition'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { NAV_SECTIONS } from '@/config/nav'
 import { connectSocket, disconnectSocket } from '@/lib/socket'
+import { useRealtimeEvents } from '@/hooks/useRealtime'
 import { useAuthStore } from '@/stores/authStore'
 import { useUiStore } from '@/stores/uiStore'
 
@@ -18,6 +19,8 @@ export default function AppLayout() {
   const { pathname } = useLocation()
   const accessToken = useAuthStore((s) => s.accessToken)
   const role = useAuthStore((s) => s.user?.role)
+
+  useRealtimeEvents()
 
   useEffect(() => {
     if (!accessToken) {

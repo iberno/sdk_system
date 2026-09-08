@@ -114,7 +114,11 @@ export class RoutingRulesService {
     });
   }
 
-  async evaluate(type: TicketType, priority: Priority): Promise<RoutingRuleWithTarget | null> {
+  async evaluate(
+    type: TicketType,
+    priority: Priority,
+    category?: string,
+  ): Promise<RoutingRuleWithTarget | null> {
     const rules = await this.prisma.routingRule.findMany({
       where: { status: Status.ACTIVE },
       orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
@@ -125,7 +129,9 @@ export class RoutingRulesService {
         (r) =>
           r.ticketType === type &&
           (r.priority === null || r.priority === priority) &&
-          (r.category === null || r.category === ''),
+          (r.category === null ||
+            r.category === '' ||
+            (category !== undefined && r.category === category)),
       ) ?? null
     );
   }
@@ -140,8 +146,9 @@ export class RoutingRulesService {
   async resolveDestination(
     type: TicketType,
     priority: Priority,
+    category?: string,
   ): Promise<StrategyTarget | null> {
-    const rule = await this.evaluate(type, priority);
+    const rule = await this.evaluate(type, priority, category);
     if (!rule) {
       const fallback = await this.defaultGroup();
       if (!fallback) return null;

@@ -2,7 +2,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { api } from '@/lib/api'
 import type { ApiListResponse, Paginated } from '@/types/ticket'
-import type { AdminCompany, AdminGroup, AdminGroupDetail, AdminUser, SlaPolicy } from '@/types/admin'
+import type {
+  AdminCompany,
+  AdminGroup,
+  AdminGroupDetail,
+  AdminUser,
+  AuditLogEntry,
+  RoutingRule,
+  SlaPolicy,
+} from '@/types/admin'
 
 const invalidate = (queryClient: ReturnType<typeof useQueryClient>, keys: string[][]) => {
   for (const key of keys) void queryClient.invalidateQueries({ queryKey: key })
@@ -151,6 +159,70 @@ export function useUpdateGroupStatus() {
     mutationFn: async ({ id, status }: { id: string; status: string }) =>
       (await api.patch(`/solver-groups/${id}/status`, { status })).data,
     onSuccess: () => invalidate(queryClient, [['admin', 'groups'], ['solver-groups']]),
+  })
+}
+
+// ---------- Routing rules ----------
+
+export function useRoutingRules() {
+  return useQuery({
+    queryKey: ['admin', 'routing-rules'],
+    queryFn: async () => {
+      const { data: body } = await api.get<{
+        statusCode: number
+        message: string
+        data: RoutingRule[]
+      }>('/routing-rules')
+      return body.data
+    },
+  })
+}
+
+export function useCreateRoutingRule() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: Record<string, unknown>) =>
+      (await api.post('/routing-rules', payload)).data,
+    onSuccess: () => invalidate(queryClient, [['admin', 'routing-rules']]),
+  })
+}
+
+export function useUpdateRoutingRule() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...payload }: { id: string } & Record<string, unknown>) =>
+      (await api.put(`/routing-rules/${id}`, payload)).data,
+    onSuccess: () => invalidate(queryClient, [['admin', 'routing-rules']]),
+  })
+}
+
+export function useUpdateRoutingRuleStatus() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) =>
+      (await api.patch(`/routing-rules/${id}/status`, { status })).data,
+    onSuccess: () => invalidate(queryClient, [['admin', 'routing-rules']]),
+  })
+}
+
+export function useReorderRoutingRules() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (rules: { id: string; order: number }[]) =>
+      (await api.post('/routing-rules/reorder', { rules })).data,
+    onSuccess: () => invalidate(queryClient, [['admin', 'routing-rules']]),
+  })
+}
+
+// ---------- Audit ----------
+
+export function useAuditLogs(params?: Record<string, string | number | undefined>) {
+  return useQuery({
+    queryKey: ['admin', 'audit', params],
+    queryFn: async () => {
+      const { data: body } = await api.get<ApiListResponse<AuditLogEntry>>('/audit', { params })
+      return { items: body.data, pagination: body.pagination }
+    },
   })
 }
 

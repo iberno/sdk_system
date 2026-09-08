@@ -543,11 +543,11 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 
 ### 15.3b Routing Rules
 
-- [ ] CRUD de regras de auto-atribuição
-- [ ] Seleção de estratégia (TO_GROUP, ROUND_ROBIN, LEAST_LOADED, MANUAL)
-- [ ] Seleção de grupo alvo (com contagem de agentes)
-- [ ] Reordenação de regras (drag & drop)
-- [ ] Toggle ativa/desativa
+- [x] CRUD de regras de auto-atribuição (condições: tipo, prioridade, categoria)
+- [x] Seleção de estratégia (TO_GROUP, ROUND_ROBIN, LEAST_LOADED, MANUAL)
+- [x] Seleção de grupo alvo (com contagem de agentes; obrigatório p/ estratégias automáticas)
+- [x] Reordenação de regras (setas ↑↓ → POST /routing-rules/reorder)
+- [x] Toggle ativa/desativa
 
 ### 15.4 SLA
 
@@ -567,17 +567,17 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 
 ### 15.7 Auditoria
 
-- [ ] Tabela de logs com filtros
+- [x] Tabela de logs com filtros (entidade, ação, período) + modal de detalhe (antes/depois, IP, user-agent)
 
 ---
 
 ## FASE 16 - Frontend: Realtime
 
-- [ ] Hook `useRealtime()` global
-- [ ] Toast quando novo ticket em rota da companhia
-- [ ] Badge de notificações no header
-- [ ] Invalidation do TanStack Query em eventos socket
-- [ ] Atualização em tempo real nas listas de tickets
+- [x] Hook `useRealtimeEvents()` global (conecta socket e registra listeners)
+- [x] Toast quando novo ticket (ticket.created), atribuição, aprovação pendente e SLA breach
+- [x] Badge de notificações no header (sino com contagem; clique limpa e vai para tickets)
+- [x] Invalidation do TanStack Query em eventos socket (tickets, ticket/:id)
+- [x] Atualização em tempo real nas listas de tickets
 
 ---
 
@@ -633,7 +633,7 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 | 13 | Frontend: Dashboard | 8 |
 | 14 | Frontend: Tickets | 18 |
 | 15 | Frontend: Administração | 16 |
-| 16 | Frontend: Realtime | 4 |
+| 16 | Frontend: Realtime | 5 |
 | 17 | Integração completa | 8 |
 | 18 | Qualidade e Entrega | 9 |
-| | **Total** | **271** |
+| | **Total** | **272** |

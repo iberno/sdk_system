@@ -19,6 +19,8 @@ import UsersAdminPage from '@/pages/admin/UsersAdminPage'
 import CompaniesAdminPage from '@/pages/admin/CompaniesAdminPage'
 import GroupsAdminPage from '@/pages/admin/GroupsAdminPage'
 import SlaAdminPage from '@/pages/admin/SlaAdminPage'
+import RoutingRulesAdminPage from '@/pages/admin/RoutingRulesAdminPage'
+import AuditAdminPage from '@/pages/admin/AuditAdminPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -78,6 +80,8 @@ const router = createBrowserRouter([
           { path: 'companies', element: <CompaniesAdminPage /> },
           { path: 'groups', element: <GroupsAdminPage /> },
           { path: 'sla', element: <SlaAdminPage /> },
+          { path: 'routing-rules', element: <RoutingRulesAdminPage /> },
+          { path: 'audit', element: <AuditAdminPage /> },
         ],
       },
     ],

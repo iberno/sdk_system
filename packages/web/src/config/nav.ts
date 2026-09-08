@@ -4,6 +4,8 @@ import {
   CheckSquare,
   GitBranch,
   LayoutDashboard,
+  Route,
+  ScrollText,
   Ticket,
   Timer,
   TrendingUp,
@@ -58,6 +60,8 @@ export const NAV_SECTIONS: NavSection[] = [
       { labelKey: 'nav.companies', href: '/admin/companies', icon: Building2, roles: ['ADMIN'] },
       { labelKey: 'nav.groups', href: '/admin/groups', icon: UsersRound, roles: ['ADMIN', 'MANAGER'] },
       { labelKey: 'nav.sla', href: '/admin/sla', icon: Timer, roles: ['ADMIN', 'MANAGER'] },
+      { labelKey: 'nav.routingRules', href: '/admin/routing-rules', icon: Route, roles: ['ADMIN', 'MANAGER'] },
+      { labelKey: 'nav.audit', href: '/admin/audit', icon: ScrollText, roles: ['ADMIN', 'MANAGER'] },
     ],
   },
 ]

@@ -152,6 +152,7 @@ export class TicketsService {
     }
 
     let categoryId: string | null = null;
+    let categoryName: string | undefined;
     if (dto.categoryId) {
       const category = await this.prisma.category.findUnique({ where: { id: dto.categoryId } });
       if (!category || category.status !== Status.ACTIVE) {
@@ -161,6 +162,7 @@ export class TicketsService {
         });
       }
       categoryId = category.id;
+      categoryName = category.name;
     }
 
     const beneficiaryId = await this.resolveBeneficiary(
@@ -176,7 +178,11 @@ export class TicketsService {
     const { slaResponseAt, slaResolveAt } = await this.sla.calculate(dto.type, priority);
     const { formatted: ticketNumber } = await this.sequence.next('TICKET', companyId);
 
-    const destination = await this.routing.resolveDestination(dto.type, priority);
+    const destination = await this.routing.resolveDestination(
+      dto.type,
+      priority,
+      categoryName,
+    );
 
     const assigneeId = destination?.assigneeId ?? null;
     const solverGroupId = destination?.groupId ?? null;

@@ -36,6 +36,35 @@ export interface AdminGroupDetail extends AdminGroup {
   agents: { id: string; name: string; email: string; status: string }[]
 }
 
+export interface RoutingRule {
+  id: string
+  name: string
+  description: string | null
+  ticketType: string
+  priority: string | null
+  category: string | null
+  strategy: string
+  targetGroupId: string | null
+  order: number
+  status: string
+  createdAt: string
+  targetGroup: { id: string; name: string; level: string } | null
+}
+
+export interface AuditLogEntry {
+  id: string
+  action: string
+  entity: string
+  entityId: string | null
+  oldData: Record<string, unknown> | null
+  newData: Record<string, unknown> | null
+  userId: string | null
+  user: { id: string; name: string; email: string } | null
+  ip: string | null
+  userAgent: string | null
+  createdAt: string
+}
+
 export interface SlaPolicy {
   id: string
   name: string

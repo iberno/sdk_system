@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { Building2, Timer, Users, UsersRound } from 'lucide-react'
+import { Building2, Route, ScrollText, Timer, Users, UsersRound } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
 
@@ -10,6 +10,8 @@ const TABS = [
   { to: '/admin/companies', labelKey: 'nav.companies', icon: Building2, roles: ['ADMIN'] },
   { to: '/admin/groups', labelKey: 'nav.groups', icon: UsersRound, roles: ['ADMIN', 'MANAGER'] },
   { to: '/admin/sla', labelKey: 'nav.sla', icon: Timer, roles: ['ADMIN', 'MANAGER'] },
+  { to: '/admin/routing-rules', labelKey: 'nav.routingRules', icon: Route, roles: ['ADMIN', 'MANAGER'] },
+  { to: '/admin/audit', labelKey: 'nav.audit', icon: ScrollText, roles: ['ADMIN', 'MANAGER'] },
 ] as const
 
 export default function AdminLayout() {
