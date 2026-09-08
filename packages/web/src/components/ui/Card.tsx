@@ -7,32 +7,41 @@ interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   subtitle?: ReactNode
   actions?: ReactNode
   bodyClassName?: string
+  hoverable?: boolean
   children: ReactNode
 }
 
-export function Card({ title, subtitle, actions, bodyClassName, className, children, ...props }: CardProps) {
+export function Card({
+  title,
+  subtitle,
+  actions,
+  bodyClassName,
+  hoverable = false,
+  className,
+  children,
+  ...props
+}: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-xl border border-stroke bg-white shadow-card dark:bg-boxdark',
+        'rounded-xl border border-stroke/80 bg-white shadow-sm transition-[box-shadow,border-color] duration-200 dark:border-strokedark dark:bg-boxdark',
+        hoverable && 'hover:border-primary/30 hover:shadow-dropdown',
         className,
       )}
       {...props}
     >
       {(title || actions) && (
-        <div className="flex items-center justify-between gap-4 border-b border-stroke px-5 py-4 dark:border-strokedark">
+        <div className="flex items-start justify-between gap-4 px-5 pb-4 pt-5">
           <div>
             {title && (
-              <h3 className="text-base font-semibold text-graydark dark:text-white">{title}</h3>
+              <h3 className="text-sm font-semibold text-graydark dark:text-white">{title}</h3>
             )}
-            {subtitle && (
-              <p className="mt-0.5 text-sm text-body dark:text-bodydark">{subtitle}</p>
-            )}
+            {subtitle && <p className="mt-0.5 text-xs text-bodystroke">{subtitle}</p>}
           </div>
           {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
         </div>
       )}
-      <div className={cn('p-5', bodyClassName)}>{children}</div>
+      <div className={cn('px-5 pb-5', title ? 'pt-0' : undefined, bodyClassName)}>{children}</div>
     </div>
   )
 }
