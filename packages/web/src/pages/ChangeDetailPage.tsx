@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, GitPullRequest, Pencil, Play, RotateCcw, Send } from 'lucide-react'
@@ -22,6 +22,8 @@ import {
   useSubmitChange,
   useExecuteChange,
   useRollbackChange,
+  useLinkTicketToChange,
+  useUnlinkTicketFromChange,
 } from '@/hooks/useProblemsChanges'
 import type { ChangeDetail } from '@/types/problem-change'
 
@@ -56,6 +58,8 @@ export default function ChangeDetailPage() {
   const submitChange = useSubmitChange()
   const executeChange = useExecuteChange()
   const rollbackChange = useRollbackChange()
+  const linkTicket = useLinkTicketToChange(id ?? '')
+  const unlinkTicket = useUnlinkTicketFromChange(id ?? '')
 
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [editForm, setEditForm] = useState({
@@ -69,6 +73,9 @@ export default function ChangeDetailPage() {
     rollbackPlan: '',
   })
   const [saving, setSaving] = useState(false)
+
+  const [linkModalOpen, setLinkModalOpen] = useState(false)
+  const [ticketIdToLink, setTicketIdToLink] = useState('')
 
   const openEdit = (c: ChangeDetail) => {
     setEditForm({
@@ -112,6 +119,30 @@ export default function ChangeDetailPage() {
       setSaving(false)
     }
   }
+
+  const handleLinkTicket = async () => {
+    if (!ticketIdToLink.trim()) return
+    try {
+      await linkTicket.mutateAsync(ticketIdToLink.trim())
+      toast.success(t('admin.saved'))
+      setLinkModalOpen(false)
+      setTicketIdToLink('')
+    } catch {
+      toast.error(t('tickets.createError'))
+    }
+  }
+
+  const handleUnlinkTicket = useCallback(
+    async (ticketId: string) => {
+      try {
+        await unlinkTicket.mutateAsync(ticketId)
+        toast.success(t('admin.saved'))
+      } catch {
+        toast.error(t('tickets.createError'))
+      }
+    },
+    [unlinkTicket, t],
+  )
 
   const approvalColumns: Array<Column<ChangeDetail['approvals'][0]>> = useMemo(
     () => [
@@ -187,8 +218,23 @@ export default function ChangeDetailPage() {
           </Badge>
         ),
       },
+      {
+        key: 'actions',
+        header: '',
+        align: 'right',
+        render: (row) => (
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => void handleUnlinkTicket(row.id)}
+            loading={unlinkTicket.isPending}
+          >
+            {t('common.remove')}
+          </Button>
+        ),
+      },
     ],
-    [t],
+    [t, handleUnlinkTicket, unlinkTicket.isPending],
   )
 
   if (isLoading)
@@ -332,9 +378,14 @@ export default function ChangeDetailPage() {
 
           {change.linkedTickets.length > 0 && (
             <Card>
-              <h3 className="mb-3 text-sm font-semibold text-graydark dark:text-white">
-                {t('tickets.linkedTickets')} ({change.linkedTickets.length})
-              </h3>
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-graydark dark:text-white">
+                  {t('tickets.linkedTickets')} ({change.linkedTickets.length})
+                </h3>
+                <Button size="sm" variant="secondary" onClick={() => setLinkModalOpen(true)}>
+                  {t('tickets.linkTicket')}
+                </Button>
+              </div>
               <Table
                 columns={ticketColumns}
                 rows={change.linkedTickets}
@@ -473,6 +524,43 @@ export default function ChangeDetailPage() {
             />
           </FormField>
         </div>
+      </Modal>
+
+      <Modal
+        open={linkModalOpen}
+        title={t('tickets.linkTicket')}
+        onClose={() => {
+          setLinkModalOpen(false)
+          setTicketIdToLink('')
+        }}
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setLinkModalOpen(false)
+                setTicketIdToLink('')
+              }}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              onClick={() => void handleLinkTicket()}
+              loading={linkTicket.isPending}
+              disabled={!ticketIdToLink.trim()}
+            >
+              {t('common.save')}
+            </Button>
+          </>
+        }
+      >
+        <FormField label={t('tickets.ticketId')} required>
+          <Input
+            value={ticketIdToLink}
+            onChange={(e) => setTicketIdToLink(e.target.value)}
+            placeholder="UUID do ticket"
+          />
+        </FormField>
       </Modal>
     </div>
   )

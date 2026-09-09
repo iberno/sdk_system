@@ -460,6 +460,8 @@ export const ptBR = {
     pickupError: 'Não foi possível assumir o ticket.',
     requestApproval: 'Solicitar Aprovação',
     selectApprovalFlow: 'Selecionar fluxo...',
+    linkTicket: 'Vincular ticket',
+    ticketId: 'ID do ticket',
   },
   changes: {
     submit: 'Submeter',
