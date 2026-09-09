@@ -85,6 +85,18 @@ export class TicketsController {
     return this.tickets.unassigned(actor);
   }
 
+  @Get('my')
+  @Permissions('tickets.read')
+  @ApiOperation({
+    summary: 'Tickets do usuário logado (atribuídos ou criados)',
+  })
+  myTickets(
+    @Query() query: QueryTicketsDto,
+    @CurrentUser() actor: UserContext,
+  ) {
+    return this.tickets.myTickets(query, actor);
+  }
+
   @Post()
   @Permissions('tickets.create')
   @ApiOperation({

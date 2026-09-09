@@ -17,6 +17,7 @@ import ProblemDetailPage from '@/pages/ProblemDetailPage'
 import ChangesPage from '@/pages/ChangesPage'
 import ChangeDetailPage from '@/pages/ChangeDetailPage'
 import UnassignedQueuePage from '@/pages/UnassignedQueuePage'
+import MyTicketsPage from '@/pages/MyTicketsPage'
 import ApprovalsPage from '@/pages/ApprovalsPage'
 import ReportsPage from '@/pages/ReportsPage'
 import TicketDetailPage from '@/pages/TicketDetailPage'
@@ -70,6 +71,7 @@ const router = createBrowserRouter([
       { index: true, element: <DashboardPage /> },
       { path: 'tickets', element: <TicketsPage /> },
       { path: 'tickets/new', element: <NewTicketPage /> },
+      { path: 'tickets/my', element: <MyTicketsPage /> },
       { path: 'tickets/queue', element: <UnassignedQueuePage /> },
       { path: 'tickets/:id', element: <TicketDetailPage /> },
       { path: 'approvals', element: <ApprovalsPage /> },

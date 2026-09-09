@@ -37,6 +37,7 @@ export const esES = {
   nav: {
     dashboard: 'Panel',
     tickets: 'Tickets',
+    myTickets: 'Mis Tickets',
     approvals: 'Aprobaciones',
     changes: 'Cambios',
     problems: 'Problemas',
@@ -450,6 +451,8 @@ export const esES = {
     selectApprovalFlow: 'Seleccionar flujo...',
     linkTicket: 'Vincular ticket',
     ticketId: 'ID del ticket',
+    myTicketsSubtitleAgent: '{{count}} tickets asignados a ti.',
+    myTicketsSubtitleUser: '{{count}} tickets que abriste.',
   },
   changes: {
     submit: 'Enviar',

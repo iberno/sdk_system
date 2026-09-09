@@ -14,6 +14,7 @@ import {
   Users,
   UsersRound,
   Wrench,
+  ListTodo,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -37,6 +38,7 @@ export const NAV_SECTIONS: NavSection[] = [
     sectionKey: 'nav.tickets',
     items: [
       { labelKey: 'nav.tickets', href: '/tickets', icon: Ticket },
+      { labelKey: 'nav.myTickets', href: '/tickets/my', icon: ListTodo },
       {
         labelKey: 'tickets.unassignedQueue',
         href: '/tickets/queue',

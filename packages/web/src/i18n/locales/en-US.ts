@@ -37,6 +37,7 @@ export const enUS = {
   nav: {
     dashboard: 'Dashboard',
     tickets: 'Tickets',
+    myTickets: 'My Tickets',
     approvals: 'Approvals',
     changes: 'Changes',
     problems: 'Problems',
@@ -446,6 +447,8 @@ export const enUS = {
     selectApprovalFlow: 'Select flow...',
     linkTicket: 'Link ticket',
     ticketId: 'Ticket ID',
+    myTicketsSubtitleAgent: '{{count}} tickets assigned to you.',
+    myTicketsSubtitleUser: '{{count}} tickets you opened.',
   },
   changes: {
     submit: 'Submit',

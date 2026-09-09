@@ -29,6 +29,18 @@ export function useUnassignedTickets() {
   })
 }
 
+export function useMyTickets(params?: TicketParams) {
+  return useQuery({
+    queryKey: ['tickets', 'my', params],
+    queryFn: async () => {
+      const { data: body } = await api.get<ApiListResponse<TicketListItem>>('/tickets/my', {
+        params,
+      })
+      return { items: body.data, pagination: body.pagination }
+    },
+  })
+}
+
 export function useTicket(id: string | undefined) {
   return useQuery({
     queryKey: ['ticket', id],

@@ -37,6 +37,7 @@ export const ptBR = {
   nav: {
     dashboard: 'Dashboard',
     tickets: 'Tickets',
+    myTickets: 'Meus Tickets',
     approvals: 'Aprovações',
     changes: 'Mudanças',
     problems: 'Problemas',
@@ -473,6 +474,8 @@ export const ptBR = {
     selectApprovalFlow: 'Selecionar fluxo...',
     linkTicket: 'Vincular ticket',
     ticketId: 'ID do ticket',
+    myTicketsSubtitleAgent: '{{count}} tickets atribuídos a você.',
+    myTicketsSubtitleUser: '{{count}} tickets que você abriu.',
   },
   changes: {
     submit: 'Submeter',

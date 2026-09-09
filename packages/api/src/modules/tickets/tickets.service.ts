@@ -537,6 +537,64 @@ export class TicketsService {
     return { items: rows.map((t) => this.mapListItem(t)) };
   }
 
+  async myTickets(query: QueryTicketsDto, actor: UserContext) {
+    const {
+      page = 1,
+      pageSize = 20,
+      ...filters
+    } = query as QueryTicketsDto & {
+      page?: number;
+      pageSize?: number;
+    };
+
+    const isTeam =
+      actor.role === 'AGENT' ||
+      actor.role === 'MANAGER' ||
+      actor.role === 'ADMIN';
+
+    const where: Prisma.TicketWhereInput = (isTeam
+        ? { assigneeId: actor.sub }
+        : { OR: [{ requesterId: actor.sub }, { beneficiaryId: actor.sub }] });
+
+    if (filters.status) where.status = filters.status;
+    if (filters.type) where.type = filters.type;
+    if (filters.priority) where.priority = filters.priority;
+    if (filters.search) {
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : []),
+        {
+          OR: [
+            { title: { contains: filters.search, mode: 'insensitive' } },
+            { ticketNumber: { contains: filters.search, mode: 'insensitive' } },
+          ],
+        },
+      ];
+    }
+
+    const direction = (filters.order ?? 'DESC').toLowerCase() as 'asc' | 'desc';
+    const orderBy: Prisma.TicketOrderByWithRelationInput[] = [
+      {
+        [filters.sortBy ?? 'createdAt']: direction,
+      } as Prisma.TicketOrderByWithRelationInput,
+      { createdAt: 'desc' },
+    ];
+
+    const [rows, totalItems] = await Promise.all([
+      this.prisma.ticket.findMany({
+        ...paginationArgs(page, pageSize),
+        where,
+        orderBy,
+        include: TICKET_INCLUDE,
+      }),
+      this.prisma.ticket.count({ where }),
+    ]);
+
+    return {
+      items: rows.map((t) => this.mapListItem(t)),
+      pagination: paginationMeta(page, pageSize, totalItems),
+    };
+  }
+
   async changeStatus(
     id: string,
     dto: UpdateTicketStatusDto,
