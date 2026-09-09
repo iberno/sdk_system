@@ -231,7 +231,7 @@ model User {
 
 model Ticket {
   id            String       @id @default(uuid())
-  ticketNumber  String       @unique
+  ticketNumber  String
   requesterId   String
   beneficiaryId String?
   title         String
@@ -280,6 +280,7 @@ model Ticket {
   @@index([solverGroupId])
   @@index([categoryId])
   @@index([createdAt(sort: Desc)])
+  @@unique([ticketNumber, companyId])
 }
 
 model TicketComment {

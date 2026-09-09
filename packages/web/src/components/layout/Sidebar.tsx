@@ -13,16 +13,29 @@ interface SidebarProps {
   collapsed: boolean
   sections: Array<{ section?: string; items: SidebarLinkConfig[] }>
   currentPath: string
+  mobileOpen?: boolean
+  onClose?: () => void
 }
 
-export function Sidebar({ collapsed, sections, currentPath }: SidebarProps) {
+export function Sidebar({ collapsed, sections, currentPath, mobileOpen, onClose }: SidebarProps) {
   const { t } = useTranslation()
   const width = collapsed ? 'w-20' : 'w-64'
 
   return (
-    <aside
-      className={`fixed inset-y-0 left-0 z-30 flex ${width} flex-col overflow-y-auto bg-gradient-to-b from-boxdark-2 to-boxdark text-white transition-[width] duration-200`}
-    >
+    <>
+      {/* backdrop mobile */}
+      {mobileOpen ? (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm lg:hidden"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      ) : null}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col overflow-y-auto bg-gradient-to-b from-boxdark-2 to-boxdark text-white transition-transform duration-200 lg:z-30 lg:transition-[width] lg:${width} ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
+      >
       <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-strokedark px-5">
         <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-sm font-bold shadow-card">
           SD
@@ -47,6 +60,7 @@ export function Sidebar({ collapsed, sections, currentPath }: SidebarProps) {
                   <li key={item.href}>
                     <Link
                       to={item.href}
+                      onClick={onClose}
                       title={collapsed ? item.label : undefined}
                       className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                         active
@@ -65,5 +79,6 @@ export function Sidebar({ collapsed, sections, currentPath }: SidebarProps) {
         ))}
       </nav>
     </aside>
+    </>
   )
 }

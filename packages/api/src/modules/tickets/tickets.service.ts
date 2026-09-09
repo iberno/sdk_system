@@ -182,6 +182,7 @@ export class TicketsService {
       dto.type,
       priority,
       categoryName,
+      companyId,
     );
 
     const assigneeId = destination?.assigneeId ?? null;

@@ -118,9 +118,15 @@ export class RoutingRulesService {
     type: TicketType,
     priority: Priority,
     category?: string,
+    companyId?: string | null,
   ): Promise<RoutingRuleWithTarget | null> {
     const rules = await this.prisma.routingRule.findMany({
-      where: { status: Status.ACTIVE },
+      where: {
+        status: Status.ACTIVE,
+        ...(companyId
+          ? { OR: [{ companyId: null }, { companyId }] }
+          : {}),
+      },
       orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
       include: { targetGroup: true },
     });
@@ -147,9 +153,17 @@ export class RoutingRulesService {
     type: TicketType,
     priority: Priority,
     category?: string,
+    companyId?: string | null,
   ): Promise<StrategyTarget | null> {
-    const rule = await this.evaluate(type, priority, category);
+    const rule = await this.evaluate(type, priority, category, companyId);
     if (!rule) {
+      // Empresa sem regras de roteamento configuradas: não roteia (fica sem grupo)
+      if (companyId) {
+        const hasRules = await this.prisma.routingRule.count({
+          where: { companyId, status: Status.ACTIVE },
+        });
+        if (hasRules === 0) return null;
+      }
       const fallback = await this.defaultGroup();
       if (!fallback) return null;
       return {

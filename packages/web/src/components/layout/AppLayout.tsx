@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
@@ -19,6 +19,7 @@ export default function AppLayout() {
   const { pathname } = useLocation()
   const accessToken = useAuthStore((s) => s.accessToken)
   const role = useAuthStore((s) => s.user?.role)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   useRealtimeEvents()
 
@@ -50,9 +51,17 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-dvh">
-      <Sidebar collapsed={collapsed} sections={sections} currentPath={pathname} />
-      <div className={`flex min-h-dvh flex-col transition-[padding] duration-200 ${collapsed ? 'pl-20' : 'pl-64'}`}>
-        <Header onToggleSidebar={toggleSidebar} />
+      <Sidebar
+        collapsed={collapsed}
+        sections={sections}
+        currentPath={pathname}
+        mobileOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+      />
+      <div
+        className={`flex min-h-dvh flex-col transition-[padding] duration-200 lg:${collapsed ? 'pl-20' : 'pl-64'}`}
+      >
+        <Header onToggleSidebar={toggleSidebar} onOpenMobile={() => setMobileOpen(true)} />
         <main className="flex-1 p-4 sm:p-6">
           <PageTransition>
             <Outlet />

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Bell, LogOut, Moon, PanelLeft, Sun, User } from 'lucide-react'
+import { Bell, LogOut, Menu, Moon, PanelLeft, Sun, User } from 'lucide-react'
 
 import { Avatar } from '@/components/ui/Avatar'
 import { Dropdown, DropdownItem } from '@/components/ui/Dropdown'
@@ -11,9 +11,10 @@ import { useUiStore } from '@/stores/uiStore'
 
 interface HeaderProps {
   onToggleSidebar: () => void
+  onOpenMobile?: () => void
 }
 
-export function Header({ onToggleSidebar }: HeaderProps) {
+export function Header({ onToggleSidebar, onOpenMobile }: HeaderProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const theme = useUiStore((s) => s.theme)
@@ -27,9 +28,18 @@ export function Header({ onToggleSidebar }: HeaderProps) {
     <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-stroke bg-white px-4 dark:border-strokedark dark:bg-boxdark sm:px-6">
       <button
         type="button"
+        onClick={onOpenMobile}
+        title={t('layout.toggleSidebar')}
+        className="rounded-lg p-2 text-body hover:bg-graylight hover:text-graydark dark:text-bodydark dark:hover:bg-boxdark-2 lg:hidden"
+      >
+        <Menu className="size-5" />
+      </button>
+
+      <button
+        type="button"
         onClick={onToggleSidebar}
         title={t('layout.toggleSidebar')}
-        className="rounded-lg p-2 text-body hover:bg-graylight hover:text-graydark dark:text-bodydark dark:hover:bg-boxdark-2"
+        className="hidden rounded-lg p-2 text-body hover:bg-graylight hover:text-graydark dark:text-bodydark dark:hover:bg-boxdark-2 lg:inline-flex"
       >
         <PanelLeft className="size-5" />
       </button>

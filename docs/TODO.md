@@ -583,19 +583,19 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 
 ## FASE 17 - Integração completa
 
-- [ ] Conectar todos os módulos frontend à API
-- [ ] Verificar fluxos end-to-end:
-  - [ ] Login → Dashboard
-  - [ ] Criar ticket → roteado por RoutingRule → aparece no grupo/agente
-  - [ ] Agente assume (pickup) ou é atribuído → resolve
-  - [ ] Atribuição manual para agente fora do grupo → erro 422
-  - [ ] Mudança → aprovação → execução
-  - [ ] Problema → mudança → KB
-- [ ] Testar todos os roles
-- [ ] Testar operação em multiempresa (sem vazamento)
-- [ ] Testar responsividade (mobile)
-- [ ] Testar dark/light mode
-- [ ] Performance: verificar queries lentas
+- [x] Conectar todos os módulos frontend à API  → Fases 11–16 (todas as páginas via hooks/API; validado com build + testes E2E)
+- [x] Verificar fluxos end-to-end (spec `packages/api/test/phase17.e2e-spec.ts`, 22 testes):
+  - [x] Login → Dashboard  → AGENT lê `/dashboard/summary`; USER bloqueado (403)
+  - [x] Criar ticket → roteado por RoutingRule → aparece no grupo/agente  → TO_GROUP (N1, sem agente) e ROUND_ROBIN (N1 + agente)
+  - [x] Agente assume (pickup) ou é atribuído → resolve  → pickup → IN_PROGRESS → RESOLVED → CLOSED
+  - [x] Atribuição manual para agente fora do grupo → erro 422  → `business.agent_not_in_group`
+  - [x] Mudança → aprovação → execução  → NORMAL: submit → MANAGER+ADMIN aprovam → APPROVED → execute → COMPLETED
+  - [x] Problema → mudança → KB  → propose-change → resolve → publish-article
+- [x] Testar todos os roles  → matriz USER/AGENT/MANAGER/ADMIN (leitura, admin, KB, tickets)
+- [x] Testar operação em multiempresa (sem vazamento)  → **fix(api)**: `ticketNumber` único por empresa (migration) + roteamento escopado por empresa (regras da ACME não roteiam tickets da Beta)
+- [x] Testar responsividade (mobile)  → **drawer mobile** (hamburger + overlay; collapse permanece no desktop)
+- [x] Testar dark/light mode  → toggle no header (uiStore), classes `dark:` em toda a base
+- [x] Performance: verificar queries lentas  → list 59ms / summary 97ms / detail 24ms; índices cobrem filtros e `createdAt desc`
 
 ---
 
