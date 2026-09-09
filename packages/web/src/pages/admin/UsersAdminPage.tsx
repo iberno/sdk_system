@@ -16,12 +16,7 @@ import { Select } from '@/components/ui/Select'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Table, type Column } from '@/components/ui/Table'
 import { toast } from '@/components/ui/toast-store'
-import {
-  useAdminUsers,
-  useCreateUser,
-  useUpdateUser,
-  useUpdateUserStatus,
-} from '@/hooks/useAdmin'
+import { useAdminUsers, useCreateUser, useUpdateUser, useUpdateUserStatus } from '@/hooks/useAdmin'
 import { useSolverGroups } from '@/hooks/useDirectory'
 import { useCompanyOptions } from '@/hooks/useTicketFormData'
 import { useAuthStore } from '@/stores/authStore'
@@ -153,8 +148,7 @@ export default function UsersAdminPage() {
         if (isAdmin) {
           if (form.password) payload.password = form.password
           if (form.role !== editing.role) payload.role = form.role
-          payload.solverGroupId =
-            form.role === 'AGENT' ? form.solverGroupId || null : null
+          payload.solverGroupId = form.role === 'AGENT' ? form.solverGroupId || null : null
         }
         await updateUser.mutateAsync({ id: editing.id, ...payload })
         toast.success(t('admin.userUpdated'))
@@ -193,7 +187,11 @@ export default function UsersAdminPage() {
 
   const columns: Array<Column<AdminUser>> = useMemo(() => {
     const formatDate = (iso: string) =>
-      new Intl.DateTimeFormat(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' }).format(new Date(iso))
+      new Intl.DateTimeFormat(undefined, {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      }).format(new Date(iso))
     return [
       {
         key: 'name',
@@ -211,7 +209,9 @@ export default function UsersAdminPage() {
       {
         key: 'role',
         header: t('admin.role'),
-        render: (row) => <Badge tone={ROLE_TONE[row.role] ?? 'neutral'}>{t(`domain.role.${row.role}`)}</Badge>,
+        render: (row) => (
+          <Badge tone={ROLE_TONE[row.role] ?? 'neutral'}>{t(`domain.role.${row.role}`)}</Badge>
+        ),
       },
       {
         key: 'company',
@@ -224,7 +224,9 @@ export default function UsersAdminPage() {
         key: 'group',
         header: t('tickets.groupLabel'),
         render: (row) => (
-          <span className="text-sm text-body dark:text-bodydark">{row.solverGroup?.name ?? '—'}</span>
+          <span className="text-sm text-body dark:text-bodydark">
+            {row.solverGroup?.name ?? '—'}
+          </span>
         ),
       },
       {
@@ -241,7 +243,9 @@ export default function UsersAdminPage() {
         header: t('dashboard.created'),
         align: 'right',
         render: (row) => (
-          <span className="tabular-nums text-body dark:text-bodydark">{formatDate(row.createdAt)}</span>
+          <span className="tabular-nums text-body dark:text-bodydark">
+            {formatDate(row.createdAt)}
+          </span>
         ),
       },
       {
@@ -335,7 +339,9 @@ export default function UsersAdminPage() {
               resetPage()
             }}
           >
-            <option value="">{t('common.all')} · {t('admin.role')}</option>
+            <option value="">
+              {t('common.all')} · {t('admin.role')}
+            </option>
             {ROLE_ORDER.map((value) => (
               <option key={value} value={value}>
                 {t(`domain.role.${value}`)}
@@ -349,7 +355,9 @@ export default function UsersAdminPage() {
               resetPage()
             }}
           >
-            <option value="">{t('common.all')} · {t('common.status')}</option>
+            <option value="">
+              {t('common.all')} · {t('common.status')}
+            </option>
             {STATUS_ORDER.map((value) => (
               <option key={value} value={value}>
                 {t(`domain.status.${value}`)}
@@ -427,7 +435,11 @@ export default function UsersAdminPage() {
           )}
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField label={t('admin.role')} required hint={!isAdmin ? t('admin.roleHintManager') : undefined}>
+            <FormField
+              label={t('admin.role')}
+              required
+              hint={!isAdmin ? t('admin.roleHintManager') : undefined}
+            >
               <Select
                 value={form.role}
                 onChange={(event) => setForm({ ...form, role: event.target.value })}

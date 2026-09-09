@@ -268,7 +268,8 @@ export const esES = {
     categoryCondition: 'Condición de categoría',
     categoryConditionHint: 'Opcional: coincide con el nombre de la categoría del ticket.',
     toggleRuleConfirm: '¿Deseas cambiar el estado de la regla {{name}}?',
-    approvalSubtitle: 'Flujos de aprobación de varias etapas con aprobadores por rol, grupo o usuario.',
+    approvalSubtitle:
+      'Flujos de aprobación de varias etapas con aprobadores por rol, grupo o usuario.',
     newFlow: 'Nuevo flujo',
     editFlow: 'Editar flujo',
     flowCreated: 'Flujo creado.',
@@ -366,7 +367,8 @@ export const esES = {
     createLoading: 'Creando...',
     createError: 'No se pudo crear el ticket. Revisa los datos e inténtalo de nuevo.',
     createdSuccess: 'Ticket creado correctamente',
-    createdSubtitle: 'Tu ticket ha sido registrado. Revisa el enrutamiento, el grupo y los plazos de SLA.',
+    createdSubtitle:
+      'Tu ticket ha sido registrado. Revisa el enrutamiento, el grupo y los plazos de SLA.',
     openTicket: 'Abrir ticket',
     createAnother: 'Crear otro',
     routedAuto: 'Enrutamiento automático',

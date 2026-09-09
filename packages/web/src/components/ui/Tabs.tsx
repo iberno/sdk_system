@@ -46,9 +46,7 @@ export function Tabs({ items, activeKey, onChange }: TabsProps) {
           )
         })}
       </div>
-      <div className="py-4">
-        {items.find((item) => item.key === active)?.content}
-      </div>
+      <div className="py-4">{items.find((item) => item.key === active)?.content}</div>
     </div>
   )
 }

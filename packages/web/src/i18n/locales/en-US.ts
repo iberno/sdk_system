@@ -88,8 +88,7 @@ export const enUS = {
     demoTitle: 'Demo',
     demoHint: 'Click to fill with the test credentials:',
     resetTitle: 'Reset password',
-    resetSubtitle:
-      'Enter your corporate email and we will send you recovery instructions.',
+    resetSubtitle: 'Enter your corporate email and we will send you recovery instructions.',
     resetSend: 'Send instructions',
     resetBack: 'Back to sign in',
     backToLogin: 'Back to sign in',

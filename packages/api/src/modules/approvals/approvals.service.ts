@@ -23,7 +23,11 @@ import {
   type ApprovalStage,
 } from '../approval-flows/approval-flows.service.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
-import { ApproveDto, QueryApprovalsDto, RejectDto } from './dto/approval.dto.js';
+import {
+  ApproveDto,
+  QueryApprovalsDto,
+  RejectDto,
+} from './dto/approval.dto.js';
 
 type Tx = Prisma.TransactionClient;
 
@@ -72,7 +76,9 @@ export class ApprovalsService {
   }
 
   async requestForTicket(flowId: string, ticketId: string, actor: UserContext) {
-    const flow = await this.prisma.approvalFlow.findUnique({ where: { id: flowId } });
+    const flow = await this.prisma.approvalFlow.findUnique({
+      where: { id: flowId },
+    });
     if (!flow) {
       throw new UnprocessableEntityException({
         key: 'business.approval_flow_invalid',
@@ -92,9 +98,14 @@ export class ApprovalsService {
       });
     }
 
-    const ticket = await this.prisma.ticket.findUnique({ where: { id: ticketId } });
+    const ticket = await this.prisma.ticket.findUnique({
+      where: { id: ticketId },
+    });
     if (!ticket) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     if (flow.companyId !== ticket.companyId) {
       throw new UnprocessableEntityException({
@@ -147,9 +158,11 @@ export class ApprovalsService {
       });
     });
 
-    await this.emitApprovalsPending(
-      { ticketId, flowName: flow.name, entityType: flow.entityType },
-    );
+    await this.emitApprovalsPending({
+      ticketId,
+      flowName: flow.name,
+      entityType: flow.entityType,
+    });
 
     return {
       ticketId,
@@ -161,7 +174,9 @@ export class ApprovalsService {
   }
 
   async requestForChange(flowId: string, changeId: string) {
-    const flow = await this.prisma.approvalFlow.findUnique({ where: { id: flowId } });
+    const flow = await this.prisma.approvalFlow.findUnique({
+      where: { id: flowId },
+    });
     if (!flow) {
       throw new UnprocessableEntityException({
         key: 'business.approval_flow_invalid',
@@ -181,9 +196,14 @@ export class ApprovalsService {
       });
     }
 
-    const change = await this.prisma.change.findUnique({ where: { id: changeId } });
+    const change = await this.prisma.change.findUnique({
+      where: { id: changeId },
+    });
     if (!change) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     if (flow.companyId !== change.companyId) {
       throw new UnprocessableEntityException({
@@ -227,9 +247,11 @@ export class ApprovalsService {
       });
     });
 
-    await this.emitApprovalsPending(
-      { changeId, flowName: flow.name, entityType: flow.entityType },
-    );
+    await this.emitApprovalsPending({
+      changeId,
+      flowName: flow.name,
+      entityType: flow.entityType,
+    });
 
     return {
       changeId,
@@ -255,7 +277,10 @@ export class ApprovalsService {
       },
     });
     if (!approval) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     if (approval.approverId !== actor.sub) {
       throw new ForbiddenException({
@@ -272,7 +297,11 @@ export class ApprovalsService {
 
     if (result === ApprovalStatus.APPROVED && approval.ticketId) {
       const priorPending = await this.prisma.approval.findFirst({
-        where: { ticketId: approval.ticketId, status: 'PENDING', order: { lt: approval.order } },
+        where: {
+          ticketId: approval.ticketId,
+          status: 'PENDING',
+          order: { lt: approval.order },
+        },
         select: { order: true },
       });
       if (priorPending) {
@@ -285,7 +314,11 @@ export class ApprovalsService {
     }
     if (result === ApprovalStatus.APPROVED && approval.changeId) {
       const priorPending = await this.prisma.approval.findFirst({
-        where: { changeId: approval.changeId, status: 'PENDING', order: { lt: approval.order } },
+        where: {
+          changeId: approval.changeId,
+          status: 'PENDING',
+          order: { lt: approval.order },
+        },
         select: { order: true },
       });
       if (priorPending) {
@@ -353,7 +386,11 @@ export class ApprovalsService {
     };
   }
 
-  private async afterChangeApproved(tx: Tx, changeId: string, _comment: string | null) {
+  private async afterChangeApproved(
+    tx: Tx,
+    changeId: string,
+    _comment: string | null,
+  ) {
     const remaining = await tx.approval.count({
       where: { changeId, status: 'PENDING' },
     });
@@ -372,7 +409,11 @@ export class ApprovalsService {
     });
   }
 
-  private async afterChangeRejected(tx: Tx, changeId: string, _comment: string | null) {
+  private async afterChangeRejected(
+    tx: Tx,
+    changeId: string,
+    _comment: string | null,
+  ) {
     await tx.approval.updateMany({
       where: { changeId, status: 'PENDING' },
       data: { status: ApprovalStatus.REJECTED },
@@ -385,11 +426,7 @@ export class ApprovalsService {
     });
   }
 
-  private async afterTicketApproved(
-    tx: Tx,
-    ticketId: string,
-    actorId: string,
-  ) {
+  private async afterTicketApproved(tx: Tx, ticketId: string, actorId: string) {
     const remaining = await tx.approval.count({
       where: { ticketId, status: 'PENDING' },
     });
@@ -450,7 +487,8 @@ export class ApprovalsService {
       'PENDING',
       'WAITING_USER',
     ];
-    if (prev && (allowed as string[]).includes(prev)) return prev as TicketStatus;
+    if (prev && (allowed as string[]).includes(prev))
+      return prev as TicketStatus;
     return TicketStatus.IN_PROGRESS;
   }
 
@@ -481,9 +519,12 @@ export class ApprovalsService {
     });
   }
 
-  private async emitApprovalsPending(
-    target: { ticketId?: string; changeId?: string; flowName: string; entityType: string },
-  ) {
+  private async emitApprovalsPending(target: {
+    ticketId?: string;
+    changeId?: string;
+    flowName: string;
+    entityType: string;
+  }) {
     const where = target.ticketId
       ? { ticketId: target.ticketId, status: ApprovalStatus.PENDING }
       : { changeId: target.changeId, status: ApprovalStatus.PENDING };
@@ -528,7 +569,9 @@ export class ApprovalsService {
     companyId: string,
   ): Promise<string | null> {
     if (stage.userId) {
-      const user = await this.prisma.user.findUnique({ where: { id: stage.userId } });
+      const user = await this.prisma.user.findUnique({
+        where: { id: stage.userId },
+      });
       return user && user.status === Status.ACTIVE ? user.id : null;
     }
     if (stage.solverGroupId) {

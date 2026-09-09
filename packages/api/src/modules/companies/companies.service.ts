@@ -6,8 +6,16 @@ import {
 } from '@nestjs/common';
 import { Prisma, Status } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { CreateCompanyDto, UpdateCompanyDto, isValidCnpj } from './dto/company.dto.js';
-import { PaginationDto, paginationArgs, paginationMeta } from '../../common/dto/pagination.dto.js';
+import {
+  CreateCompanyDto,
+  UpdateCompanyDto,
+  isValidCnpj,
+} from './dto/company.dto.js';
+import {
+  PaginationDto,
+  paginationArgs,
+  paginationMeta,
+} from '../../common/dto/pagination.dto.js';
 import { PaginatedResult } from '../../common/interceptors/transform.interceptor.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 
@@ -96,9 +104,15 @@ export class CompaniesService {
   }
 
   async findOne(id: string) {
-    const row = await this.prisma.company.findUnique({ where: { id }, select: companySelect });
+    const row = await this.prisma.company.findUnique({
+      where: { id },
+      select: companySelect,
+    });
     if (!row) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return this.serialize(row);
   }
@@ -145,7 +159,11 @@ export class CompaniesService {
     return this.serialize(row);
   }
 
-  private async assertUnique(name: string | undefined, cnpj: string | undefined, ignoreId?: string) {
+  private async assertUnique(
+    name: string | undefined,
+    cnpj: string | undefined,
+    ignoreId?: string,
+  ) {
     const where: Prisma.CompanyWhereInput[] = [];
     if (name) where.push({ name });
     if (cnpj) where.push({ cnpj });
@@ -156,7 +174,10 @@ export class CompaniesService {
       select: { id: true, name: true, cnpj: true },
     });
     if (duplicate) {
-      throw new ConflictException({ key: 'errors.conflict', error: 'Conflict' });
+      throw new ConflictException({
+        key: 'errors.conflict',
+        error: 'Conflict',
+      });
     }
   }
 }

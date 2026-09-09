@@ -33,7 +33,8 @@ export class CreateTicketDto {
   beneficiaryId?: string;
 
   @ApiPropertyOptional({
-    description: 'Solicitante do chamado (apenas equipe). Deve pertencer à mesma empresa do chamado; padrão: usuário logado',
+    description:
+      'Solicitante do chamado (apenas equipe). Deve pertencer à mesma empresa do chamado; padrão: usuário logado',
   })
   @IsOptional()
   @IsString()
@@ -55,13 +56,16 @@ export class CreateTicketDto {
   urgency?: Urgency;
 
   @ApiPropertyOptional({
-    description: 'Empresa do chamado (default: a do usuário logado). Equipe pode abrir para qualquer empresa ATIVA.',
+    description:
+      'Empresa do chamado (default: a do usuário logado). Equipe pode abrir para qualquer empresa ATIVA.',
   })
   @IsOptional()
   @IsString()
   companyId?: string;
 
-  @ApiPropertyOptional({ description: 'Categoria hierárquica (folha da árvore de categorias)' })
+  @ApiPropertyOptional({
+    description: 'Categoria hierárquica (folha da árvore de categorias)',
+  })
   @IsOptional()
   @IsString()
   categoryId?: string;

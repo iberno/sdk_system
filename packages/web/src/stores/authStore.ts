@@ -48,17 +48,14 @@ export const useAuthStore = create<AuthState>()(
       setLocale: (locale) =>
         set((state) => (state.user ? { user: { ...state.user, locale } } : state)),
       login: async (email, password) => {
-        const data = unwrap<LoginResponse>(
-          await api.post('/auth/login', { email, password }),
-        )
+        const data = unwrap<LoginResponse>(await api.post('/auth/login', { email, password }))
         set({
           accessToken: data.accessToken,
           refreshToken: data.refreshToken ?? null,
           user: data.user,
         })
       },
-      logout: () =>
-        set({ accessToken: null, refreshToken: null, user: null }),
+      logout: () => set({ accessToken: null, refreshToken: null, user: null }),
     }),
     { name: 'sdk-auth' },
   ),

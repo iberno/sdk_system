@@ -18,17 +18,25 @@ import { SlaService } from '../sla/sla.service.js';
 import { RoutingRulesService } from '../routing-rules/routing-rules.service.js';
 import { AuditService } from '../audit/audit.service.js';
 import { RealtimeGateway } from '../realtime/realtime.gateway.js';
-import { paginationArgs, paginationMeta } from '../../common/dto/pagination.dto.js';
+import {
+  paginationArgs,
+  paginationMeta,
+} from '../../common/dto/pagination.dto.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 import { CreateTicketDto } from './dto/create-ticket.dto.js';
 import { QueryTicketsDto } from './dto/query-tickets.dto.js';
 import { UpdateTicketDto } from './dto/update-ticket.dto.js';
-import { CreateCommentDto, UpdateTicketStatusDto } from './dto/status-comment.dto.js';
+import {
+  CreateCommentDto,
+  UpdateTicketStatusDto,
+} from './dto/status-comment.dto.js';
 
 const TICKET_INCLUDE = {
   requester: { select: { id: true, name: true, email: true } },
   beneficiary: { select: { id: true, name: true, email: true } },
-  assignee: { select: { id: true, name: true, email: true, solverGroupId: true } },
+  assignee: {
+    select: { id: true, name: true, email: true, solverGroupId: true },
+  },
   solverGroup: { select: { id: true, name: true, level: true } },
   company: { select: { id: true, name: true } },
   category: { select: { id: true, name: true, path: true } },
@@ -52,16 +60,46 @@ const DETAIL_INCLUDE = {
     include: { user: { select: { id: true, name: true } } },
   },
   attachments: { orderBy: { createdAt: 'asc' } },
-  problems: { include: { problem: { select: { id: true, title: true, status: true } } } },
-  changes: { include: { change: { select: { id: true, title: true, status: true } } } },
+  problems: {
+    include: { problem: { select: { id: true, title: true, status: true } } },
+  },
+  changes: {
+    include: { change: { select: { id: true, title: true, status: true } } },
+  },
 } satisfies Prisma.TicketInclude;
 
 const TRANSITIONS: Record<TicketStatus, TicketStatus[]> = {
-  OPEN: ['IN_PROGRESS', 'PENDING', 'WAITING_USER', 'WAITING_APPROVAL', 'RESOLVED', 'CLOSED'],
-  IN_PROGRESS: ['PENDING', 'WAITING_USER', 'WAITING_APPROVAL', 'RESOLVED', 'CLOSED', 'OPEN'],
-  PENDING: ['IN_PROGRESS', 'WAITING_USER', 'WAITING_APPROVAL', 'RESOLVED', 'CLOSED'],
+  OPEN: [
+    'IN_PROGRESS',
+    'PENDING',
+    'WAITING_USER',
+    'WAITING_APPROVAL',
+    'RESOLVED',
+    'CLOSED',
+  ],
+  IN_PROGRESS: [
+    'PENDING',
+    'WAITING_USER',
+    'WAITING_APPROVAL',
+    'RESOLVED',
+    'CLOSED',
+    'OPEN',
+  ],
+  PENDING: [
+    'IN_PROGRESS',
+    'WAITING_USER',
+    'WAITING_APPROVAL',
+    'RESOLVED',
+    'CLOSED',
+  ],
   WAITING_USER: ['IN_PROGRESS', 'RESOLVED', 'CLOSED'],
-  WAITING_APPROVAL: ['IN_PROGRESS', 'PENDING', 'WAITING_USER', 'RESOLVED', 'CLOSED'],
+  WAITING_APPROVAL: [
+    'IN_PROGRESS',
+    'PENDING',
+    'WAITING_USER',
+    'RESOLVED',
+    'CLOSED',
+  ],
   RESOLVED: ['CLOSED', 'OPEN', 'IN_PROGRESS'],
   CLOSED: ['OPEN', 'IN_PROGRESS'],
 };
@@ -96,7 +134,11 @@ export class TicketsService {
   ) {}
 
   async findAll(query: QueryTicketsDto, actor: UserContext) {
-    const { page = 1, pageSize = 20, ...filters } = query as QueryTicketsDto & {
+    const {
+      page = 1,
+      pageSize = 20,
+      ...filters
+    } = query as QueryTicketsDto & {
       page?: number;
       pageSize?: number;
     };
@@ -127,9 +169,14 @@ export class TicketsService {
   }
 
   async create(dto: CreateTicketDto, actor: UserContext) {
-    const actorUser = await this.prisma.user.findUnique({ where: { id: actor.sub } });
+    const actorUser = await this.prisma.user.findUnique({
+      where: { id: actor.sub },
+    });
     if (!actorUser || actorUser.status !== Status.ACTIVE) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     if (!actorUser.companyId) {
       throw new UnprocessableEntityException({
@@ -138,11 +185,18 @@ export class TicketsService {
       });
     }
 
-    const isTeam = actor.role === 'AGENT' || actor.role === 'MANAGER' || actor.role === 'ADMIN';
-    const companyId = isTeam ? (dto.companyId ?? actorUser.companyId) : actorUser.companyId;
+    const isTeam =
+      actor.role === 'AGENT' ||
+      actor.role === 'MANAGER' ||
+      actor.role === 'ADMIN';
+    const companyId = isTeam
+      ? (dto.companyId ?? actorUser.companyId)
+      : actorUser.companyId;
 
     if (companyId !== actorUser.companyId) {
-      const company = await this.prisma.company.findUnique({ where: { id: companyId } });
+      const company = await this.prisma.company.findUnique({
+        where: { id: companyId },
+      });
       if (!company || company.status !== Status.ACTIVE) {
         throw new UnprocessableEntityException({
           key: 'business.company_invalid',
@@ -161,7 +215,11 @@ export class TicketsService {
       requesterId === actorUser.id
         ? actorUser
         : await this.prisma.user.findUnique({ where: { id: requesterId } });
-    if (!requester || requester.status !== Status.ACTIVE || requester.companyId !== companyId) {
+    if (
+      !requester ||
+      requester.status !== Status.ACTIVE ||
+      requester.companyId !== companyId
+    ) {
       throw new UnprocessableEntityException({
         key: 'business.requester_invalid',
         error: 'UnprocessableEntity',
@@ -171,7 +229,9 @@ export class TicketsService {
     let categoryId: string | null = null;
     let categoryName: string | undefined;
     if (dto.categoryId) {
-      const category = await this.prisma.category.findUnique({ where: { id: dto.categoryId } });
+      const category = await this.prisma.category.findUnique({
+        where: { id: dto.categoryId },
+      });
       if (!category || category.status !== Status.ACTIVE) {
         throw new UnprocessableEntityException({
           key: 'business.category_invalid',
@@ -192,8 +252,14 @@ export class TicketsService {
     const impact = dto.impact && isTeam ? dto.impact : 'MEDIUM';
     const urgency = dto.urgency && isTeam ? dto.urgency : 'MEDIUM';
 
-    const { slaResponseAt, slaResolveAt } = await this.sla.calculate(dto.type, priority);
-    const { formatted: ticketNumber } = await this.sequence.next('TICKET', companyId);
+    const { slaResponseAt, slaResolveAt } = await this.sla.calculate(
+      dto.type,
+      priority,
+    );
+    const { formatted: ticketNumber } = await this.sequence.next(
+      'TICKET',
+      companyId,
+    );
 
     const destination = await this.routing.resolveDestination(
       dto.type,
@@ -236,7 +302,9 @@ export class TicketsService {
       ...(solverGroupId
         ? [{ field: 'solverGroupId', oldValue: null, newValue: solverGroupId }]
         : []),
-      ...(assigneeId ? [{ field: 'assigneeId', oldValue: null, newValue: assigneeId }] : []),
+      ...(assigneeId
+        ? [{ field: 'assigneeId', oldValue: null, newValue: assigneeId }]
+        : []),
     ]);
 
     await this.audit.log({
@@ -275,36 +343,61 @@ export class TicketsService {
   async findOne(id: string, actor: UserContext) {
     const ticket = await this.getTicketDetail(id);
     if (!this.isVisible(ticket, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return this.mapDetail(ticket, actor);
   }
 
   async update(id: string, dto: UpdateTicketDto, actor: UserContext) {
     if (actor.role === 'USER') {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
     const priorityAllowed = actor.role === 'ADMIN' || actor.role === 'MANAGER';
     if ((dto.priority || dto.impact || dto.urgency) && !priorityAllowed) {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
 
     const prev = await this.getTicketDetail(id);
 
-    const history: { field: string; oldValue?: string | null; newValue?: string | null }[] = [];
+    const history: {
+      field: string;
+      oldValue?: string | null;
+      newValue?: string | null;
+    }[] = [];
     const data: Prisma.TicketUncheckedUpdateInput = {};
 
     if (dto.title && dto.title !== prev.title) {
       data.title = dto.title;
-      history.push({ field: 'title', oldValue: prev.title, newValue: dto.title });
+      history.push({
+        field: 'title',
+        oldValue: prev.title,
+        newValue: dto.title,
+      });
     }
     if (dto.description !== undefined && dto.description !== prev.description) {
       data.description = dto.description;
-      history.push({ field: 'description', oldValue: prev.description, newValue: dto.description });
+      history.push({
+        field: 'description',
+        oldValue: prev.description,
+        newValue: dto.description,
+      });
     }
     if (dto.priority && dto.priority !== prev.priority) {
       data.priority = dto.priority;
-      history.push({ field: 'priority', oldValue: prev.priority, newValue: dto.priority });
+      history.push({
+        field: 'priority',
+        oldValue: prev.priority,
+        newValue: dto.priority,
+      });
       const sla = await this.sla.calculate(prev.type, dto.priority);
       data.slaResponseAt = sla.slaResponseAt;
       data.slaResolveAt = sla.slaResolveAt;
@@ -368,10 +461,16 @@ export class TicketsService {
 
   async pickup(id: string, solverGroupId: string, actor: UserContext) {
     if (actor.role !== 'AGENT') {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
     if (!actor.solverGroupId || actor.solverGroupId !== solverGroupId) {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
 
     const ticket = await this.getTicketDetail(id);
@@ -388,9 +487,14 @@ export class TicketsService {
       });
     }
 
-    return this.applyAssignment(id, { assigneeId: actor.sub, solverGroupId }, actor, {
-      skipGroupValidation: true,
-    });
+    return this.applyAssignment(
+      id,
+      { assigneeId: actor.sub, solverGroupId },
+      actor,
+      {
+        skipGroupValidation: true,
+      },
+    );
   }
 
   async reassign(
@@ -407,14 +511,19 @@ export class TicketsService {
     }
     const results = [];
     for (const id of ticketIds) {
-      results.push(await this.applyAssignment(id, { assigneeId, solverGroupId }, actor));
+      results.push(
+        await this.applyAssignment(id, { assigneeId, solverGroupId }, actor),
+      );
     }
     return { updated: results.length };
   }
 
   async unassigned(actor: UserContext) {
     if (actor.role === 'USER') {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
     const rows = await this.prisma.ticket.findMany({
       where: {
@@ -428,10 +537,17 @@ export class TicketsService {
     return { items: rows.map((t) => this.mapListItem(t)) };
   }
 
-  async changeStatus(id: string, dto: UpdateTicketStatusDto, actor: UserContext) {
+  async changeStatus(
+    id: string,
+    dto: UpdateTicketStatusDto,
+    actor: UserContext,
+  ) {
     const ticket = await this.getTicketDetail(id);
 
-    const isTeam = actor.role === 'AGENT' || actor.role === 'MANAGER' || actor.role === 'ADMIN';
+    const isTeam =
+      actor.role === 'AGENT' ||
+      actor.role === 'MANAGER' ||
+      actor.role === 'ADMIN';
     const isParticipant = this.isParticipant(ticket, actor.sub);
 
     if (dto.status === ticket.status) {
@@ -452,17 +568,26 @@ export class TicketsService {
 
     if (!isTeam) {
       if (!isParticipant) {
-        throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+        throw new ForbiddenException({
+          key: 'errors.forbidden',
+          error: 'Forbidden',
+        });
       }
       const participantAllowed =
         (ticket.status === 'RESOLVED' && dto.status === 'CLOSED') ||
-        (ticket.status === 'CLOSED' && (dto.status === 'OPEN' || dto.status === 'IN_PROGRESS'));
+        (ticket.status === 'CLOSED' &&
+          (dto.status === 'OPEN' || dto.status === 'IN_PROGRESS'));
       if (!participantAllowed) {
-        throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+        throw new ForbiddenException({
+          key: 'errors.forbidden',
+          error: 'Forbidden',
+        });
       }
     }
 
-    const reopening = ticket.status === 'CLOSED' && (dto.status === 'OPEN' || dto.status === 'IN_PROGRESS');
+    const reopening =
+      ticket.status === 'CLOSED' &&
+      (dto.status === 'OPEN' || dto.status === 'IN_PROGRESS');
     if (
       reopening &&
       ticket.closedAt &&
@@ -481,12 +606,16 @@ export class TicketsService {
       ...(dto.status === 'RESOLVED' && !ticket.resolvedAt
         ? { resolvedAt: new Date() }
         : {}),
-      ...(dto.status === 'CLOSED' && !ticket.closedAt ? { closedAt: new Date() } : {}),
+      ...(dto.status === 'CLOSED' && !ticket.closedAt
+        ? { closedAt: new Date() }
+        : {}),
     };
 
-    const history: { field: string; oldValue?: string | null; newValue?: string | null }[] = [
-      { field: 'status', oldValue: ticket.status, newValue: dto.status },
-    ];
+    const history: {
+      field: string;
+      oldValue?: string | null;
+      newValue?: string | null;
+    }[] = [{ field: 'status', oldValue: ticket.status, newValue: dto.status }];
     if (dto.resolutionNote) {
       history.push({
         field: 'resolutionNote',
@@ -495,7 +624,11 @@ export class TicketsService {
       });
     }
 
-    const updated = await this.prisma.ticket.update({ where: { id }, data, include: DETAIL_INCLUDE });
+    const updated = await this.prisma.ticket.update({
+      where: { id },
+      data,
+      include: DETAIL_INCLUDE,
+    });
     await this.recordHistory(id, actor.sub, history);
     await this.audit.log({
       action: 'UPDATE',
@@ -532,11 +665,17 @@ export class TicketsService {
 
     if (dto.visibility === 'INTERNAL') {
       if (!isTeam) {
-        throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+        throw new ForbiddenException({
+          key: 'errors.forbidden',
+          error: 'Forbidden',
+        });
       }
     } else {
       if (!isParticipant && !isTeam) {
-        throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+        throw new ForbiddenException({
+          key: 'errors.forbidden',
+          error: 'Forbidden',
+        });
       }
     }
 
@@ -581,7 +720,10 @@ export class TicketsService {
   ) {
     const ticket = await this.getTicketDetail(id);
     if (!this.isVisible(ticket, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return this.prisma.attachment.create({
       data: { ...file, ticketId: id },
@@ -591,7 +733,10 @@ export class TicketsService {
   async getAttachment(id: string, attachmentId: string, actor: UserContext) {
     const ticket = await this.getTicketDetail(id);
     if (!this.isVisible(ticket, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return this.prisma.attachment.findFirst({
       where: { id: attachmentId, ticketId: id },
@@ -614,10 +759,16 @@ export class TicketsService {
 
     const prev = await this.getTicketDetail(id);
     const data: Prisma.TicketUncheckedUpdateInput = {};
-    const history: { field: string; oldValue?: string | null; newValue?: string | null }[] = [];
+    const history: {
+      field: string;
+      oldValue?: string | null;
+      newValue?: string | null;
+    }[] = [];
 
     if (solverGroupId) {
-      const group = await this.prisma.solverGroup.findUnique({ where: { id: solverGroupId } });
+      const group = await this.prisma.solverGroup.findUnique({
+        where: { id: solverGroupId },
+      });
       if (!group || group.status !== Status.ACTIVE) {
         throw new UnprocessableEntityException({
           key: 'business.group_inactive',
@@ -642,11 +793,17 @@ export class TicketsService {
         }
       }
       data.solverGroupId = group.id;
-      history.push({ field: 'solverGroupId', oldValue: prev.solverGroupId, newValue: group.id });
+      history.push({
+        field: 'solverGroupId',
+        oldValue: prev.solverGroupId,
+        newValue: group.id,
+      });
     }
 
     if (assigneeId) {
-      const agent = await this.prisma.user.findUnique({ where: { id: assigneeId } });
+      const agent = await this.prisma.user.findUnique({
+        where: { id: assigneeId },
+      });
       if (!agent || agent.role !== 'AGENT' || agent.status !== Status.ACTIVE) {
         throw new UnprocessableEntityException({
           key: 'business.agent_inactive',
@@ -668,7 +825,11 @@ export class TicketsService {
         });
       }
       data.assigneeId = agent.id;
-      history.push({ field: 'assigneeId', oldValue: prev.assigneeId, newValue: agent.id });
+      history.push({
+        field: 'assigneeId',
+        oldValue: prev.assigneeId,
+        newValue: agent.id,
+      });
     }
 
     data.routedByAuto = false;
@@ -677,13 +838,23 @@ export class TicketsService {
 
     if (prev.status === 'OPEN') {
       data.status = 'IN_PROGRESS';
-      history.push({ field: 'status', oldValue: 'OPEN', newValue: 'IN_PROGRESS' });
+      history.push({
+        field: 'status',
+        oldValue: 'OPEN',
+        newValue: 'IN_PROGRESS',
+      });
     }
 
     const updated = await this.prisma.$transaction(async (tx) => {
       for (const h of history) {
         await tx.ticketHistory.create({
-          data: { field: h.field, oldValue: h.oldValue, newValue: h.newValue, ticketId: id, userId: actor.sub },
+          data: {
+            field: h.field,
+            oldValue: h.oldValue,
+            newValue: h.newValue,
+            ticketId: id,
+            userId: actor.sub,
+          },
         });
       }
       return tx.ticket.update({ where: { id }, data, include: DETAIL_INCLUDE });
@@ -733,7 +904,9 @@ export class TicketsService {
     companyId: string,
   ): Promise<string> {
     if (beneficiaryId === requesterId) return requesterId;
-    const beneficiary = await this.prisma.user.findUnique({ where: { id: beneficiaryId } });
+    const beneficiary = await this.prisma.user.findUnique({
+      where: { id: beneficiaryId },
+    });
     if (!beneficiary) {
       throw new UnprocessableEntityException({
         key: 'business.beneficiary_invalid',
@@ -749,7 +922,10 @@ export class TicketsService {
     return beneficiary.id;
   }
 
-  private buildWhere(filters: QueryTicketsDto, actor: UserContext): Prisma.TicketWhereInput {
+  private buildWhere(
+    filters: QueryTicketsDto,
+    actor: UserContext,
+  ): Prisma.TicketWhereInput {
     const where: Prisma.TicketWhereInput = {};
 
     if (filters.search) {
@@ -773,7 +949,12 @@ export class TicketsService {
       where.AND = [
         ...(Array.isArray(where.AND) ? where.AND : []),
         { status: { notIn: ['RESOLVED', 'CLOSED'] } },
-        { OR: [{ slaResolveAt: { lt: new Date() } }, { slaResponseAt: { lt: new Date() } }] },
+        {
+          OR: [
+            { slaResolveAt: { lt: new Date() } },
+            { slaResponseAt: { lt: new Date() } },
+          ],
+        },
       ];
     }
     if (filters.unassigned) {
@@ -781,7 +962,10 @@ export class TicketsService {
       where.status = { in: OPEN_QUEUE_STATUSES };
     }
 
-    where.AND = [...(Array.isArray(where.AND) ? where.AND : []), this.visibilityScope(actor)];
+    where.AND = [
+      ...(Array.isArray(where.AND) ? where.AND : []),
+      this.visibilityScope(actor),
+    ];
     return where;
   }
 
@@ -801,7 +985,9 @@ export class TicketsService {
     }
     return {
       OR: [
-        ...(actor.solverGroupId ? [{ solverGroupId: actor.solverGroupId }] : []),
+        ...(actor.solverGroupId
+          ? [{ solverGroupId: actor.solverGroupId }]
+          : []),
         { assigneeId: actor.sub },
       ],
     };
@@ -810,7 +996,9 @@ export class TicketsService {
   private isVisible(ticket: TicketRow, actor: UserContext): boolean {
     if (actor.role === 'ADMIN') return true;
     if (actor.role === 'USER') {
-      return ticket.requesterId === actor.sub || ticket.beneficiaryId === actor.sub;
+      return (
+        ticket.requesterId === actor.sub || ticket.beneficiaryId === actor.sub
+      );
     }
     if (actor.role === 'MANAGER') {
       return (
@@ -820,7 +1008,8 @@ export class TicketsService {
       );
     }
     return (
-      (ticket.solverGroupId != null && ticket.solverGroupId === actor.solverGroupId) ||
+      (ticket.solverGroupId != null &&
+        ticket.solverGroupId === actor.solverGroupId) ||
       ticket.assigneeId === actor.sub
     );
   }
@@ -837,10 +1026,16 @@ export class TicketsService {
     if (this.isParticipant(ticket, actor.sub)) return false;
     if (actor.role === 'USER') return false;
     if (actor.role === 'ADMIN' || actor.role === 'MANAGER') return true;
-    return ticket.solverGroupId != null && ticket.solverGroupId === actor.solverGroupId;
+    return (
+      ticket.solverGroupId != null &&
+      ticket.solverGroupId === actor.solverGroupId
+    );
   }
 
-  private isSlaBreached(t: { slaResolveAt: Date | null; status: TicketStatus }): boolean {
+  private isSlaBreached(t: {
+    slaResolveAt: Date | null;
+    status: TicketStatus;
+  }): boolean {
     return (
       t.slaResolveAt != null &&
       t.status !== 'RESOLVED' &&
@@ -849,7 +1044,9 @@ export class TicketsService {
     );
   }
 
-  private mapListItem(t: Prisma.TicketGetPayload<{ include: typeof TICKET_INCLUDE }>) {
+  private mapListItem(
+    t: Prisma.TicketGetPayload<{ include: typeof TICKET_INCLUDE }>,
+  ) {
     return {
       id: t.id,
       ticketNumber: t.ticketNumber,
@@ -862,14 +1059,22 @@ export class TicketsService {
       slaResponseAt: t.slaResponseAt,
       slaResolveAt: t.slaResolveAt,
       slaBreached: this.isSlaBreached(t),
-      requester: t.requester ? { id: t.requester.id, name: t.requester.name } : null,
+      requester: t.requester
+        ? { id: t.requester.id, name: t.requester.name }
+        : null,
       beneficiary: t.beneficiary
         ? { id: t.beneficiary.id, name: t.beneficiary.name }
         : null,
-      assignee: t.assignee ? { id: t.assignee.id, name: t.assignee.name } : null,
-      solverGroup: t.solverGroup ? { id: t.solverGroup.id, name: t.solverGroup.name } : null,
+      assignee: t.assignee
+        ? { id: t.assignee.id, name: t.assignee.name }
+        : null,
+      solverGroup: t.solverGroup
+        ? { id: t.solverGroup.id, name: t.solverGroup.name }
+        : null,
       company: t.company ? { id: t.company.id, name: t.company.name } : null,
-      category: t.category ? { id: t.category.id, name: t.category.name, path: t.category.path } : null,
+      category: t.category
+        ? { id: t.category.id, name: t.category.name, path: t.category.path }
+        : null,
       createdAt: t.createdAt,
       resolvedAt: t.resolvedAt,
     };
@@ -901,18 +1106,30 @@ export class TicketsService {
       slaResponseAt: t.slaResponseAt,
       slaResolveAt: t.slaResolveAt,
       slaBreached: this.isSlaBreached(t),
-      requester: t.requester ? { id: t.requester.id, name: t.requester.name } : null,
+      requester: t.requester
+        ? { id: t.requester.id, name: t.requester.name }
+        : null,
       beneficiary: t.beneficiary
         ? { id: t.beneficiary.id, name: t.beneficiary.name }
         : null,
       assignee: t.assignee
-        ? { id: t.assignee.id, name: t.assignee.name, solverGroupId: t.assignee.solverGroupId }
+        ? {
+            id: t.assignee.id,
+            name: t.assignee.name,
+            solverGroupId: t.assignee.solverGroupId,
+          }
         : null,
       solverGroup: t.solverGroup
-        ? { id: t.solverGroup.id, name: t.solverGroup.name, level: t.solverGroup.level }
+        ? {
+            id: t.solverGroup.id,
+            name: t.solverGroup.name,
+            level: t.solverGroup.level,
+          }
         : null,
       company: t.company ? { id: t.company.id, name: t.company.name } : null,
-      category: t.category ? { id: t.category.id, name: t.category.name, path: t.category.path } : null,
+      category: t.category
+        ? { id: t.category.id, name: t.category.name, path: t.category.path }
+        : null,
       routedBy: {
         auto: t.routedByAuto,
         strategy: t.routedStrategy,
@@ -924,7 +1141,9 @@ export class TicketsService {
         status: a.status,
         order: a.order,
         comment: a.comment,
-        approver: a.approver ? { id: a.approver.id, name: a.approver.name } : null,
+        approver: a.approver
+          ? { id: a.approver.id, name: a.approver.name }
+          : null,
         flowName: a.flow?.name ?? null,
       })),
       timeline,
@@ -969,7 +1188,11 @@ export class TicketsService {
   private async recordHistory(
     ticketId: string,
     userId: string,
-    entries: { field: string; oldValue?: string | null; newValue?: string | null }[],
+    entries: {
+      field: string;
+      oldValue?: string | null;
+      newValue?: string | null;
+    }[],
   ) {
     if (entries.length === 0) return;
     await this.prisma.ticketHistory.createMany({
@@ -996,11 +1219,7 @@ export class TicketsService {
   }): Promise<boolean> {
     if (ticket.slaBreached) return false;
     const end = ticket.slaResolveAt;
-    if (
-      !end ||
-      ticket.status === 'RESOLVED' ||
-      ticket.status === 'CLOSED'
-    ) {
+    if (!end || ticket.status === 'RESOLVED' || ticket.status === 'CLOSED') {
       return false;
     }
     if (end.getTime() > Date.now()) return false;
@@ -1024,7 +1243,10 @@ export class TicketsService {
       include: DETAIL_INCLUDE,
     });
     if (!ticket) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return ticket;
   }

@@ -60,7 +60,10 @@ export class UpdateSolverGroupDto {
 }
 
 export class ReplaceAgentsDto {
-  @ApiProperty({ description: 'Lista completa de agentes do grupo (substitui atual)', type: [String] })
+  @ApiProperty({
+    description: 'Lista completa de agentes do grupo (substitui atual)',
+    type: [String],
+  })
   @IsArray()
   @ArrayMinSize(1)
   @IsUUID(undefined, { each: true })

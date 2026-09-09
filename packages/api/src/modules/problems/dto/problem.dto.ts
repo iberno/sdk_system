@@ -1,11 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsIn,
-  IsOptional,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { IsEnum, IsIn, IsOptional, IsString, MinLength } from 'class-validator';
 import { Impact, ProblemStatus } from '@prisma/client';
 
 const PROBLEM_STATUSES = ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'] as const;
@@ -16,7 +10,9 @@ export class CreateProblemDto {
   @MinLength(3)
   title: string;
 
-  @ApiProperty({ example: 'Usuários relatando falha de autenticação intermitente' })
+  @ApiProperty({
+    example: 'Usuários relatando falha de autenticação intermitente',
+  })
   @IsString()
   @MinLength(3)
   description: string;
@@ -26,7 +22,9 @@ export class CreateProblemDto {
   @IsEnum(Impact)
   impact?: Impact;
 
-  @ApiPropertyOptional({ description: 'Empresa (dispensável se o usuário tiver companyId)' })
+  @ApiPropertyOptional({
+    description: 'Empresa (dispensável se o usuário tiver companyId)',
+  })
   @IsOptional()
   @IsString()
   companyId?: string;

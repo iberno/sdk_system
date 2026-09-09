@@ -16,7 +16,10 @@ export class DashboardService {
 
   async summary(actor: UserContext) {
     if (actor.role === 'USER') {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
     const scope: Prisma.TicketWhereInput = this.visibilityScope(actor);
 
@@ -25,53 +28,65 @@ export class DashboardService {
     start.setDate(end.getDate() - 29);
     start.setHours(0, 0, 0, 0);
 
-    const [openTickets, inProgress, resolved, slaBreached, byPriorityRaw, byStatusRaw, byTypeRaw, byGroupRaw, activity, avgResolution] =
-      await Promise.all([
-        this.prisma.ticket.count({ where: { ...scope, status: STATUS_OPEN } }),
-        this.prisma.ticket.count({ where: { ...scope, status: STATUS_IN_PROGRESS } }),
-        this.prisma.ticket.count({
-          where: { ...scope, status: { in: [STATUS_RESOLVED, STATUS_CLOSED] } },
-        }),
-        this.prisma.ticket.count({ where: { ...scope, slaBreached: true } }),
-        this.prisma.ticket.groupBy({
-          by: ['priority'],
-          where: scope,
-          _count: { _all: true },
-          orderBy: { _count: { priority: 'desc' } },
-        }),
-        this.prisma.ticket.groupBy({
-          by: ['status'],
-          where: scope,
-          _count: { _all: true },
-          orderBy: { _count: { status: 'desc' } },
-        }),
-        this.prisma.ticket.groupBy({
-          by: ['type'],
-          where: scope,
-          _count: { _all: true },
-          orderBy: { _count: { type: 'desc' } },
-        }),
-        this.prisma.ticket.groupBy({
-          by: ['solverGroupId'],
-          where: scope,
-          _count: { _all: true },
-          orderBy: { _count: { solverGroupId: 'desc' } },
-        }),
-        this.prisma.ticket.findMany({
-          where: { ...scope, createdAt: { gte: start } },
-          select: {
-            id: true,
-            createdAt: true,
-            resolvedAt: true,
-            closedAt: true,
-            status: true,
-          },
-        }),
-        this.prisma.ticket.findMany({
-          where: { ...scope, status: { in: [STATUS_RESOLVED, STATUS_CLOSED] } },
-          select: { id: true, createdAt: true, resolvedAt: true },
-        }),
-      ]);
+    const [
+      openTickets,
+      inProgress,
+      resolved,
+      slaBreached,
+      byPriorityRaw,
+      byStatusRaw,
+      byTypeRaw,
+      byGroupRaw,
+      activity,
+      avgResolution,
+    ] = await Promise.all([
+      this.prisma.ticket.count({ where: { ...scope, status: STATUS_OPEN } }),
+      this.prisma.ticket.count({
+        where: { ...scope, status: STATUS_IN_PROGRESS },
+      }),
+      this.prisma.ticket.count({
+        where: { ...scope, status: { in: [STATUS_RESOLVED, STATUS_CLOSED] } },
+      }),
+      this.prisma.ticket.count({ where: { ...scope, slaBreached: true } }),
+      this.prisma.ticket.groupBy({
+        by: ['priority'],
+        where: scope,
+        _count: { _all: true },
+        orderBy: { _count: { priority: 'desc' } },
+      }),
+      this.prisma.ticket.groupBy({
+        by: ['status'],
+        where: scope,
+        _count: { _all: true },
+        orderBy: { _count: { status: 'desc' } },
+      }),
+      this.prisma.ticket.groupBy({
+        by: ['type'],
+        where: scope,
+        _count: { _all: true },
+        orderBy: { _count: { type: 'desc' } },
+      }),
+      this.prisma.ticket.groupBy({
+        by: ['solverGroupId'],
+        where: scope,
+        _count: { _all: true },
+        orderBy: { _count: { solverGroupId: 'desc' } },
+      }),
+      this.prisma.ticket.findMany({
+        where: { ...scope, createdAt: { gte: start } },
+        select: {
+          id: true,
+          createdAt: true,
+          resolvedAt: true,
+          closedAt: true,
+          status: true,
+        },
+      }),
+      this.prisma.ticket.findMany({
+        where: { ...scope, status: { in: [STATUS_RESOLVED, STATUS_CLOSED] } },
+        select: { id: true, createdAt: true, resolvedAt: true },
+      }),
+    ]);
 
     const byGroupIds = byGroupRaw
       .map((g) => g.solverGroupId)
@@ -84,7 +99,9 @@ export class DashboardService {
       : [];
     const groupName = new Map(groups.map((g) => [g.id, g.name]));
     const byGroup = byGroupRaw.map((g) => ({
-      group: g.solverGroupId ? (groupName.get(g.solverGroupId) ?? 'Desconhecido') : 'Sem grupo',
+      group: g.solverGroupId
+        ? (groupName.get(g.solverGroupId) ?? 'Desconhecido')
+        : 'Sem grupo',
       count: g._count._all,
     }));
 
@@ -107,12 +124,18 @@ export class DashboardService {
 
     const resolutionDurations = avgResolution
       .filter((t) => t.resolvedAt)
-      .map((t) =>
-        Math.max(0, t.resolvedAt!.getTime() - t.createdAt.getTime()) / 3_600_000,
+      .map(
+        (t) =>
+          Math.max(0, t.resolvedAt!.getTime() - t.createdAt.getTime()) /
+          3_600_000,
       );
     const avgResolutionHours =
       resolutionDurations.length > 0
-        ? Math.round((resolutionDurations.reduce((a, b) => a + b, 0) / resolutionDurations.length) * 10) / 10
+        ? Math.round(
+            (resolutionDurations.reduce((a, b) => a + b, 0) /
+              resolutionDurations.length) *
+              10,
+          ) / 10
         : 0;
 
     const trend = this.buildTrend(activity, start, end);
@@ -161,7 +184,9 @@ export class DashboardService {
       where: { id: { in: [...map.keys()] } },
       select: { id: true, createdAt: true },
     });
-    const createdBy = new Map(tickets.map((t) => [t.id, t.createdAt.getTime()]));
+    const createdBy = new Map(
+      tickets.map((t) => [t.id, t.createdAt.getTime()]),
+    );
     const result = new Map<string, number>();
     for (const [ticketId, firstTs] of map) {
       const createdAt = createdBy.get(ticketId);
@@ -184,7 +209,11 @@ export class DashboardService {
   ) {
     const day = (date: Date) => date.toISOString().slice(0, 10);
     const buckets = new Map<string, { created: number; resolved: number }>();
-    for (let d = new Date(start); d.getTime() <= end.getTime(); d = new Date(d.getTime() + DAY_MS)) {
+    for (
+      let d = new Date(start);
+      d.getTime() <= end.getTime();
+      d = new Date(d.getTime() + DAY_MS)
+    ) {
       buckets.set(day(d), { created: 0, resolved: 0 });
     }
     for (const t of activity) {

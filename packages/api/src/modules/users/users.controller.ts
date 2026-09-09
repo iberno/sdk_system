@@ -1,7 +1,20 @@
-import { Body, Controller, Get, Param, Patch, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service.js';
-import { CreateUserDto, UpdateUserDto, UpdateUserStatusDto } from './dto/update-user.dto.js';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  UpdateUserStatusDto,
+} from './dto/update-user.dto.js';
 import { QueryUsersDto } from './dto/query-users.dto.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
@@ -28,7 +41,9 @@ export class UsersController {
 
   @Get('directory')
   @Roles('ADMIN', 'MANAGER', 'AGENT', 'USER')
-  @ApiOperation({ summary: 'Diretório de usuários (busca por empresa/departamento/nome)' })
+  @ApiOperation({
+    summary: 'Diretório de usuários (busca por empresa/departamento/nome)',
+  })
   directory(@Query() query: QueryUsersDto, @CurrentUser() actor: UserContext) {
     return this.usersService.findDirectory(query, actor);
   }
@@ -43,8 +58,14 @@ export class UsersController {
   @Put(':id')
   @Roles('ADMIN', 'MANAGER')
   @ApiBody({ type: UpdateUserDto })
-  @ApiOperation({ summary: 'Atualiza usuário (role/solverGroup s/ permissão MANAGER)' })
-  update(@Param('id') id: string, @Body() dto: UpdateUserDto, @CurrentUser() actor: UserContext) {
+  @ApiOperation({
+    summary: 'Atualiza usuário (role/solverGroup s/ permissão MANAGER)',
+  })
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateUserDto,
+    @CurrentUser() actor: UserContext,
+  ) {
     return this.usersService.update(id, dto, actor);
   }
 

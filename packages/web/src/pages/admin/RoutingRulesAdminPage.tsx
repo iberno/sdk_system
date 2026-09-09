@@ -183,7 +183,11 @@ export default function RoutingRulesAdminPage() {
 
   const columns: Array<Column<RoutingRule>> = useMemo(() => {
     const formatDate = (iso: string) =>
-      new Intl.DateTimeFormat(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' }).format(new Date(iso))
+      new Intl.DateTimeFormat(undefined, {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      }).format(new Date(iso))
     return [
       {
         key: 'order',
@@ -277,7 +281,9 @@ export default function RoutingRulesAdminPage() {
         header: t('dashboard.created'),
         align: 'right',
         render: (row) => (
-          <span className="tabular-nums text-body dark:text-bodydark">{formatDate(row.createdAt)}</span>
+          <span className="tabular-nums text-body dark:text-bodydark">
+            {formatDate(row.createdAt)}
+          </span>
         ),
       },
       {

@@ -14,7 +14,14 @@ import { Select } from '@/components/ui/Select'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Table } from '@/components/ui/Table'
 import type { Column, SortDirection } from '@/components/ui/Table'
-import { STATUS_TONE, PRIORITY_TONE, TYPE_TONE, STATUS_ORDER, PRIORITY_ORDER, TYPE_ORDER } from '@/lib/domain'
+import {
+  STATUS_TONE,
+  PRIORITY_TONE,
+  TYPE_TONE,
+  STATUS_ORDER,
+  PRIORITY_ORDER,
+  TYPE_ORDER,
+} from '@/lib/domain'
 import { useTickets } from '@/hooks/useTickets'
 import { useSolverGroups } from '@/hooks/useDirectory'
 import { useAuthStore } from '@/stores/authStore'
@@ -30,14 +37,24 @@ function useDebouncedValue<T>(value: T, delay = 300) {
   return debounced
 }
 
-function SlaChip({ slaResolveAt, slaBreached, isOpen }: { slaResolveAt: string | null; slaBreached: boolean; isOpen: boolean }) {
+function SlaChip({
+  slaResolveAt,
+  slaBreached,
+  isOpen,
+}: {
+  slaResolveAt: string | null
+  slaBreached: boolean
+  isOpen: boolean
+}) {
   const { t } = useTranslation()
   if (!isOpen || !slaResolveAt) return null
   return (
     <span
       className={cn(
         'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium tabular-nums',
-        slaBreached ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+        slaBreached
+          ? 'bg-red-500/10 text-red-500'
+          : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
       )}
     >
       <FolderClock className="size-3.5" />
@@ -88,7 +105,11 @@ export default function TicketsPage() {
 
   const columns: Array<Column<TicketListItem>> = useMemo(() => {
     const formatDate = (iso: string) =>
-      new Intl.DateTimeFormat(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' }).format(new Date(iso))
+      new Intl.DateTimeFormat(undefined, {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      }).format(new Date(iso))
     return [
       {
         key: 'ticketNumber',
@@ -125,7 +146,9 @@ export default function TicketsPage() {
         key: 'priority',
         header: t('dashboard.priority'),
         sortable: true,
-        render: (row) => <Badge tone={PRIORITY_TONE[row.priority]}>{t(`domain.priority.${row.priority}`)}</Badge>,
+        render: (row) => (
+          <Badge tone={PRIORITY_TONE[row.priority]}>{t(`domain.priority.${row.priority}`)}</Badge>
+        ),
       },
       {
         key: 'requester',
@@ -183,7 +206,9 @@ export default function TicketsPage() {
         align: 'right',
         sortable: true,
         render: (row) => (
-          <span className="tabular-nums text-body dark:text-bodydark">{formatDate(row.createdAt)}</span>
+          <span className="tabular-nums text-body dark:text-bodydark">
+            {formatDate(row.createdAt)}
+          </span>
         ),
       },
     ]
@@ -195,7 +220,9 @@ export default function TicketsPage() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight text-graydark dark:text-white">{t('nav.tickets')}</h1>
+          <h1 className="text-lg font-semibold tracking-tight text-graydark dark:text-white">
+            {t('nav.tickets')}
+          </h1>
           <p className="text-sm text-bodystroke">
             {t('tickets.listSubtitle', { count: pagination?.totalItems ?? 0 })}
           </p>
@@ -244,7 +271,9 @@ export default function TicketsPage() {
               resetPage()
             }}
           >
-            <option value="">{t('common.all')} · {t('common.status')}</option>
+            <option value="">
+              {t('common.all')} · {t('common.status')}
+            </option>
             {STATUS_ORDER.map((value) => (
               <option key={value} value={value}>
                 {t(`domain.status.${value}`)}
@@ -258,7 +287,9 @@ export default function TicketsPage() {
               resetPage()
             }}
           >
-            <option value="">{t('common.all')} · {t('dashboard.type')}</option>
+            <option value="">
+              {t('common.all')} · {t('dashboard.type')}
+            </option>
             {TYPE_ORDER.map((value) => (
               <option key={value} value={value}>
                 {t(`domain.type.${value}`)}
@@ -272,7 +303,9 @@ export default function TicketsPage() {
               resetPage()
             }}
           >
-            <option value="">{t('common.all')} · {t('dashboard.priority')}</option>
+            <option value="">
+              {t('common.all')} · {t('dashboard.priority')}
+            </option>
             {PRIORITY_ORDER.map((value) => (
               <option key={value} value={value}>
                 {t(`domain.priority.${value}`)}
@@ -287,7 +320,9 @@ export default function TicketsPage() {
                 resetPage()
               }}
             >
-              <option value="">{t('common.all')} · {t('tickets.group')}</option>
+              <option value="">
+                {t('common.all')} · {t('tickets.group')}
+              </option>
               {groups.map((g) => (
                 <option key={g.id} value={g.id}>
                   {g.name}

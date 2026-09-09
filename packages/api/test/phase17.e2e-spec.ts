@@ -37,7 +37,10 @@ describe('Fase 17 — Integração completa (e2e)', () => {
   };
 
   const login = async (email: string) => {
-    const res = await api('post', '/auth/login', undefined, { email, password: PASSWORD });
+    const res = await api('post', '/auth/login', undefined, {
+      email,
+      password: PASSWORD,
+    });
     expect(res.status).toBe(200);
     const data = res.body.data as {
       accessToken: string;
@@ -47,18 +50,13 @@ describe('Fase 17 — Integração completa (e2e)', () => {
   };
 
   const createTicket = async (token: string, over: Record<string, unknown>) => {
-    const res = await api(
-      'post',
-      '/tickets',
-      token,
-      {
-        ...over,
-        title: `${MARK} ${over.title}`,
-        description:
-          (over.description as string | undefined) ??
-          'Descrição criada pelo teste E2E da Fase 17',
-      },
-    );
+    const res = await api('post', '/tickets', token, {
+      ...over,
+      title: `${MARK} ${over.title}`,
+      description:
+        (over.description as string | undefined) ??
+        'Descrição criada pelo teste E2E da Fase 17',
+    });
     expect(res.status).toBeGreaterThanOrEqual(200);
     expect(res.status).toBeLessThan(300);
     return res.body.data as Record<string, any>;
@@ -99,7 +97,10 @@ describe('Fase 17 — Integração completa (e2e)', () => {
     agentFabioId = fabio.user.id;
 
     const companies = await api('get', '/companies', tokens.admin);
-    const companyRows = companies.body.data as Array<{ id: string; name: string }>;
+    const companyRows = companies.body.data as Array<{
+      id: string;
+      name: string;
+    }>;
     betaCompanyId = companyRows.find((c) => c.name === 'Beta Ltda')!.id;
 
     const groups = await api('get', '/solver-groups', tokens.manager);
@@ -136,14 +137,23 @@ describe('Fase 17 — Integração completa (e2e)', () => {
         select: { id: true },
       });
       const articleIds = articles.map((a) => a.id);
-      const allEntityIds = [...ticketIds, ...problemIds, ...changeIds, ...articleIds];
+      const allEntityIds = [
+        ...ticketIds,
+        ...problemIds,
+        ...changeIds,
+        ...articleIds,
+      ];
 
-      await prisma.refreshToken.deleteMany({ where: { userId: { in: userIds } } });
+      await prisma.refreshToken.deleteMany({
+        where: { userId: { in: userIds } },
+      });
       await prisma.auditLog.deleteMany({
         where: {
           OR: [
             ...(userIds.length ? [{ userId: { in: userIds } }] : []),
-            ...(allEntityIds.length ? [{ entityId: { in: allEntityIds } }] : []),
+            ...(allEntityIds.length
+              ? [{ entityId: { in: allEntityIds } }]
+              : []),
           ],
         },
       });
@@ -155,16 +165,28 @@ describe('Fase 17 — Integração completa (e2e)', () => {
           ],
         },
       });
-      await prisma.changeTicket.deleteMany({ where: { changeId: { in: changeIds } } });
-      await prisma.problemTicket.deleteMany({ where: { problemId: { in: problemIds } } });
-      await prisma.attachment.deleteMany({ where: { ticketId: { in: ticketIds } } });
-      await prisma.ticketHistory.deleteMany({ where: { ticketId: { in: ticketIds } } });
-      await prisma.ticketComment.deleteMany({ where: { ticketId: { in: ticketIds } } });
+      await prisma.changeTicket.deleteMany({
+        where: { changeId: { in: changeIds } },
+      });
+      await prisma.problemTicket.deleteMany({
+        where: { problemId: { in: problemIds } },
+      });
+      await prisma.attachment.deleteMany({
+        where: { ticketId: { in: ticketIds } },
+      });
+      await prisma.ticketHistory.deleteMany({
+        where: { ticketId: { in: ticketIds } },
+      });
+      await prisma.ticketComment.deleteMany({
+        where: { ticketId: { in: ticketIds } },
+      });
       await prisma.ticket.deleteMany({ where: { id: { in: ticketIds } } });
       // Problem.proposedChangeId referencia Change: problema antes da mudança
       await prisma.problem.deleteMany({ where: { id: { in: problemIds } } });
       await prisma.change.deleteMany({ where: { id: { in: changeIds } } });
-      await prisma.knowledgeArticle.deleteMany({ where: { id: { in: articleIds } } });
+      await prisma.knowledgeArticle.deleteMany({
+        where: { id: { in: articleIds } },
+      });
       await prisma.user.deleteMany({ where: { id: { in: userIds } } });
 
       // Restaura contadores de sequência ao estado pré-teste
@@ -228,7 +250,11 @@ describe('Fase 17 — Integração completa (e2e)', () => {
     });
 
     it('os dois tickets aparecem na fila do grupo N1', async () => {
-      const queue = await api('get', `/tickets?solverGroupId=${n1Group.id}`, tokens.ana);
+      const queue = await api(
+        'get',
+        `/tickets?solverGroupId=${n1Group.id}`,
+        tokens.ana,
+      );
       expect(queue.status).toBe(200);
       const items = queue.body.data as Array<{ ticketNumber: string }>;
       const numbers = items.map((i) => i.ticketNumber);
@@ -277,7 +303,10 @@ describe('Fase 17 — Integração completa (e2e)', () => {
         'post',
         `/tickets/${unassigned.id}/status`,
         tokens.ana,
-        { status: 'RESOLVED', resolutionNote: 'Resolvido pelo teste E2E da Fase 17' },
+        {
+          status: 'RESOLVED',
+          resolutionNote: 'Resolvido pelo teste E2E da Fase 17',
+        },
       );
       expect(resolved.status).toBeGreaterThanOrEqual(200);
       expect(resolved.status).toBeLessThan(300);
@@ -338,32 +367,31 @@ describe('Fase 17 — Integração completa (e2e)', () => {
     let changeId: string;
 
     it('AGENT cria mudança NORMAL e submete para aprovação', async () => {
-      const created = await api(
-        'post',
-        '/changes',
-        tokens.ana,
-        {
-          title: `${MARK} Migração de banco`,
-          description: 'Migração de versão para o teste E2E da Fase 17',
-          type: 'NORMAL',
-          risk: 'HIGH',
-          reason: 'Validação do fluxo de aprovação na Fase 17',
-          plan: '1. Backup 2. Migrar 3. Validar',
-          rollbackPlan: 'Restaurar snapshot',
-        },
-      );
+      const created = await api('post', '/changes', tokens.ana, {
+        title: `${MARK} Migração de banco`,
+        description: 'Migração de versão para o teste E2E da Fase 17',
+        type: 'NORMAL',
+        risk: 'HIGH',
+        reason: 'Validação do fluxo de aprovação na Fase 17',
+        plan: '1. Backup 2. Migrar 3. Validar',
+        rollbackPlan: 'Restaurar snapshot',
+      });
       expect(created.status).toBeGreaterThanOrEqual(200);
       expect(created.status).toBeLessThan(300);
       expect(created.body.data.status).toBe('DRAFT');
       changeId = created.body.data.id;
 
-      const submitted = await api('post', `/changes/${changeId}/submit`, tokens.ana);
+      const submitted = await api(
+        'post',
+        `/changes/${changeId}/submit`,
+        tokens.ana,
+      );
       expect(submitted.status).toBeGreaterThanOrEqual(200);
       expect(submitted.status).toBeLessThan(300);
       expect(submitted.body.data.status).toBe('PENDING_APPROVAL');
-      const pending = (submitted.body.data.approvals as Array<{ status: string }>).filter(
-        (a) => a.status === 'PENDING',
-      );
+      const pending = (
+        submitted.body.data.approvals as Array<{ status: string }>
+      ).filter((a) => a.status === 'PENDING');
       expect(pending).toHaveLength(2);
     });
 
@@ -406,30 +434,33 @@ describe('Fase 17 — Integração completa (e2e)', () => {
     });
 
     it('executa a mudança até COMPLETED', async () => {
-      const start = await api('post', `/changes/${changeId}/execute`, tokens.ana);
+      const start = await api(
+        'post',
+        `/changes/${changeId}/execute`,
+        tokens.ana,
+      );
       expect(start.status).toBeGreaterThanOrEqual(200);
       expect(start.status).toBeLessThan(300);
       expect(start.body.data.status).toBe('IN_PROGRESS');
 
-      const done = await api('post', `/changes/${changeId}/execute`, tokens.ana);
+      const done = await api(
+        'post',
+        `/changes/${changeId}/execute`,
+        tokens.ana,
+      );
       expect(done.status).toBeGreaterThanOrEqual(200);
       expect(done.status).toBeLessThan(300);
       expect(done.body.data.status).toBe('COMPLETED');
     });
 
     it('USER não pode criar mudança', async () => {
-      const denied = await api(
-        'post',
-        '/changes',
-        tokens.gustavo,
-        {
-          title: `${MARK} Bloqueado`,
-          description: 'não deve criar',
-          reason: 'não deve criar',
-          plan: 'não deve criar',
-          rollbackPlan: 'não deve criar',
-        },
-      );
+      const denied = await api('post', '/changes', tokens.gustavo, {
+        title: `${MARK} Bloqueado`,
+        description: 'não deve criar',
+        reason: 'não deve criar',
+        plan: 'não deve criar',
+        rollbackPlan: 'não deve criar',
+      });
       expect(denied.status).toBe(403);
     });
   });
@@ -438,43 +469,48 @@ describe('Fase 17 — Integração completa (e2e)', () => {
     let problemId: string;
 
     it('AGENT cria problema e propõe mudança', async () => {
-      const created = await api(
-        'post',
-        '/problems',
-        tokens.ana,
-        {
-          title: `${MARK} Quedas de rede no polo`,
-          description: 'Quedas recorrentes identificadas no teste E2E da Fase 17',
-          impact: 'HIGH',
-        },
-      );
+      const created = await api('post', '/problems', tokens.ana, {
+        title: `${MARK} Quedas de rede no polo`,
+        description: 'Quedas recorrentes identificadas no teste E2E da Fase 17',
+        impact: 'HIGH',
+      });
       expect(created.status).toBeGreaterThanOrEqual(200);
       expect(created.status).toBeLessThan(300);
       expect(created.body.data.status).toBe('OPEN');
       problemId = created.body.data.id;
 
-      const proposal = await api('post', `/problems/${problemId}/propose-change`, tokens.ana);
+      const proposal = await api(
+        'post',
+        `/problems/${problemId}/propose-change`,
+        tokens.ana,
+      );
       expect(proposal.status).toBeGreaterThanOrEqual(200);
       expect(proposal.status).toBeLessThan(300);
       expect(proposal.body.data.status).toBe('DRAFT');
 
-      const dup = await api('post', `/problems/${problemId}/propose-change`, tokens.ana);
+      const dup = await api(
+        'post',
+        `/problems/${problemId}/propose-change`,
+        tokens.ana,
+      );
       expect(dup.status).toBe(422);
       expect(dup.body.i18n?.key).toBe('business.problem_has_proposal');
     });
 
     it('resolve o problema e publica artigo na KB', async () => {
-      const resolved = await api(
-        'put',
-        `/problems/${problemId}`,
-        tokens.ana,
-        { status: 'RESOLVED', solution: 'Substituição do switch do polo e atualização de firmware' },
-      );
+      const resolved = await api('put', `/problems/${problemId}`, tokens.ana, {
+        status: 'RESOLVED',
+        solution: 'Substituição do switch do polo e atualização de firmware',
+      });
       expect(resolved.status).toBeGreaterThanOrEqual(200);
       expect(resolved.status).toBeLessThan(300);
       expect(resolved.body.data.status).toBe('RESOLVED');
 
-      const article = await api('post', `/problems/${problemId}/publish-article`, tokens.ana);
+      const article = await api(
+        'post',
+        `/problems/${problemId}/publish-article`,
+        tokens.ana,
+      );
       expect(article.status).toBeGreaterThanOrEqual(200);
       expect(article.status).toBeLessThan(300);
       expect(article.body.data.published).toBe(true);
@@ -500,8 +536,12 @@ describe('Fase 17 — Integração completa (e2e)', () => {
 
     it('USER: lê o que é seu, mas não acessa admin nem altera tickets', async () => {
       expect((await api('get', '/users', tokens.gustavo)).status).toBe(403);
-      expect((await api('get', '/solver-groups', tokens.gustavo)).status).toBe(403);
-      expect((await api('post', '/users', tokens.gustavo, {})).status).toBe(403);
+      expect((await api('get', '/solver-groups', tokens.gustavo)).status).toBe(
+        403,
+      );
+      expect((await api('post', '/users', tokens.gustavo, {})).status).toBe(
+        403,
+      );
       expect(
         (
           await api('post', '/knowledge', tokens.gustavo, {
@@ -520,9 +560,14 @@ describe('Fase 17 — Integração completa (e2e)', () => {
       expect(upd.status).toBe(403);
 
       // e não pode mover para IN_PROGRESS (transição restrita ao time)
-      const st = await api('post', `/tickets/${ownTicket.id}/status`, tokens.gustavo, {
-        status: 'IN_PROGRESS',
-      });
+      const st = await api(
+        'post',
+        `/tickets/${ownTicket.id}/status`,
+        tokens.gustavo,
+        {
+          status: 'IN_PROGRESS',
+        },
+      );
       expect(st.status).toBe(403);
     });
 
@@ -530,12 +575,12 @@ describe('Fase 17 — Integração completa (e2e)', () => {
       expect((await api('get', '/solver-groups', tokens.ana)).status).toBe(200);
       expect((await api('get', '/users', tokens.ana)).status).toBe(403);
 
-      const kb = await api(
-        'post',
-        '/knowledge',
-        tokens.ana,
-        { title: `${MARK} Rascunho do agente`, content: 'conteúdo', category: 'Guia', tags: ['e2e'] },
-      );
+      const kb = await api('post', '/knowledge', tokens.ana, {
+        title: `${MARK} Rascunho do agente`,
+        content: 'conteúdo',
+        category: 'Guia',
+        tags: ['e2e'],
+      });
       expect(kb.status).toBeGreaterThanOrEqual(200);
       expect(kb.status).toBeLessThan(300);
       expect(kb.body.data.published).toBe(false);
@@ -544,7 +589,10 @@ describe('Fase 17 — Integração completa (e2e)', () => {
         'post',
         `/tickets/${ownTicket.id}/comments`,
         tokens.ana,
-        { content: 'comentário interno do agente (E2E17)', visibility: 'INTERNAL' },
+        {
+          content: 'comentário interno do agente (E2E17)',
+          visibility: 'INTERNAL',
+        },
       );
       expect(comment.status).toBeGreaterThanOrEqual(200);
       expect(comment.status).toBeLessThan(300);
@@ -552,29 +600,26 @@ describe('Fase 17 — Integração completa (e2e)', () => {
 
     it('MANAGER: lista usuários e grupos, mas não cria usuários', async () => {
       expect((await api('get', '/users', tokens.manager)).status).toBe(200);
-      expect((await api('get', '/solver-groups', tokens.manager)).status).toBe(200);
-      const denied = await api(
-        'post',
-        '/users',
-        tokens.manager,
-        { name: `${MARK} nope`, email: `nope${Date.now()}${EMAIL_SUFFIX}`, password: PASSWORD, role: 'USER' },
+      expect((await api('get', '/solver-groups', tokens.manager)).status).toBe(
+        200,
       );
+      const denied = await api('post', '/users', tokens.manager, {
+        name: `${MARK} nope`,
+        email: `nope${Date.now()}${EMAIL_SUFFIX}`,
+        password: PASSWORD,
+        role: 'USER',
+      });
       expect(denied.status).toBe(403);
     });
 
     it('ADMIN: cria usuário e acessa empresas', async () => {
       expect((await api('get', '/companies', tokens.admin)).status).toBe(200);
-      const created = await api(
-        'post',
-        '/users',
-        tokens.admin,
-        {
-          name: `${MARK} Usuário admin`,
-          email: `admin-cria-${Date.now()}${EMAIL_SUFFIX}`,
-          password: PASSWORD,
-          role: 'USER',
-        },
-      );
+      const created = await api('post', '/users', tokens.admin, {
+        name: `${MARK} Usuário admin`,
+        email: `admin-cria-${Date.now()}${EMAIL_SUFFIX}`,
+        password: PASSWORD,
+        role: 'USER',
+      });
       expect(created.status).toBeGreaterThanOrEqual(200);
       expect(created.status).toBeLessThan(300);
       expect(created.body.data.email).toContain(EMAIL_SUFFIX);
@@ -588,12 +633,13 @@ describe('Fase 17 — Integração completa (e2e)', () => {
 
     it('usuário da Beta Ltda cria ticket na própria empresa', async () => {
       const email = `beta-${Date.now()}${EMAIL_SUFFIX}`;
-      const created = await api(
-        'post',
-        '/users',
-        tokens.admin,
-        { name: `${MARK} Usuário Beta`, email, password: PASSWORD, role: 'USER', companyId: betaCompanyId },
-      );
+      const created = await api('post', '/users', tokens.admin, {
+        name: `${MARK} Usuário Beta`,
+        email,
+        password: PASSWORD,
+        role: 'USER',
+        companyId: betaCompanyId,
+      });
       expect(created.status).toBeGreaterThanOrEqual(200);
       expect(created.status).toBeLessThan(300);
 
@@ -614,7 +660,10 @@ describe('Fase 17 — Integração completa (e2e)', () => {
 
     it('ACME não enxerga o ticket da Beta', async () => {
       const managerList = await api('get', '/tickets', tokens.manager);
-      const managerItems = managerList.body.data as Array<{ id: string; company?: { name: string } | null }>;
+      const managerItems = managerList.body.data as Array<{
+        id: string;
+        company?: { name: string } | null;
+      }>;
       expect(managerItems.some((t) => t.id === betaTicket.id)).toBe(false);
       for (const t of managerItems) {
         if (t.company) expect(t.company.name).toBe('ACME Corp');
@@ -637,7 +686,11 @@ describe('Fase 17 — Integração completa (e2e)', () => {
         expect(t.requester?.id ?? t.beneficiary?.id).toBe(betaUserId);
       }
 
-      const acmeOnly = await api('get', `/tickets?companyId=${betaCompanyId}`, tokens.admin);
+      const acmeOnly = await api(
+        'get',
+        `/tickets?companyId=${betaCompanyId}`,
+        tokens.admin,
+      );
       const acmeItems = acmeOnly.body.data as Array<{ id: string }>;
       expect(acmeItems.some((t) => t.id === betaTicket.id)).toBe(true);
       expect(acmeItems.length).toBeGreaterThanOrEqual(1);

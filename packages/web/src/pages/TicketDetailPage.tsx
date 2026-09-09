@@ -46,7 +46,11 @@ import { PRIORITY_TONE, STATUS_TONE, TYPE_TONE } from '@/lib/domain'
 import { cn } from '@/lib/utils'
 
 const formatDateTime = (iso: string | null) =>
-  iso ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso)) : '—'
+  iso
+    ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(
+        new Date(iso),
+      )
+    : '—'
 
 const formatDate = (iso: string | null) =>
   iso ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(iso)) : '—'
@@ -57,7 +61,13 @@ const formatSize = (bytes: number) => {
   return `${bytes} B`
 }
 
-function PersonaRow({ label, person }: { label: string; person: { name: string } | null | undefined }) {
+function PersonaRow({
+  label,
+  person,
+}: {
+  label: string
+  person: { name: string } | null | undefined
+}) {
   return (
     <div className="flex items-center justify-between gap-3">
       <span className="text-xs text-bodystroke">{label}</span>
@@ -111,7 +121,12 @@ export default function TicketDetailPage() {
     const status = ticket.status
     const teamActions: Array<{ to: string; label: string; note?: boolean }> = []
     const participantActions: Array<{ to: string; label: string; note?: boolean }> = []
-    if (status === 'OPEN' || status === 'PENDING' || status === 'WAITING_USER' || status === 'WAITING_APPROVAL') {
+    if (
+      status === 'OPEN' ||
+      status === 'PENDING' ||
+      status === 'WAITING_USER' ||
+      status === 'WAITING_APPROVAL'
+    ) {
       teamActions.push({ to: 'IN_PROGRESS', label: t('tickets.startWork') })
     }
     if (status === 'IN_PROGRESS') {
@@ -127,7 +142,12 @@ export default function TicketDetailPage() {
   }, [ticket, isTeam, t])
 
   const canPickup =
-    isTeam && user?.role === 'AGENT' && !!ticket && !ticket.assignee && !!ticket.solverGroup && ticket.solverGroup.id === user.solverGroupId
+    isTeam &&
+    user?.role === 'AGENT' &&
+    !!ticket &&
+    !ticket.assignee &&
+    !!ticket.solverGroup &&
+    ticket.solverGroup.id === user.solverGroupId
 
   const submitComment = async () => {
     const content = comment.trim()
@@ -283,10 +303,14 @@ export default function TicketDetailPage() {
                 {t(`domain.status.${ticket.status}`)}
               </Badge>
               <Badge tone={TYPE_TONE[ticket.type]}>{t(`domain.type.${ticket.type}`)}</Badge>
-              <Badge tone={PRIORITY_TONE[ticket.priority]}>{t(`domain.priority.${ticket.priority}`)}</Badge>
+              <Badge tone={PRIORITY_TONE[ticket.priority]}>
+                {t(`domain.priority.${ticket.priority}`)}
+              </Badge>
               {ticket.slaBreached && <Badge tone="error">{t('tickets.breached')}</Badge>}
             </div>
-            <h1 className="text-lg font-semibold tracking-tight text-graydark dark:text-white">{ticket.title}</h1>
+            <h1 className="text-lg font-semibold tracking-tight text-graydark dark:text-white">
+              {ticket.title}
+            </h1>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-bodystroke">
               <span className="inline-flex items-center gap-1">
                 <Sparkles className="size-3.5" />
@@ -318,7 +342,11 @@ export default function TicketDetailPage() {
           {actions.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
               {canPickup && (
-                <Button variant="secondary" loading={pickupMutation.isPending} onClick={() => void runPickup()}>
+                <Button
+                  variant="secondary"
+                  loading={pickupMutation.isPending}
+                  onClick={() => void runPickup()}
+                >
                   <UserCheck className="size-4" />
                   {t('tickets.pickup')}
                 </Button>
@@ -355,7 +383,9 @@ export default function TicketDetailPage() {
                     >
                       <FileText className="size-4 shrink-0 text-bodystroke group-hover:text-primary" />
                       <span className="truncate">{file.filename}</span>
-                      <span className="ml-auto text-xs tabular-nums text-bodystroke">{formatSize(file.size)}</span>
+                      <span className="ml-auto text-xs tabular-nums text-bodystroke">
+                        {formatSize(file.size)}
+                      </span>
                     </button>
                   </li>
                 ))}
@@ -399,11 +429,17 @@ export default function TicketDetailPage() {
                   <Avatar name={c.author.name} size="sm" className="mt-0.5 shrink-0" />
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-medium text-graydark dark:text-white">{c.author.name}</span>
+                      <span className="text-sm font-medium text-graydark dark:text-white">
+                        {c.author.name}
+                      </span>
                       <span className="text-xs text-bodystroke">{formatDateTime(c.createdAt)}</span>
-                      {c.visibility === 'INTERNAL' && <Badge tone="warning">{t('tickets.commentInternal')}</Badge>}
+                      {c.visibility === 'INTERNAL' && (
+                        <Badge tone="warning">{t('tickets.commentInternal')}</Badge>
+                      )}
                     </div>
-                    <p className="whitespace-pre-wrap text-sm text-body dark:text-bodydark">{c.content}</p>
+                    <p className="whitespace-pre-wrap text-sm text-body dark:text-bodydark">
+                      {c.content}
+                    </p>
                   </div>
                 </li>
               ))}
@@ -438,7 +474,12 @@ export default function TicketDetailPage() {
                 ) : (
                   <span />
                 )}
-                <Button size="sm" disabled={!comment.trim()} loading={commentMutation.isPending} onClick={() => void submitComment()}>
+                <Button
+                  size="sm"
+                  disabled={!comment.trim()}
+                  loading={commentMutation.isPending}
+                  onClick={() => void submitComment()}
+                >
                   <Send className="size-3.5" />
                   {t('tickets.commentSubmit')}
                 </Button>
@@ -469,7 +510,9 @@ export default function TicketDetailPage() {
                   </div>
                   <p className="flex flex-wrap items-center gap-1 text-body dark:text-bodydark">
                     <span className="text-bodystroke">{t('tickets.from')}:</span>
-                    <span className="line-through decoration-bodystroke/50">{historyValue(h.field, h.oldValue)}</span>
+                    <span className="line-through decoration-bodystroke/50">
+                      {historyValue(h.field, h.oldValue)}
+                    </span>
                     <span className="text-bodystroke">{t('tickets.to')}:</span>
                     <span className="font-medium text-graydark dark:text-white">
                       {historyValue(h.field, h.newValue)}
@@ -505,8 +548,13 @@ export default function TicketDetailPage() {
 
             {isManagerAdmin && (
               <div className="flex flex-col gap-2.5 border-t border-stroke pt-3 dark:border-strokedark">
-                <label className="text-xs font-medium text-bodystroke">{t('tickets.groupLabel')}</label>
-                <Select value={assignGroup} onChange={(event) => setAssignGroup(event.target.value)}>
+                <label className="text-xs font-medium text-bodystroke">
+                  {t('tickets.groupLabel')}
+                </label>
+                <Select
+                  value={assignGroup}
+                  onChange={(event) => setAssignGroup(event.target.value)}
+                >
                   <option value="">{t('tickets.selectGroup')}</option>
                   {groups.map((g) => (
                     <option key={g.id} value={g.id}>
@@ -514,7 +562,11 @@ export default function TicketDetailPage() {
                     </option>
                   ))}
                 </Select>
-                <Select value={assignTo} onChange={(event) => setAssignTo(event.target.value)} disabled={!assignGroup}>
+                <Select
+                  value={assignTo}
+                  onChange={(event) => setAssignTo(event.target.value)}
+                  disabled={!assignGroup}
+                >
                   <option value="">{t('tickets.selectAgent')}</option>
                   {agents
                     .filter((a) => a.solverGroupId === assignGroup)
@@ -547,19 +599,38 @@ export default function TicketDetailPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-xs text-bodystroke">{t('tickets.slaResolve')}</span>
-              <span className={cn('text-sm tabular-nums text-body dark:text-bodydark', breached && 'text-error')}>
+              <span
+                className={cn(
+                  'text-sm tabular-nums text-body dark:text-bodydark',
+                  breached && 'text-error',
+                )}
+              >
                 {formatDateTime(ticket.slaResolveAt)}
               </span>
             </div>
             <div className="mt-1 flex flex-col gap-2 border-t border-stroke pt-3 dark:border-strokedark">
-              <TimelineRow label={t('tickets.createdOn')} date={ticket.timeline.createdAt} datetime />
-              <TimelineRow label={t('tickets.firstResponse')} date={ticket.timeline.firstResponseAt} datetime />
-              <TimelineRow label={t('tickets.resolvedOn')} date={ticket.timeline.resolvedAt} datetime />
+              <TimelineRow
+                label={t('tickets.createdOn')}
+                date={ticket.timeline.createdAt}
+                datetime
+              />
+              <TimelineRow
+                label={t('tickets.firstResponse')}
+                date={ticket.timeline.firstResponseAt}
+                datetime
+              />
+              <TimelineRow
+                label={t('tickets.resolvedOn')}
+                date={ticket.timeline.resolvedAt}
+                datetime
+              />
               <TimelineRow label={t('tickets.closedOn')} date={ticket.timeline.closedAt} datetime />
             </div>
           </Card>
 
-          {(ticket.relatedProblem || ticket.relatedChanges.length > 0 || (kbQuery.data?.items ?? []).length > 0) && (
+          {(ticket.relatedProblem ||
+            ticket.relatedChanges.length > 0 ||
+            (kbQuery.data?.items ?? []).length > 0) && (
             <Card title={t('tickets.related')} bodyClassName="flex flex-col gap-1.5">
               {ticket.relatedProblem && (
                 <Link
@@ -614,14 +685,25 @@ export default function TicketDetailPage() {
           {ticket.approvals.length > 0 && (
             <Card title={t('tickets.approvals')} bodyClassName="flex flex-col gap-2.5">
               {ticket.approvals.map((a) => (
-                <div key={a.id} className="flex items-center justify-between gap-3 rounded-lg border border-stroke px-3 py-2.5 dark:border-strokedark">
+                <div
+                  key={a.id}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-stroke px-3 py-2.5 dark:border-strokedark"
+                >
                   <div className="flex min-w-0 flex-col">
                     <span className="truncate text-sm font-medium text-graydark dark:text-white">
                       {a.flowName ?? t('tickets.approvals')}
                     </span>
                     <span className="text-xs text-bodystroke">{a.approver?.name ?? '—'}</span>
                   </div>
-                  <Badge tone={a.status === 'APPROVED' ? 'success' : a.status === 'REJECTED' ? 'error' : 'warning'}>
+                  <Badge
+                    tone={
+                      a.status === 'APPROVED'
+                        ? 'success'
+                        : a.status === 'REJECTED'
+                          ? 'error'
+                          : 'warning'
+                    }
+                  >
                     {t(`domain.status.${a.status}`)}
                   </Badge>
                 </div>
@@ -640,7 +722,10 @@ export default function TicketDetailPage() {
             <Button variant="secondary" onClick={() => setShowResolve(false)}>
               {t('common.cancel')}
             </Button>
-            <Button loading={statusMutation.isPending} onClick={() => void runStatus('RESOLVED', resolutionNote.trim() || undefined)}>
+            <Button
+              loading={statusMutation.isPending}
+              onClick={() => void runStatus('RESOLVED', resolutionNote.trim() || undefined)}
+            >
               {t('tickets.confirmResolve')}
             </Button>
           </>
@@ -661,7 +746,15 @@ export default function TicketDetailPage() {
   )
 }
 
-function TimelineRow({ label, date, datetime }: { label: string; date: string | null; datetime?: boolean }) {
+function TimelineRow({
+  label,
+  date,
+  datetime,
+}: {
+  label: string
+  date: string | null
+  datetime?: boolean
+}) {
   return (
     <div className="flex items-center justify-between gap-3">
       <span className="text-xs text-bodystroke">{label}</span>

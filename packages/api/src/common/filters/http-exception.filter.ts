@@ -7,9 +7,7 @@ import {
 } from '@nestjs/common';
 import { I18nContext } from 'nestjs-i18n';
 import { Response } from 'express';
-import {
-  I18nValidationException,
-} from 'nestjs-i18n';
+import { I18nValidationException } from 'nestjs-i18n';
 
 const DEFAULT_ERROR_KEY = 'errors.internal';
 
@@ -31,7 +29,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
         status: 'BAD_REQUEST',
         error: 'ValidationError',
         i18n: { key, args: { property: errors[0]?.property } },
-        message: i18n ? i18n.t(key, { args: { property: errors[0]?.property } }) : undefined,
+        message: i18n
+          ? i18n.t(key, { args: { property: errors[0]?.property } })
+          : undefined,
       });
       return;
     }

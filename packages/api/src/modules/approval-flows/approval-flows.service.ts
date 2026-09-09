@@ -33,13 +33,18 @@ export function normalizeStages(rules: unknown): ApprovalStage[] {
       ? ((rules as Record<string, unknown>).stages as Record<string, unknown>[])
       : [];
   return raw.map((s, i) => ({
-    order: typeof s.order === 'number' ? (s.order as number)
-      : typeof s.step === 'number' ? (s.step as number)
-      : i + 1,
-    approverRole: typeof s.approverRole === 'string' ? s.approverRole : undefined,
+    order:
+      typeof s.order === 'number'
+        ? (s.order as number)
+        : typeof s.step === 'number'
+          ? (s.step as number)
+          : i + 1,
+    approverRole:
+      typeof s.approverRole === 'string' ? s.approverRole : undefined,
     approverCategory:
       typeof s.approverCategory === 'string' ? s.approverCategory : undefined,
-    solverGroupId: typeof s.solverGroupId === 'string' ? s.solverGroupId : undefined,
+    solverGroupId:
+      typeof s.solverGroupId === 'string' ? s.solverGroupId : undefined,
     userId: typeof s.userId === 'string' ? s.userId : undefined,
   }));
 }
@@ -110,7 +115,11 @@ export class ApprovalFlowsService {
       entity: 'ApprovalFlow',
       entityId: flow.id,
       userId: actor.sub,
-      newData: { name: flow.name, entityType: flow.entityType, companyId: flow.companyId },
+      newData: {
+        name: flow.name,
+        entityType: flow.entityType,
+        companyId: flow.companyId,
+      },
     });
     return flow;
   }
@@ -122,9 +131,13 @@ export class ApprovalFlowsService {
       where: { id },
       data: {
         ...(dto.name ? { name: dto.name } : {}),
-        ...(dto.description !== undefined ? { description: dto.description } : {}),
+        ...(dto.description !== undefined
+          ? { description: dto.description }
+          : {}),
         ...(dto.entityType ? { entityType: dto.entityType } : {}),
-        ...(dto.rules !== undefined ? { rules: dto.rules as Prisma.InputJsonValue } : {}),
+        ...(dto.rules !== undefined
+          ? { rules: dto.rules as Prisma.InputJsonValue }
+          : {}),
       },
       include: FLOW_INCLUDE,
     });
@@ -155,7 +168,10 @@ export class ApprovalFlowsService {
       where: { id: finalCompanyId },
     });
     if (!company) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return finalCompanyId;
   }
@@ -166,7 +182,10 @@ export class ApprovalFlowsService {
       include: FLOW_INCLUDE,
     });
     if (!flow) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return flow;
   }

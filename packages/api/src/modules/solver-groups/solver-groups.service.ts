@@ -31,7 +31,11 @@ export class SolverGroupsService {
   private async serializeGroup(row: GroupRow) {
     const [agentsCount, openTickets] = await Promise.all([
       this.prisma.user.count({
-        where: { solverGroupId: row.id, role: UserRole.AGENT, status: Status.ACTIVE },
+        where: {
+          solverGroupId: row.id,
+          role: UserRole.AGENT,
+          status: Status.ACTIVE,
+        },
       }),
       this.prisma.ticket.count({
         where: { solverGroupId: row.id, status: { in: OPEN_TICKET_STATUSES } },
@@ -68,7 +72,10 @@ export class SolverGroupsService {
       },
     });
     if (!row) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     const { users, ...rest } = row;
     const base = await this.serializeGroup(rest);
@@ -96,7 +103,9 @@ export class SolverGroupsService {
       where: { id },
       data: {
         ...(dto.name ? { name: dto.name } : {}),
-        ...(dto.description !== undefined ? { description: dto.description } : {}),
+        ...(dto.description !== undefined
+          ? { description: dto.description }
+          : {}),
         ...(dto.level ? { level: dto.level } : {}),
       },
       select: groupSelect,
@@ -109,17 +118,26 @@ export class SolverGroupsService {
     const agents = await this.assertAgentsUsable(dto.agentIds);
 
     const currentIds = (
-      await this.prisma.user.findMany({ where: { solverGroupId: id }, select: { id: true } })
+      await this.prisma.user.findMany({
+        where: { solverGroupId: id },
+        select: { id: true },
+      })
     ).map((u) => u.id);
 
     const removed = currentIds.filter((cid) => !dto.agentIds.includes(cid));
 
     await this.prisma.$transaction([
       ...removed.map((uid) =>
-        this.prisma.user.update({ where: { id: uid }, data: { solverGroupId: null } }),
+        this.prisma.user.update({
+          where: { id: uid },
+          data: { solverGroupId: null },
+        }),
       ),
       ...agents.map((a) =>
-        this.prisma.user.update({ where: { id: a.id }, data: { solverGroupId: id } }),
+        this.prisma.user.update({
+          where: { id: a.id },
+          data: { solverGroupId: id },
+        }),
       ),
     ]);
 
@@ -130,7 +148,11 @@ export class SolverGroupsService {
     await this.findEntity(id);
     if (status === Status.ACTIVE) {
       const count = await this.prisma.user.count({
-        where: { solverGroupId: id, role: UserRole.AGENT, status: Status.ACTIVE },
+        where: {
+          solverGroupId: id,
+          role: UserRole.AGENT,
+          status: Status.ACTIVE,
+        },
       });
       if (count === 0) {
         throw new UnprocessableEntityException({
@@ -150,7 +172,10 @@ export class SolverGroupsService {
   private async findEntity(id: string) {
     const group = await this.prisma.solverGroup.findUnique({ where: { id } });
     if (!group) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return group;
   }

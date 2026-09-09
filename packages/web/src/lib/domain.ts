@@ -1,6 +1,14 @@
 import type { BadgeTone } from '@/components/ui/Badge'
 
-export const STATUS_ORDER = ['OPEN', 'IN_PROGRESS', 'PENDING', 'WAITING_USER', 'WAITING_APPROVAL', 'RESOLVED', 'CLOSED'] as const
+export const STATUS_ORDER = [
+  'OPEN',
+  'IN_PROGRESS',
+  'PENDING',
+  'WAITING_USER',
+  'WAITING_APPROVAL',
+  'RESOLVED',
+  'CLOSED',
+] as const
 
 export const STATUS_TONE: Record<string, BadgeTone> = {
   OPEN: 'info',

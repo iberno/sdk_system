@@ -70,8 +70,7 @@ const toRules = (stages: StageForm[]) => ({
 export default function ApprovalFlowsAdminPage() {
   const { t } = useTranslation()
   const currentUser = useAuthStore((s) => s.user)
-  const isManagerOrAdmin =
-    currentUser?.role === 'ADMIN' || currentUser?.role === 'MANAGER'
+  const isManagerOrAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'MANAGER'
 
   const { data, isLoading, isError, refetch } = useApprovalFlows()
   const groupsQuery = useAdminGroups()
@@ -179,7 +178,11 @@ export default function ApprovalFlowsAdminPage() {
 
   const columns: Array<Column<ApprovalFlow>> = useMemo(() => {
     const formatDate = (iso: string) =>
-      new Intl.DateTimeFormat(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' }).format(new Date(iso))
+      new Intl.DateTimeFormat(undefined, {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      }).format(new Date(iso))
     return [
       {
         key: 'name',
@@ -196,9 +199,7 @@ export default function ApprovalFlowsAdminPage() {
       {
         key: 'entityType',
         header: t('admin.entityType'),
-        render: (row) => (
-          <Badge tone="primary">{t(`admin.entityType.${row.entityType}`)}</Badge>
-        ),
+        render: (row) => <Badge tone="primary">{t(`admin.entityType.${row.entityType}`)}</Badge>,
       },
       {
         key: 'company',
@@ -231,7 +232,9 @@ export default function ApprovalFlowsAdminPage() {
         header: t('dashboard.created'),
         align: 'right',
         render: (row) => (
-          <span className="tabular-nums text-body dark:text-bodydark">{formatDate(row.createdAt)}</span>
+          <span className="tabular-nums text-body dark:text-bodydark">
+            {formatDate(row.createdAt)}
+          </span>
         ),
       },
       {
@@ -371,15 +374,21 @@ export default function ApprovalFlowsAdminPage() {
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-graydark dark:text-white">{t('admin.stages')}</p>
-              <Button variant="secondary" size="sm" onClick={() => setForm((prev) => ({ ...prev, stages: [...prev.stages, emptyStage()] }))}>
+              <p className="text-sm font-medium text-graydark dark:text-white">
+                {t('admin.stages')}
+              </p>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() =>
+                  setForm((prev) => ({ ...prev, stages: [...prev.stages, emptyStage()] }))
+                }
+              >
                 <Plus className="size-4" />
                 {t('admin.addStage')}
               </Button>
             </div>
-            {formErrors.stages && (
-              <p className="text-xs text-error">{formErrors.stages}</p>
-            )}
+            {formErrors.stages && <p className="text-xs text-error">{formErrors.stages}</p>}
 
             <div className="flex flex-col gap-2">
               {form.stages.map((stage, index) => (
@@ -392,7 +401,9 @@ export default function ApprovalFlowsAdminPage() {
                   </Badge>
                   <Select
                     value={stage.type}
-                    onChange={(event) => updateStage(index, { type: event.target.value as StageType, value: '' })}
+                    onChange={(event) =>
+                      updateStage(index, { type: event.target.value as StageType, value: '' })
+                    }
                     className="w-32"
                   >
                     {STAGE_TYPES.map((type) => (
@@ -464,7 +475,12 @@ export default function ApprovalFlowsAdminPage() {
                     <button
                       type="button"
                       disabled={form.stages.length === 1}
-                      onClick={() => setForm((prev) => ({ ...prev, stages: prev.stages.filter((_, i) => i !== index) }))}
+                      onClick={() =>
+                        setForm((prev) => ({
+                          ...prev,
+                          stages: prev.stages.filter((_, i) => i !== index),
+                        }))
+                      }
                       title={t('common.delete')}
                       className="rounded p-1.5 text-bodystroke transition-colors hover:text-error disabled:opacity-30"
                     >

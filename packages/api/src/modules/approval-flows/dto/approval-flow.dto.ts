@@ -42,7 +42,9 @@ export class CreateApprovalFlowDto {
   @IsIn(FLOW_STATUSES)
   status?: Status;
 
-  @ApiPropertyOptional({ description: 'Empresa (dispensável se o usuário tiver companyId)' })
+  @ApiPropertyOptional({
+    description: 'Empresa (dispensável se o usuário tiver companyId)',
+  })
   @IsOptional()
   @IsString()
   companyId?: string;

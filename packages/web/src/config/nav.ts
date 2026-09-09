@@ -65,11 +65,31 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { labelKey: 'nav.users', href: '/admin/users', icon: Users, roles: ['ADMIN', 'MANAGER'] },
       { labelKey: 'nav.companies', href: '/admin/companies', icon: Building2, roles: ['ADMIN'] },
-      { labelKey: 'nav.groups', href: '/admin/groups', icon: UsersRound, roles: ['ADMIN', 'MANAGER'] },
+      {
+        labelKey: 'nav.groups',
+        href: '/admin/groups',
+        icon: UsersRound,
+        roles: ['ADMIN', 'MANAGER'],
+      },
       { labelKey: 'nav.sla', href: '/admin/sla', icon: Timer, roles: ['ADMIN', 'MANAGER'] },
-      { labelKey: 'nav.routingRules', href: '/admin/routing-rules', icon: Route, roles: ['ADMIN', 'MANAGER'] },
-      { labelKey: 'nav.audit', href: '/admin/audit', icon: ScrollText, roles: ['ADMIN', 'MANAGER'] },
-      { labelKey: 'nav.approvalFlows', href: '/admin/approval-flows', icon: CheckSquare, roles: ['ADMIN', 'MANAGER'] },
+      {
+        labelKey: 'nav.routingRules',
+        href: '/admin/routing-rules',
+        icon: Route,
+        roles: ['ADMIN', 'MANAGER'],
+      },
+      {
+        labelKey: 'nav.audit',
+        href: '/admin/audit',
+        icon: ScrollText,
+        roles: ['ADMIN', 'MANAGER'],
+      },
+      {
+        labelKey: 'nav.approvalFlows',
+        href: '/admin/approval-flows',
+        icon: CheckSquare,
+        roles: ['ADMIN', 'MANAGER'],
+      },
     ],
   },
 ]

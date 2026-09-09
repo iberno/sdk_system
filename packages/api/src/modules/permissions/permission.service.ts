@@ -28,12 +28,17 @@ export class PermissionService {
     return this.prisma.user.findUnique({
       where: { id: userId },
       select: {
-        solverGroup: { select: { id: true, name: true, level: true, status: true } },
+        solverGroup: {
+          select: { id: true, name: true, level: true, status: true },
+        },
       },
     });
   }
 
-  async canActAsApprover(user: UserContext, entityType: 'TICKET' | 'CHANGE'): Promise<boolean> {
+  async canActAsApprover(
+    user: UserContext,
+    entityType: 'TICKET' | 'CHANGE',
+  ): Promise<boolean> {
     const flow = await this.prisma.approvalFlow.findFirst({
       where: { entityType, status: 'ACTIVE' },
     });

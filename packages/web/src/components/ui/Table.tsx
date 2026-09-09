@@ -111,7 +111,10 @@ export function Table<T>({
             ))}
           {!loading && rows.length === 0 && (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-8 text-center text-sm text-bodystroke">
+              <td
+                colSpan={columns.length}
+                className="px-4 py-8 text-center text-sm text-bodystroke"
+              >
                 {empty ?? 'No records'}
               </td>
             </tr>

@@ -6,6 +6,7 @@ Cada item tem um checkbox. Complete em ordem. Itens marcados com **`[ ]`**
 são pendentes. **`[x]`** são concluídos.
 
 **Fases:**
+
 - 🏗️ **Estrutura** - Setup do projeto
 - 📦 **Backend** - API NestJS
 - 🎨 **Frontend** - React + TailAdmin pattern
@@ -17,11 +18,11 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 0.1 Verificar pré-requisitos
 
-- [x] Node.js v24 instalado (`node --version`)  → v26.8.1
-- [x] pnpm instalado (`pnpm --version`)  → v11.24.0
-- [x] PostgreSQL v18 rodando (`pg_isready`)  → v17.11 (compatível com Prisma)
+- [x] Node.js v24 instalado (`node --version`) → v26.8.1
+- [x] pnpm instalado (`pnpm --version`) → v11.24.0
+- [x] PostgreSQL v18 rodando (`pg_isready`) → v17.11 (compatível com Prisma)
 - [x] Banco `servicedesk` criado no PostgreSQL
-- [x] Usuário/credenciais PostgreSQL definidos  → role `servicedesk` + senha dev
+- [x] Usuário/credenciais PostgreSQL definidos → role `servicedesk` + senha dev
 
 ### 0.2 Setup do Monorepo
 
@@ -30,7 +31,7 @@ são pendentes. **`[x]`** são concluídos.
 - [x] Criar `.gitignore` raiz
 - [x] Criar `tsconfig.base.json` (config compartilhada)
 - [x] Inicializar git (`git init`)
-- [x] Criar commit inicial  → commits publicados ao longo das fases
+- [x] Criar commit inicial → commits publicados ao longo das fases
 
 **Referência:** ADR-001 (pnpm workspaces)
 
@@ -40,29 +41,29 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 1.1 Scaffolding
 
-- [x] Criar `packages/api` com `@nestjs/cli`  → NestJS 12 (ESM)
+- [x] Criar `packages/api` com `@nestjs/cli` → NestJS 12 (ESM)
 - [x] Instalar dependências base (NestJS core, common, platform-express)
 - [x] Instalar dependências de apoio (typescript, ts-loader, etc.)
-- [x] Configurar `nest-cli.json`  (+ assets i18n p/ dist)
+- [x] Configurar `nest-cli.json` (+ assets i18n p/ dist)
 
 ### 1.2 Configuração
 
 - [x] Instalar `@nestjs/config` e `dotenv`
 - [x] Criar `.env` e `.env.example`
-- [x] Criar `src/config/app.config.ts`  → Fase 11 (registerAs + ConfigModule.forRoot load; CORS/port via ConfigService)
-- [x] Criar `src/config/database.config.ts`  → Fase 11 (registerAs; colocado no load do ConfigModule)
+- [x] Criar `src/config/app.config.ts` → Fase 11 (registerAs + ConfigModule.forRoot load; CORS/port via ConfigService)
+- [x] Criar `src/config/database.config.ts` → Fase 11 (registerAs; colocado no load do ConfigModule)
 - [x] Configurar CORS para frontend (porta 5173)
 - [x] Configurar global prefix `/api`
-- [x] Configurar ValidationPipe global  → I18nValidationPipe
+- [x] Configurar ValidationPipe global → I18nValidationPipe
 - [x] Configurar rate limiter (`@nestjs/throttler` - 30 req/60s)
-- [x] **i18n:** instalar `nestjs-i18n` e configurar módulo (ADR-013)  → v11.0.0-beta (compatível Nest 12)
+- [x] **i18n:** instalar `nestjs-i18n` e configurar módulo (ADR-013) → v11.0.0-beta (compatível Nest 12)
 - [x] **i18n:** criar pastas `src/i18n/{pt-BR,en,es}` com `errors/validation/business`
-- [x] **i18n:** `User.locale` + resolução `Accept-Language → ?lang → User.locale → pt-BR`  (User.locale no schema; resolvers prontos)
+- [x] **i18n:** `User.locale` + resolução `Accept-Language → ?lang → User.locale → pt-BR` (User.locale no schema; resolvers prontos)
 - [x] **i18n:** erro padronizado com `i18n.key` + `args` + `message` localizado
 
 ### 1.3 Swagger
 
-- [x] Instalar `@nestjs/swagger`  → v12.0.1 (necessário para Nest 12)
+- [x] Instalar `@nestjs/swagger` → v12.0.1 (necessário para Nest 12)
 - [x] Configurar Swagger em `main.ts`
 - [x] Acessível em `/swagger`
 
@@ -78,8 +79,8 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 2.1 Prisma Setup
 
-- [x] Instalar `prisma` e `@prisma/client`  → v6.19.3
-- [x] Criar `prisma/schema.prisma` baseado no **ERD.md**  (20 models + 16 enums)
+- [x] Instalar `prisma` e `@prisma/client` → v6.19.3
+- [x] Criar `prisma/schema.prisma` baseado no **ERD.md** (20 models + 16 enums)
 - [x] Configurar `DATABASE_URL` no `.env`
 - [x] Rodar `prisma generate`
 
@@ -113,7 +114,7 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 2.3 Migrations e Seed
 
-- [x] Rodar `prisma migrate dev` (primeira migration)  → `20260907223317_init` aplicada
+- [x] Rodar `prisma migrate dev` (primeira migration) → `20260907223317_init` aplicada
 - [x] Criar `prisma/seed.ts`
   - [x] Seed: Empresas (3)
   - [x] Seed: Grupos Solucionadores (N1, N2, N3, REDES, INFRA, DEVOPS) - cada um com min. 1 agente
@@ -403,7 +404,7 @@ são pendentes. **`[x]`** são concluídos.
 
 ### 11.1 Scaffolding
 
-- [x] Criar `packages/web` com Vite + React + TypeScript  → Vite 8, React 19, TS 6
+- [x] Criar `packages/web` com Vite + React + TypeScript → Vite 8, React 19, TS 6
 - [x] Instalar: tailwindcss v4 (+ plugin oficial `@tailwindcss/vite`; `postcss/autoprefixer` dispensáveis na v4)
 - [x] Instalar: react-router-dom, @tanstack/react-query, zustand
 - [x] Instalar: axios, socket.io-client, lucide-react
@@ -429,7 +430,7 @@ são pendentes. **`[x]`** são concluídos.
 - [x] `Card`
 - [x] `Badge` (variants: status colors)
 - [x] `Input`, `Select`, `Textarea`
-- [x] `SearchableSelect` (busca com teclado, filtro sem acento, clearable)  ← adicionado a pedido
+- [x] `SearchableSelect` (busca com teclado, filtro sem acento, clearable) ← adicionado a pedido
 - [x] `Table` (com paginação, sorting)
 - [x] `Modal`
 - [x] `Dropdown`
@@ -583,19 +584,19 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 
 ## FASE 17 - Integração completa
 
-- [x] Conectar todos os módulos frontend à API  → Fases 11–16 (todas as páginas via hooks/API; validado com build + testes E2E)
+- [x] Conectar todos os módulos frontend à API → Fases 11–16 (todas as páginas via hooks/API; validado com build + testes E2E)
 - [x] Verificar fluxos end-to-end (spec `packages/api/test/phase17.e2e-spec.ts`, 22 testes):
-  - [x] Login → Dashboard  → AGENT lê `/dashboard/summary`; USER bloqueado (403)
-  - [x] Criar ticket → roteado por RoutingRule → aparece no grupo/agente  → TO_GROUP (N1, sem agente) e ROUND_ROBIN (N1 + agente)
-  - [x] Agente assume (pickup) ou é atribuído → resolve  → pickup → IN_PROGRESS → RESOLVED → CLOSED
-  - [x] Atribuição manual para agente fora do grupo → erro 422  → `business.agent_not_in_group`
-  - [x] Mudança → aprovação → execução  → NORMAL: submit → MANAGER+ADMIN aprovam → APPROVED → execute → COMPLETED
-  - [x] Problema → mudança → KB  → propose-change → resolve → publish-article
-- [x] Testar todos os roles  → matriz USER/AGENT/MANAGER/ADMIN (leitura, admin, KB, tickets)
-- [x] Testar operação em multiempresa (sem vazamento)  → **fix(api)**: `ticketNumber` único por empresa (migration) + roteamento escopado por empresa (regras da ACME não roteiam tickets da Beta)
-- [x] Testar responsividade (mobile)  → **drawer mobile** (hamburger + overlay; collapse permanece no desktop)
-- [x] Testar dark/light mode  → toggle no header (uiStore), classes `dark:` em toda a base
-- [x] Performance: verificar queries lentas  → list 59ms / summary 97ms / detail 24ms; índices cobrem filtros e `createdAt desc`
+  - [x] Login → Dashboard → AGENT lê `/dashboard/summary`; USER bloqueado (403)
+  - [x] Criar ticket → roteado por RoutingRule → aparece no grupo/agente → TO_GROUP (N1, sem agente) e ROUND_ROBIN (N1 + agente)
+  - [x] Agente assume (pickup) ou é atribuído → resolve → pickup → IN_PROGRESS → RESOLVED → CLOSED
+  - [x] Atribuição manual para agente fora do grupo → erro 422 → `business.agent_not_in_group`
+  - [x] Mudança → aprovação → execução → NORMAL: submit → MANAGER+ADMIN aprovam → APPROVED → execute → COMPLETED
+  - [x] Problema → mudança → KB → propose-change → resolve → publish-article
+- [x] Testar todos os roles → matriz USER/AGENT/MANAGER/ADMIN (leitura, admin, KB, tickets)
+- [x] Testar operação em multiempresa (sem vazamento) → **fix(api)**: `ticketNumber` único por empresa (migration) + roteamento escopado por empresa (regras da ACME não roteiam tickets da Beta)
+- [x] Testar responsividade (mobile) → **drawer mobile** (hamburger + overlay; collapse permanece no desktop)
+- [x] Testar dark/light mode → toggle no header (uiStore), classes `dark:` em toda a base
+- [x] Performance: verificar queries lentas → list 59ms / summary 97ms / detail 24ms; índices cobrem filtros e `createdAt desc`
 
 ---
 
@@ -615,25 +616,25 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 
 ## Resumo por Fase
 
-| Fase | Descrição | Itens |
-|------|-----------|-------|
-| 0 | Configuração do Ambiente | 7 |
-| 1 | Backend: Setup NestJS | 16 |
-| 2 | Backend: Banco + Prisma | 28 |
-| 3 | Backend: Auth + Autorização | 18 |
-| 4 | Backend: Módulos Core | 26 |
-| 5 | Backend: Tickets | 23 |
-| 6 | Backend: Aprovações | 11 |
-| 7 | Backend: Problemas/Mudanças | 15 |
-| 8 | Backend: KB + Auditoria | 8 |
-| 9 | Backend: Realtime + Dashboard | 12 |
-| 10 | Backend: Testes | 9 |
-| 11 | Frontend: Setup | 27 |
-| 12 | Frontend: Auth | 8 |
-| 13 | Frontend: Dashboard | 8 |
-| 14 | Frontend: Tickets | 18 |
-| 15 | Frontend: Administração | 16 |
-| 16 | Frontend: Realtime | 5 |
-| 17 | Integração completa | 8 |
-| 18 | Qualidade e Entrega | 9 |
-| | **Total** | **272** |
+| Fase | Descrição                     | Itens   |
+| ---- | ----------------------------- | ------- |
+| 0    | Configuração do Ambiente      | 7       |
+| 1    | Backend: Setup NestJS         | 16      |
+| 2    | Backend: Banco + Prisma       | 28      |
+| 3    | Backend: Auth + Autorização   | 18      |
+| 4    | Backend: Módulos Core         | 26      |
+| 5    | Backend: Tickets              | 23      |
+| 6    | Backend: Aprovações           | 11      |
+| 7    | Backend: Problemas/Mudanças   | 15      |
+| 8    | Backend: KB + Auditoria       | 8       |
+| 9    | Backend: Realtime + Dashboard | 12      |
+| 10   | Backend: Testes               | 9       |
+| 11   | Frontend: Setup               | 27      |
+| 12   | Frontend: Auth                | 8       |
+| 13   | Frontend: Dashboard           | 8       |
+| 14   | Frontend: Tickets             | 18      |
+| 15   | Frontend: Administração       | 16      |
+| 16   | Frontend: Realtime            | 5       |
+| 17   | Integração completa           | 8       |
+| 18   | Qualidade e Entrega           | 9       |
+|      | **Total**                     | **272** |

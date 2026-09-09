@@ -109,8 +109,10 @@ export default function SlaAdminPage() {
     if (form.name.trim().length < 3) errors.name = t('tickets.createError')
     const responseTime = Number(form.responseTime)
     const resolveTime = Number(form.resolveTime)
-    if (!Number.isInteger(responseTime) || responseTime < 1) errors.responseTime = t('admin.invalidMinutes')
-    if (!Number.isInteger(resolveTime) || resolveTime < 1) errors.resolveTime = t('admin.invalidMinutes')
+    if (!Number.isInteger(responseTime) || responseTime < 1)
+      errors.responseTime = t('admin.invalidMinutes')
+    if (!Number.isInteger(resolveTime) || resolveTime < 1)
+      errors.resolveTime = t('admin.invalidMinutes')
     setFormErrors(errors)
     if (Object.keys(errors).length > 0) return
 
@@ -218,7 +220,10 @@ export default function SlaAdminPage() {
               </thead>
               <tbody className="divide-y divide-stroke/60 dark:divide-strokedark/60">
                 {TYPES.map((type) => (
-                  <tr key={type} className="transition-colors hover:bg-slate-50 dark:hover:bg-white/[0.03]">
+                  <tr
+                    key={type}
+                    className="transition-colors hover:bg-slate-50 dark:hover:bg-white/[0.03]"
+                  >
                     <td className="px-4 py-3 font-medium text-graydark dark:text-white">
                       {t(`domain.slaType.${type}`)}
                     </td>
@@ -328,7 +333,11 @@ export default function SlaAdminPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField label={t('dashboard.type')} required>
-              <Select value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })} disabled={Boolean(editing)}>
+              <Select
+                value={form.type}
+                onChange={(event) => setForm({ ...form, type: event.target.value })}
+                disabled={Boolean(editing)}
+              >
                 {TYPES.map((value) => (
                   <option key={value} value={value}>
                     {t(`domain.slaType.${value}`)}
@@ -338,7 +347,11 @@ export default function SlaAdminPage() {
             </FormField>
 
             <FormField label={t('dashboard.priority')} required>
-              <Select value={form.priority} onChange={(event) => setForm({ ...form, priority: event.target.value })} disabled={Boolean(editing)}>
+              <Select
+                value={form.priority}
+                onChange={(event) => setForm({ ...form, priority: event.target.value })}
+                disabled={Boolean(editing)}
+              >
                 {PRIORITIES.map((value) => (
                   <option key={value} value={value}>
                     {t(`domain.priority.${value}`)}

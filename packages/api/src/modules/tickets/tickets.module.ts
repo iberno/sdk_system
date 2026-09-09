@@ -8,7 +8,13 @@ import { AuditModule } from '../audit/audit.module.js';
 import { RealtimeModule } from '../realtime/realtime.module.js';
 
 @Module({
-  imports: [RoutingRulesModule, SlaModule, ApprovalsModule, AuditModule, RealtimeModule],
+  imports: [
+    RoutingRulesModule,
+    SlaModule,
+    ApprovalsModule,
+    AuditModule,
+    RealtimeModule,
+  ],
   controllers: [TicketsController],
   providers: [TicketsService],
   exports: [TicketsService],

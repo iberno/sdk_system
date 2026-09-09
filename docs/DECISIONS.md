@@ -31,11 +31,13 @@ ServiceDesk/
 ### Consequências
 
 **Positivas:**
+
 - Instalação de dependências mais rápida (pnpm)
 - Versionamento conjunto de API + Frontend
 - Fácil compartilhamento de tipos (futuro: `packages/shared`)
 
 **Negativas:**
+
 - Requer pnpm instalado globalmente
 - Hoisting de dependências pode causar conflitos em casos específicos
 
@@ -70,11 +72,13 @@ src/modules/
 ### Consequências
 
 **Positivas:**
+
 - Coesão alta por módulo
 - Mover/remover um módulo é remover uma pasta
 - Cada feature é testável isoladamente
 
 **Negativas:**
+
 - Código compartilhado entre features precisa de atenção
 - Módulos podem crescer descontroladamente sem disciplina
 
@@ -106,6 +110,7 @@ permissao = f(role_base, solver_group, approval_flows_vinculados)
 ```
 
 **E ainda, controle por participação no objeto (ABAC/object-level):**
+
 - Comentários `INTERNAL`: solicitante/beneficiário/aprovador **nunca** veem,
   independente da role (a proteção é por participação no ticket)
 - Filtro de dados por `company_id` do usuário
@@ -114,12 +119,14 @@ permissao = f(role_base, solver_group, approval_flows_vinculados)
 ### Consequências
 
 **Positivas:**
+
 - Novos grupos/níveis criados pelo ADMIN sem deploy
 - Permissões evoluem com o negócio
 - Multi-tenant futuro simplificado (per empresa)
 - Segurança por participação complementa o RBAC (defesa em camadas)
 
 **Negativas:**
+
 - Validação de permissão mais complexa (consulta a DB + contexto do objeto)
 - Requer cache para performance (elasticache/redis futuro)
 
@@ -138,6 +145,7 @@ a PostgreSQL.
 ### Decisão
 
 Utilizar **Prisma ORM** com:
+
 - `schema.prisma` como fonte de verdade do banco
 - Migrations versionadas em `prisma/migrations/`
 - Seed script para dados iniciais
@@ -146,11 +154,13 @@ Utilizar **Prisma ORM** com:
 ### Consequências
 
 **Positivas:**
+
 - Typescript com full type safety
 - Migrations reviewáveis
 - Seed data reproduzível
 
 **Negativas:**
+
 - Vendor lock-in (Prisma)
 - Migrations complexas (data migrations) requerem scripts extras
 
@@ -170,19 +180,21 @@ curta duração somados a refresh tokens rotacionáveis reduzem o risco.
 
 Implementar **JWT com rotation**:
 
-| Token | Validade | Onde fica | Rotation |
-|-------|----------|-----------|----------|
-| Access | 15 min | Memória (Zustand) | Re-gerado no refresh |
-| Refresh | 7 dias | HttpOnly cookie | Novos a cada refresh |
+| Token   | Validade | Onde fica         | Rotation             |
+| ------- | -------- | ----------------- | -------------------- |
+| Access  | 15 min   | Memória (Zustand) | Re-gerado no refresh |
+| Refresh | 7 dias   | HttpOnly cookie   | Novos a cada refresh |
 
 ### Consequências
 
 **Positivas:**
+
 - Menor janela de exposição do access token
 - Refresh rotation invalida tokens roubados
 - Logout funcional (revoga refresh no servidor)
 
 **Negativas:**
+
 - Estado no servidor (tabela refresh_tokens)
 - Complexidade ligeiramente maior
 
@@ -200,19 +212,21 @@ Divisão clara entre estado do servidor (dados da API) e estado do cliente
 
 ### Decisão
 
-| Camada | Responsabilidade |
-|--------|------------------|
+| Camada         | Responsabilidade                                         |
+| -------------- | -------------------------------------------------------- |
 | TanStack Query | Dados vindos da API (tickets, users, cache, invalidação) |
-| Zustand | Sessão/token, sidebar, tema, preferências |
+| Zustand        | Sessão/token, sidebar, tema, preferências                |
 
 ### Consequências
 
 **Positivas:**
+
 - Zero duplicação de fetch
 - Cache inteligente com background refetch
 - Stores pequenos e testáveis
 
 **Negativas:**
+
 - Duas libs de estado (curva de aprendizado)
 
 ---
@@ -245,11 +259,13 @@ não vendo, salvo se atuar como equipe naquele ticket).
 ### Consequências
 
 **Positivas:**
+
 - Transparência com o cliente sem expor discussão técnica
 - Um único enum (sem tabela separada)
 - Proteção por participação (lado cliente vs equipe) — difícil de burlar
 
 **Negativas:**
+
 - Consultas precisam filtrar `visibility` baseado em quem consulta
 - Requer regra clara no retorno da API e no Socket.IO
 
@@ -275,11 +291,13 @@ tabelas de domínio + guard global que filtra por empresa do usuário.
 ### Consequências
 
 **Positivas:**
+
 - Simples e funcional para o times inicial
 - Guard centralizado garante isolation
 - Migração futura documentada
 
 **Negativas:**
+
 - Risco de vazamento se guard não for aplicado em algum endpoint
 - Índices compostos necessários para performance
 
@@ -299,24 +317,26 @@ comentário, SLA breach, aprovação pendente.
 
 Utilizar **Socket.IO** para eventos realtime:
 
-| Evento | Payload |
-|--------|---------|
-| `ticket.created` | Ticket resumido |
-| `ticket.updated` | Ticket atualizado |
-| `ticket.commented` | Comentário novo |
+| Evento             | Payload                           |
+| ------------------ | --------------------------------- |
+| `ticket.created`   | Ticket resumido                   |
+| `ticket.updated`   | Ticket atualizado                 |
+| `ticket.commented` | Comentário novo                   |
 | `approval.pending` | Aprovação pendente para o usuário |
-| `sla.breached` | Alerta SLA |
-| `notification` | Notificação geral |
+| `sla.breached`     | Alerta SLA                        |
+| `notification`     | Notificação geral                 |
 
 Rooms por `companyId` + `userId` para entrega direcionada.
 
 ### Consequências
 
 **Positivas:**
+
 - Experiência realtime para operadores
 - Integração com TanStack Query (invalidate on event)
 
 **Negativas:**
+
 - Infraestrutura adicional (Redis adapter para scale)
 
 ---
@@ -349,11 +369,13 @@ via tokens `@theme` no CSS, com derivações de tonalidade para hover e dark mod
 ### Consequências
 
 **Positivas:**
+
 - Zero débito de código de terceiros
 - Componentes próprios reutilizáveis
 - Controle total do estilo
 
 **Negativas:**
+
 - Mais tempo de desenvolvimento inicial
 
 ---
@@ -366,6 +388,7 @@ via tokens `@theme` no CSS, com derivações de tonalidade para hover e dark mod
 ### Contexto
 
 O negócio exige flexibilidade no direcionamento de tickets:
+
 - Direcionar para **grupos solucionadores** (filas) e/ou **agentes específicos**
 - **Auto-atribuição** na criação
 - Segurança e coerência (agente sempre pertencente ao grupo)
@@ -373,15 +396,18 @@ O negócio exige flexibilidade no direcionamento de tickets:
 ### Decisão
 
 **1. Grupo Solucionador como unidade de atendimento:**
+
 - Grupo agrega 1 ou mais usuários `AGENT`
 - Agente pertence a **exatamente 1** grupo (`solver_group_id` em User)
 
 **2. Destino do ticket = grupo e/ou agente:**
+
 - `solverGroupId` (nullable): direciona ao grupo (fila)
 - `assigneeId` (nullable): direciona ao agente específico
 - **Mínimo 1 destino** obrigatório; se ambos, agente **deve** pertencer ao grupo
 
 **3. Auto-atribuição via `RoutingRule`:**
+
 - Tabela `RoutingRule` com estratégias:
   - `TO_GROUP` → grupo fixo
   - `ROUND_ROBIN` → próximo agente do grupo em ciclo
@@ -391,27 +417,30 @@ O negócio exige flexibilidade no direcionamento de tickets:
 - Ticket registra a origem do roteamento (`routedBy`)
 
 **4. Pickup:**
+
 - Agente pode **assumir** ticket da fila do **seu próprio grupo** (`POST /tickets/:id/pickup`)
 - Valida role AGENT + pertencimento ao grupo destino
 
 ### Regras de Segurança
 
-| Regra | Proteção |
-|-------|----------|
-| Grupo exige mínimo 1 agente | Validação na criação/edição |
-| Agente ∈ 1 grupo | Unicidade de `solver_group_id` |
-| Coerência grupo+agente | 422 se agente não pertence ao grupo |
-| Grupo/agente inativos | Rejeitam atribuição |
-| Toda atribuição rastreável | TicketHistory + AuditLog |
+| Regra                       | Proteção                            |
+| --------------------------- | ----------------------------------- |
+| Grupo exige mínimo 1 agente | Validação na criação/edição         |
+| Agente ∈ 1 grupo            | Unicidade de `solver_group_id`      |
+| Coerência grupo+agente      | 422 se agente não pertence ao grupo |
+| Grupo/agente inativos       | Rejeitam atribuição                 |
+| Toda atribuição rastreável  | TicketHistory + AuditLog            |
 
 ### Consequências
 
 **Positivas:**
+
 - Modelo único atende fila (grupo) e atribuição direta (agente)
 - Auto-atribuição configurável por empresa (sem code change)
 - Segurança de coerência garantida no domínio, não só no UI
 
 **Negativas:**
+
 - Validações extras no backend (pertencimento, status, mínimo de agentes)
 - ROUND_ROBIN exige estado de contador/ponteiro por grupo
 
@@ -449,11 +478,13 @@ SD-2026-000124
 ### Consequências
 
 **Positivas:**
+
 - Referência amigável em e-mails/badges/busca
 - Buscável e indexável
 - Reaproveitável para outras entidades
 
 **Negativas:**
+
 - Requer tabela `SequenceCounter` + transação atômica
 - Coluna extra a manter sincronizada (sem reutilização de número a não ser que desejado)
 
@@ -474,13 +505,14 @@ desde a primeira versão.
 
 **Idiomas suportados** (PT-BR é o fallback):
 
-| Locale | Idioma | Papel |
-|--------|--------|-------|
+| Locale  | Idioma             | Papel               |
+| ------- | ------------------ | ------------------- |
 | `pt-BR` | Português (Brasil) | **Padrão/fallback** |
-| `en-US` | Inglês (EUA) | Suporte |
-| `es-ES` | Espanhol | Suporte |
+| `en-US` | Inglês (EUA)       | Suporte             |
+| `es-ES` | Espanhol           | Suporte             |
 
 **API (NestJS):**
+
 - `nestjs-i18n` para tradução de mensagens (validação + exceções + regras de negócio)
 - Detecção de idioma: `Accept-Language` header → `?lang=` → `User.locale` → `pt-BR`
 - Respostas de erro sempre incluem `key` + `args` (leitura por máquina) **e** um
@@ -489,12 +521,14 @@ desde a primeira versão.
 - Arquivos de tradução por domínio: `src/i18n/{locale}/errors.json`, `validation.json`, `business.json`
 
 **Frontend (React):**
+
 - `i18next` + `react-i18next`
 - Seletor de idioma no layout; preferência em `localStorage` + `User.locale`
   (sincronizado na API)
 - Datas/números via `Intl` (locale do navegador); moeda via config da empresa
 
 **Banco:**
+
 - `User.locale` (texto, default `pt-BR`) — preferência por usuário
 - Conteúdo criado pelo usuário (comentários, artigos) **não** é traduzido;
   apenas UI, mensagens de erro/sistema e e-mails transacionais
@@ -502,11 +536,13 @@ desde a primeira versão.
 ### Consequências
 
 **Positivas:**
+
 - Sem retrabalho de tradução pós-lançamento
 - Resposta de erro com key → frontend mantém 100% do controle de idioma
 - Novos idiomas = adicionar pasta de locale (API) + bundle (web)
 
 **Negativas:**
+
 - Duplicação semântica de strings entre API (`errors`) e Web (UI) nos arquivos
 - `nestjs-i18n` adiciona dependência e config inicial
 - Toda nova mensagem precisa de 3 traduções (pt-BR, en-US, es-ES)
@@ -515,10 +551,10 @@ desde a primeira versão.
 
 ## Lista de ADRs Futuros (TBD)
 
-| ID | Decisão Pendente |
-|----|------------------|
+| ID      | Decisão Pendente                               |
+| ------- | ---------------------------------------------- |
 | ADR-014 | Migração para schema isolation (multi-tenancy) |
-| ADR-015 | Estratégia de cache (Redis/Elasticache) |
-| ADR-016 | Queue/RabbitMQ para automação de fluxos |
-| ADR-017 | Containerização (Docker) e orquestração |
-| ADR-018 | Compartilhamento de tipos entre API e Web |
+| ADR-015 | Estratégia de cache (Redis/Elasticache)        |
+| ADR-016 | Queue/RabbitMQ para automação de fluxos        |
+| ADR-017 | Containerização (Docker) e orquestração        |
+| ADR-018 | Compartilhamento de tipos entre API e Web      |

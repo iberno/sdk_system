@@ -14,7 +14,7 @@ erDiagram
     %% ============================================
     %% MODELOS BASE
     %% ============================================
-    
+
     User {
         uuid id PK
         string name
@@ -321,20 +321,20 @@ erDiagram
 
 ### 1. Usuários e Empresas
 
-| Relation | Tipo | Descrição |
-|---------|------|-----------|
-| Company → User | 1:N | Uma empresa possui vários usuários |
-| User → Company | N:1 | Um usuário pertence a uma empresa |
+| Relation       | Tipo | Descrição                          |
+| -------------- | ---- | ---------------------------------- |
+| Company → User | 1:N  | Uma empresa possui vários usuários |
+| User → Company | N:1  | Um usuário pertence a uma empresa  |
 
 ### 1.1 Internacionalização (i18n)
 
 O sistema é internacionalizado desde a primeira versão:
 
-| Idioma | Locale | Uso |
-|--------|--------|-----|
+| Idioma             | Locale  | Uso                   |
+| ------------------ | ------- | --------------------- |
 | Português (Brasil) | `pt-BR` | **Padrão** (fallback) |
-| Inglês (EUA) | `en-US` | Suporte |
-| Espanhol | `es-ES` | Suporte |
+| Inglês (EUA)       | `en-US` | Suporte               |
+| Espanhol           | `es-ES` | Suporte               |
 
 - O campo `User.locale` guarda a preferência de idioma do usuário (interface + e-mails)
 - Detecção de idioma: `Accept-Language` header → `?lang=` → `User.locale` → fallback `pt-BR`
@@ -344,47 +344,47 @@ O sistema é internacionalizado desde a primeira versão:
 
 ### 2. Usuários e Grupos Solucionadores
 
-| Relação | Tipo | Descrição |
-|---------|------|-----------|
-| SolverGroup → User | 1:N | Um grupo possui **1 ou mais** agentes (mínimo 1 obrigatório) |
-| User → SolverGroup | N:1 | Um agente pertence a **exatamente 1** grupo (null = não é agente) |
+| Relação            | Tipo | Descrição                                                         |
+| ------------------ | ---- | ----------------------------------------------------------------- |
+| SolverGroup → User | 1:N  | Um grupo possui **1 ou mais** agentes (mínimo 1 obrigatório)      |
+| User → SolverGroup | N:1  | Um agente pertence a **exatamente 1** grupo (null = não é agente) |
 
 > **Regra de negócio:** Um grupo solucionador só existe se tiver no mínimo **1 usuário AGENT** vinculado. O vínculo é feito via `solver_group_id` no usuário. Todos os agentes do grupo herdam as capacidades do nível dele (N1, N2, DEVOPS...).
 
 ### 2.1 Direcionamento e Atribuição de Tickets
 
-| Regra | Descrição |
-|-------|-----------|
-| **Direcionamento** | Todo ticket criado é direcionado a um **destino**: um `solverGroupId` (grupo) e/ou um `assigneeId` (agente) |
-| **Destino mínimo** | O ticket **obrigatoriamente** tem pelo menos 1 destino (grupo OU agente) |
-| **Coerência** | Se ambos forem definidos, o agente **deve pertencer** ao grupo informado |
-| **Grupo** | Direciona o ticket ao grupo como um todo; qualquer agente do grupo pode atendê-lo |
-| **Agente** | Atribui diretamente a um agente específico; mesmo assim pode manter o grupo de origem |
-| **Auto-atribuição** | Regras de `RoutingRule` definem o destino automático conforme tipo/prioridade/categoria |
+| Regra               | Descrição                                                                                                   |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Direcionamento**  | Todo ticket criado é direcionado a um **destino**: um `solverGroupId` (grupo) e/ou um `assigneeId` (agente) |
+| **Destino mínimo**  | O ticket **obrigatoriamente** tem pelo menos 1 destino (grupo OU agente)                                    |
+| **Coerência**       | Se ambos forem definidos, o agente **deve pertencer** ao grupo informado                                    |
+| **Grupo**           | Direciona o ticket ao grupo como um todo; qualquer agente do grupo pode atendê-lo                           |
+| **Agente**          | Atribui diretamente a um agente específico; mesmo assim pode manter o grupo de origem                       |
+| **Auto-atribuição** | Regras de `RoutingRule` definem o destino automático conforme tipo/prioridade/categoria                     |
 
 **Estratégias de auto-atribuição (RoutingRule.strategy):**
 
-| Estratégia | Comportamento |
-|------------|---------------|
-| `TO_GROUP` | Direciona para um grupo fixo (ex: todo INCIDENT → N1) |
-| `ROUND_ROBIN` | Atribui ao próximo agente do grupo em ordem cíclica |
-| `LEAST_LOADED` | Atribui ao agente do grupo com menos tickets abertos |
-| `MANUAL` | Sem auto-atribuição; um MANAGER/ADMIN distribui manualmente |
+| Estratégia     | Comportamento                                               |
+| -------------- | ----------------------------------------------------------- |
+| `TO_GROUP`     | Direciona para um grupo fixo (ex: todo INCIDENT → N1)       |
+| `ROUND_ROBIN`  | Atribui ao próximo agente do grupo em ordem cíclica         |
+| `LEAST_LOADED` | Atribui ao agente do grupo com menos tickets abertos        |
+| `MANUAL`       | Sem auto-atribuição; um MANAGER/ADMIN distribui manualmente |
 
 ### 3. Tickets
 
-| Relação | Tipo | Descrição |
-|---------|------|-----------|
-| User → Ticket (requester) | 1:N | Um usuário é **solicitante** de vários tickets (quem abre o chamado) |
-| User → Ticket (beneficiary) | 1:N | Um usuário é **beneficiário** de vários tickets (quem recebe o serviço) |
-| User → Ticket (assignee) | 1:N | Um agente recebe vários tickets |
-| Company → Ticket | 1:N | Uma empresa possui vários tickets |
-| SolverGroup → Ticket | 1:N | Um grupo recebe vários tickets |
-| User → TicketComment | 1:N | Um usuário escreve vários comentários |
-| Ticket → TicketComment | 1:N | Um ticket possui vários comentários (PUBLIC + INTERNAL) |
-| Ticket → TicketHistory | 1:N | Um ticket possui várias alterações no histórico |
-| Ticket → Attachment | 1:N | Um ticket possui vários anexos |
-| Ticket → Approval | 1:N | Um ticket pode precisar de várias aprovações |
+| Relação                     | Tipo | Descrição                                                               |
+| --------------------------- | ---- | ----------------------------------------------------------------------- |
+| User → Ticket (requester)   | 1:N  | Um usuário é **solicitante** de vários tickets (quem abre o chamado)    |
+| User → Ticket (beneficiary) | 1:N  | Um usuário é **beneficiário** de vários tickets (quem recebe o serviço) |
+| User → Ticket (assignee)    | 1:N  | Um agente recebe vários tickets                                         |
+| Company → Ticket            | 1:N  | Uma empresa possui vários tickets                                       |
+| SolverGroup → Ticket        | 1:N  | Um grupo recebe vários tickets                                          |
+| User → TicketComment        | 1:N  | Um usuário escreve vários comentários                                   |
+| Ticket → TicketComment      | 1:N  | Um ticket possui vários comentários (PUBLIC + INTERNAL)                 |
+| Ticket → TicketHistory      | 1:N  | Um ticket possui várias alterações no histórico                         |
+| Ticket → Attachment         | 1:N  | Um ticket possui vários anexos                                          |
+| Ticket → Approval           | 1:N  | Um ticket pode precisar de várias aprovações                            |
 
 ### 3.1 Solicitante, Beneficiário e Aprovador
 
@@ -398,21 +398,21 @@ flowchart LR
     D[Grupo/Agente<br/>solver_group_id / assignee_id<br/>quem atende] --> T
 ```
 
-| Persona | Campo | Obrigatório | Papel |
-|---------|-------|-------------|-------|
-| **Solicitante** | `ticket.requesterId` | **Sempre** | Usuário que registrou a solicitação (pode ser o próprio beneficiário) |
-| **Beneficiário** | `ticket.beneficiaryId` | Opcional | Usuário que usufrui do resultado; se vazio, assume o solicitante |
-| **Aprovador** | `Approval.approverId` | Quando houver fluxo | Usuário com poder de autorizar (gerencial, comercial, técnico) |
-| **Atendente** | `assigneeId` / `solverGroupId` | Pela regra de atribuição | Grupo e/ou agente responsável por resolver |
+| Persona          | Campo                          | Obrigatório              | Papel                                                                 |
+| ---------------- | ------------------------------ | ------------------------ | --------------------------------------------------------------------- |
+| **Solicitante**  | `ticket.requesterId`           | **Sempre**               | Usuário que registrou a solicitação (pode ser o próprio beneficiário) |
+| **Beneficiário** | `ticket.beneficiaryId`         | Opcional                 | Usuário que usufrui do resultado; se vazio, assume o solicitante      |
+| **Aprovador**    | `Approval.approverId`          | Quando houver fluxo      | Usuário com poder de autorizar (gerencial, comercial, técnico)        |
+| **Atendente**    | `assigneeId` / `solverGroupId` | Pela regra de atribuição | Grupo e/ou agente responsável por resolver                            |
 
 **Casos comuns:**
 
-| Caso | Solicitante | Beneficiário |
-|------|-------------|--------------|
-| Usuário reporta erro no sistema | O próprio usuário | O mesmo usuário (igual ao solicitante) |
-| Gestor pede notebook para funcionário | Gestor | Funcionário (diferente) |
-| Time de redes abre chamado de infra | Agente de redes | A empresa/usuário afetado |
-| Aprovação de mudança | Criador da mudança | — (aprovador via ApprovalFlow) |
+| Caso                                  | Solicitante        | Beneficiário                           |
+| ------------------------------------- | ------------------ | -------------------------------------- |
+| Usuário reporta erro no sistema       | O próprio usuário  | O mesmo usuário (igual ao solicitante) |
+| Gestor pede notebook para funcionário | Gestor             | Funcionário (diferente)                |
+| Time de redes abre chamado de infra   | Agente de redes    | A empresa/usuário afetado              |
+| Aprovação de mudança                  | Criador da mudança | — (aprovador via ApprovalFlow)         |
 
 > **Regra:** Se `beneficiaryId` não for informado na criação, o sistema copia `requesterId`.
 
@@ -456,22 +456,24 @@ SD-2026-000124
 ```
 
 **Exemplos:**
+
 - `SD-2026-000001` — primeiro ticket do ano
 - `SD-2026-000124` — 124º ticket de 2026
 - `SD-2027-000001` — primeiro ticket do ano seguinte (reinicia por ano)
 
 **Regras de sequência:**
 
-| Regra | Descrição |
-|-------|-----------|
-| Unicidade | `ticketNumber` é `UNIQUE` — sem duplicados |
-| Escopo | Sequência por **ano** (reinicia em 01/01) |
-| Faturamento | Definida por `SequenceCounter` (atomic `UPDATE ... RETURNING`) |
-| Atomicidade | Incremento e criação do ticket na **mesma transação** (sem buracos concorrentes) |
-| Entidades | Reutilizável para `CHANGE` e `PROBLEM` (prefixos `SDC-`, `SDP-`) |
-| Futuro multi-empresa | Sequência por `companyId` opcional (ex: `SD-2026-ACME-000124`) |
+| Regra                | Descrição                                                                        |
+| -------------------- | -------------------------------------------------------------------------------- |
+| Unicidade            | `ticketNumber` é `UNIQUE` — sem duplicados                                       |
+| Escopo               | Sequência por **ano** (reinicia em 01/01)                                        |
+| Faturamento          | Definida por `SequenceCounter` (atomic `UPDATE ... RETURNING`)                   |
+| Atomicidade          | Incremento e criação do ticket na **mesma transação** (sem buracos concorrentes) |
+| Entidades            | Reutilizável para `CHANGE` e `PROBLEM` (prefixos `SDC-`, `SDP-`)                 |
+| Futuro multi-empresa | Sequência por `companyId` opcional (ex: `SD-2026-ACME-000124`)                   |
 
 **Mecanismo (transação atômica):**
+
 1. `BEGIN`
 2. `UPDATE sequence_counters SET last_value = last_value + 1 WHERE ... RETURNING last_value` (com row lock)
 3. Monta `ticketNumber = SD-{year}-{last_value zerofill 6}`
@@ -480,32 +482,32 @@ SD-2026-000124
 
 ### 4. Problemas
 
-| Relação | Tipo | Descrição |
-|---------|------|-----------|
-| Problem → Ticket | M:N | Um problema pode estar relacionado a vários tickets (via ProblemTicket) |
+| Relação          | Tipo | Descrição                                                               |
+| ---------------- | ---- | ----------------------------------------------------------------------- |
+| Problem → Ticket | M:N  | Um problema pode estar relacionado a vários tickets (via ProblemTicket) |
 
 ### 5. Mudanças
 
-| Relação | Tipo | Descrição |
-|---------|------|-----------|
-| Change → Ticket | M:N | Uma mudança pode estar relacionada a vários tickets (via ChangeTicket) |
-| Change → Approval | 1:N | Uma mudança pode precisar de várias aprovações |
+| Relação           | Tipo | Descrição                                                              |
+| ----------------- | ---- | ---------------------------------------------------------------------- |
+| Change → Ticket   | M:N  | Uma mudança pode estar relacionada a vários tickets (via ChangeTicket) |
+| Change → Approval | 1:N  | Uma mudança pode precisar de várias aprovações                         |
 
 ### 6. Aprovações
 
-| Relação | Tipo | Descrição |
-|---------|------|-----------|
-| ApprovalFlow → Approval | 1:N | Um fluxo define várias aprovações |
-| Ticket/Change → Approval | 1:N | Tickets e Changes precisam de aprovações |
+| Relação                  | Tipo | Descrição                                |
+| ------------------------ | ---- | ---------------------------------------- |
+| ApprovalFlow → Approval  | 1:N  | Um fluxo define várias aprovações        |
+| Ticket/Change → Approval | 1:N  | Tickets e Changes precisam de aprovações |
 
 ### 7. Roteamento (Auto-atribuição)
 
-| Relação | Tipo | Descrição |
-|---------|------|-----------|
-| RoutingRule → SolverGroup | N:1 | Uma regra aponta para um grupo alvo (estratégia TO_GROUP) |
-| RoutingRule → Ticket | 1:N | Uma regra roteia vários tickets |
-| Company → RoutingRule | 1:N | Cada empresa pode ter suas próprias regras |
-| Ticket → RoutingRule | N:1 | O ticket registra qual regra o roteou |
+| Relação                   | Tipo | Descrição                                                 |
+| ------------------------- | ---- | --------------------------------------------------------- |
+| RoutingRule → SolverGroup | N:1  | Uma regra aponta para um grupo alvo (estratégia TO_GROUP) |
+| RoutingRule → Ticket      | 1:N  | Uma regra roteia vários tickets                           |
+| Company → RoutingRule     | 1:N  | Cada empresa pode ter suas próprias regras                |
+| Ticket → RoutingRule      | N:1  | O ticket registra qual regra o roteou                     |
 
 ---
 
@@ -536,8 +538,8 @@ CREATE TYPE group_level AS ENUM (
 ```sql
 CREATE TYPE ticket_type AS ENUM ('INCIDENT', 'SERVICE_REQUEST');
 CREATE TYPE ticket_status AS ENUM (
-    'OPEN', 'IN_PROGRESS', 'PENDING', 
-    'WAITING_USER', 'WAITING_APPROVAL', 
+    'OPEN', 'IN_PROGRESS', 'PENDING',
+    'WAITING_USER', 'WAITING_APPROVAL',
     'RESOLVED', 'CLOSED'
 );
 CREATE TYPE priority_level AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL');
@@ -687,27 +689,27 @@ CREATE INDEX idx_knowledge_published ON knowledge_articles(published);
 flowchart TD
     A[🧾 Ticket criado] --> B[Define tipo, prioridade, categoria]
     B --> C{Existe RoutingRule ativa?}
-    
+
     C -->|Sim| D{Avalia regra na ordem}
     D --> E[TO_GROUP]
     D --> F[ROUND_ROBIN]
     D --> G[LEAST_LOADED]
     D --> H[MANUAL]
-    
+
     E --> I[Grupo alvo definido<br/>agente = null]
     F --> J[Próximo agente do grupo<br/>em ordem cíclica]
     G --> K[Agente com menos<br/>tickets abertos]
     H --> L[aguarda MANAGER/ADMIN<br/>distribuir]
-    
+
     C -->|Não| M[Usa grupo padrão da empresa<br/>estratégia TO_GROUP]
-    
+
     I & J & K --> N[DESTINO = Grupo + Agente]
     L --> N
-    
+
     N --> O{Agente pertence ao grupo?}
     O -->|Sim| P[✅ Atribuição válida]
     O -->|Não| Q[❌ Rejeita atribuição<br/>mensagem de erro]
-    
+
     P --> R[Ticket marcado IN_PROGRESS]
     P --> S[Registra TicketHistory]
     P --> T[Notifica agente via Socket]

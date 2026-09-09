@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CompaniesService } from './companies.service.js';
 import {
@@ -25,7 +35,10 @@ export class CompaniesController {
 
   @Get('options')
   @Roles('ADMIN', 'MANAGER', 'AGENT', 'USER')
-  @ApiOperation({ summary: 'Opções de empresas para o usuário logado (team: todas ATIVAS; USER: a própria)' })
+  @ApiOperation({
+    summary:
+      'Opções de empresas para o usuário logado (team: todas ATIVAS; USER: a própria)',
+  })
   options(@CurrentUser() actor: UserContext) {
     return this.companiesService.options(actor);
   }

@@ -2,10 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Globe } from 'lucide-react'
 
 import { Dropdown, DropdownItem } from '@/components/ui/Dropdown'
-import {
-  LOCALE_STORAGE_KEY,
-  SUPPORTED_LOCALES,
-} from '@/i18n'
+import { LOCALE_STORAGE_KEY, SUPPORTED_LOCALES } from '@/i18n'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/authStore'
@@ -41,10 +38,7 @@ export function LanguageSelector() {
       }
     >
       {SUPPORTED_LOCALES.map((locale) => (
-        <DropdownItem
-          key={locale}
-          onClick={() => void changeLanguage(locale)}
-        >
+        <DropdownItem key={locale} onClick={() => void changeLanguage(locale)}>
           <span className={cn(locale === current && 'font-semibold text-primary')}>
             {LOCALE_LABELS[locale]}
           </span>

@@ -232,7 +232,9 @@ export default function DashboardPage() {
       align: 'right',
       sortable: true,
       render: (row) => (
-        <span className="tabular-nums text-body dark:text-bodydark">{formatDate(row.createdAt)}</span>
+        <span className="tabular-nums text-body dark:text-bodydark">
+          {formatDate(row.createdAt)}
+        </span>
       ),
     },
   ]
@@ -281,7 +283,8 @@ export default function DashboardPage() {
             {t('app.tagline')}
           </h1>
           <p className="text-sm text-bodystroke">
-            {t('nav.dashboard')} · {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full' }).format(new Date())}
+            {t('nav.dashboard')} ·{' '}
+            {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full' }).format(new Date())}
           </p>
         </div>
         {isLoading ? (

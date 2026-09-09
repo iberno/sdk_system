@@ -27,9 +27,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  const from =
-    (location.state as { from?: { pathname: string } } | null)?.from?.pathname ??
-    '/'
+  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/'
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
@@ -41,8 +39,7 @@ export default function LoginPage() {
       navigate(from, { replace: true })
     } catch (err) {
       const status = (err as { response?: { status?: number } })?.response?.status
-      const message =
-        status === 401 ? t('auth.invalidCredentials') : t('auth.signInError')
+      const message = status === 401 ? t('auth.invalidCredentials') : t('auth.signInError')
       setError(message)
       toast.error(message)
     } finally {
@@ -81,11 +78,7 @@ export default function LoginPage() {
             </div>
           </FormField>
 
-          <FormField
-            label={t('auth.password')}
-            required
-            className="gap-1.5"
-          >
+          <FormField label={t('auth.password')} required className="gap-1.5">
             <div className="relative">
               <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-bodystroke" />
               <Input
@@ -108,12 +101,7 @@ export default function LoginPage() {
             </div>
           </FormField>
 
-          <Button
-            type="submit"
-            loading={submitting}
-            className="mt-1 w-full"
-            size="lg"
-          >
+          <Button type="submit" loading={submitting} className="mt-1 w-full" size="lg">
             {submitting ? t('auth.signInLoading') : t('auth.signIn')}
           </Button>
         </form>

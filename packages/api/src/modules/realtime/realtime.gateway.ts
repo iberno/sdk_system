@@ -94,7 +94,8 @@ export class RealtimeGateway implements OnGatewayConnection {
         throw new Error('missing token');
       }
       const payload = await this.jwt.verifyAsync<UserContext>(raw, {
-        secret: this.config.get<string>('JWT_ACCESS_SECRET') ?? 'default_secret',
+        secret:
+          this.config.get<string>('JWT_ACCESS_SECRET') ?? 'default_secret',
       });
       socket.data.user = payload;
       const rooms = [`company:${payload.companyId}`, `user:${payload.sub}`];
@@ -112,9 +113,13 @@ export class RealtimeGateway implements OnGatewayConnection {
     this.server
       .to(this.roomsFor(payload.companyId, payload.solverGroupId))
       .emit('ticket.created', payload);
-    this.server.to(`user:${payload.requesterId}`).emit('ticket.created', payload);
+    this.server
+      .to(`user:${payload.requesterId}`)
+      .emit('ticket.created', payload);
     if (payload.beneficiaryId) {
-      this.server.to(`user:${payload.beneficiaryId}`).emit('ticket.created', payload);
+      this.server
+        .to(`user:${payload.beneficiaryId}`)
+        .emit('ticket.created', payload);
     }
   }
 
@@ -150,7 +155,9 @@ export class RealtimeGateway implements OnGatewayConnection {
 
   async #emitToCompanyExceptParticipants(payload: TicketCommentedPayload) {
     const except = new Set(payload.exceptUserIds ?? []);
-    const sockets = await this.server.in(`company:${payload.companyId}`).fetchSockets();
+    const sockets = await this.server
+      .in(`company:${payload.companyId}`)
+      .fetchSockets();
     for (const socket of sockets) {
       const user = socket.data?.user as UserContext | undefined;
       if (!user) continue;

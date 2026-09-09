@@ -7,7 +7,10 @@ import {
 import { ProblemStatus, Prisma, Status } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { AuditService } from '../audit/audit.service.js';
-import { paginationArgs, paginationMeta } from '../../common/dto/pagination.dto.js';
+import {
+  paginationArgs,
+  paginationMeta,
+} from '../../common/dto/pagination.dto.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 import {
   CreateProblemDto,
@@ -18,7 +21,9 @@ import {
 
 const PROBLEM_INCLUDE = {
   company: { select: { id: true, name: true } },
-  proposedChange: { select: { id: true, title: true, status: true, type: true } },
+  proposedChange: {
+    select: { id: true, title: true, status: true, type: true },
+  },
 } satisfies Prisma.ProblemInclude;
 
 const DETAIL_INCLUDE = {
@@ -100,7 +105,10 @@ export class ProblemsService {
   async findOne(id: string, actor: UserContext) {
     const problem = await this.getDetail(id);
     if (!this.isVisible(problem, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return this.mapDetail(problem);
   }
@@ -136,7 +144,10 @@ export class ProblemsService {
     this.assertTeam(actor);
     const prev = await this.getDetail(id);
     if (!this.isVisible(prev, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
 
     if (dto.status && dto.status !== prev.status) {
@@ -153,7 +164,9 @@ export class ProblemsService {
       where: { id },
       data: {
         ...(dto.title ? { title: dto.title } : {}),
-        ...(dto.description !== undefined ? { description: dto.description } : {}),
+        ...(dto.description !== undefined
+          ? { description: dto.description }
+          : {}),
         ...(dto.impact ? { impact: dto.impact } : {}),
         ...(dto.rootCause !== undefined ? { rootCause: dto.rootCause } : {}),
         ...(dto.workaround !== undefined ? { workaround: dto.workaround } : {}),
@@ -177,14 +190,22 @@ export class ProblemsService {
       oldData: {
         title: prev.title,
         status: prev.status,
-        ...(dto.rootCause !== undefined ? { rootCause: prev.rootCause ?? null } : {}),
-        ...(dto.solution !== undefined ? { solution: prev.solution ?? null } : {}),
+        ...(dto.rootCause !== undefined
+          ? { rootCause: prev.rootCause ?? null }
+          : {}),
+        ...(dto.solution !== undefined
+          ? { solution: prev.solution ?? null }
+          : {}),
       },
       newData: {
         title: updated.title,
         status: updated.status,
-        ...(dto.rootCause !== undefined ? { rootCause: updated.rootCause ?? null } : {}),
-        ...(dto.solution !== undefined ? { solution: updated.solution ?? null } : {}),
+        ...(dto.rootCause !== undefined
+          ? { rootCause: updated.rootCause ?? null }
+          : {}),
+        ...(dto.solution !== undefined
+          ? { solution: updated.solution ?? null }
+          : {}),
       },
     });
     return this.mapDetail(updated);
@@ -194,9 +215,14 @@ export class ProblemsService {
     this.assertTeam(actor);
     const problem = await this.getDetail(id);
     if (!this.isVisible(problem, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
-    const ticket = await this.prisma.ticket.findUnique({ where: { id: dto.ticketId } });
+    const ticket = await this.prisma.ticket.findUnique({
+      where: { id: dto.ticketId },
+    });
     if (!ticket || ticket.companyId !== problem.companyId) {
       throw new UnprocessableEntityException({
         key: 'business.ticket_link_invalid',
@@ -225,7 +251,10 @@ export class ProblemsService {
     this.assertTeam(actor);
     const problem = await this.getDetail(id);
     if (!this.isVisible(problem, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     await this.prisma.problemTicket.deleteMany({
       where: { problemId: id, ticketId },
@@ -279,11 +308,17 @@ export class ProblemsService {
 
   private assertTeam(actor: UserContext) {
     if (actor.role === 'USER') {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
   }
 
-  private isVisible(problem: { companyId: string }, actor: UserContext): boolean {
+  private isVisible(
+    problem: { companyId: string },
+    actor: UserContext,
+  ): boolean {
     if (actor.role === 'ADMIN') return true;
     return actor.companyId != null && problem.companyId === actor.companyId;
   }
@@ -304,9 +339,14 @@ export class ProblemsService {
         error: 'UnprocessableEntity',
       });
     }
-    const company = await this.prisma.company.findUnique({ where: { id: companyId } });
+    const company = await this.prisma.company.findUnique({
+      where: { id: companyId },
+    });
     if (!company || company.status !== Status.ACTIVE) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return companyId;
   }
@@ -317,7 +357,10 @@ export class ProblemsService {
       include: DETAIL_INCLUDE,
     });
     if (!problem) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return problem;
   }

@@ -22,11 +22,9 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && original && !original._retry && refreshToken) {
       original._retry = true
       try {
-        const { data } = await axios.post(
-          '/api/auth/refresh',
-          undefined,
-          { headers: { Authorization: `Bearer ${refreshToken}` } },
-        )
+        const { data } = await axios.post('/api/auth/refresh', undefined, {
+          headers: { Authorization: `Bearer ${refreshToken}` },
+        })
         const tokens = data.data as { accessToken: string; refreshToken?: string }
         useAuthStore.getState().setTokens(tokens)
         original.headers.Authorization = `Bearer ${tokens.accessToken}`

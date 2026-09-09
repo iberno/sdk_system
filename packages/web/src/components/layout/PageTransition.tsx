@@ -8,8 +8,7 @@ interface PageTransitionProps {
 export function PageTransition({ children }: PageTransitionProps) {
   const location = useLocation()
   const navigationType = useNavigationType()
-  const motionClass =
-    navigationType === 'POP' ? 'page-enter-back' : 'page-enter-forward'
+  const motionClass = navigationType === 'POP' ? 'page-enter-back' : 'page-enter-forward'
 
   return (
     <div key={location.key} className={motionClass}>

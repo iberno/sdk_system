@@ -23,7 +23,12 @@ export function Select({ invalid = false, className, options, children, ...props
         )}
         {...props}
       >
-        {children ?? options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        {children ??
+          options?.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
       </select>
       <ChevronDown
         className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-bodystroke"

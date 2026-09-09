@@ -247,7 +247,9 @@ export default function KnowledgePage() {
               setPage(1)
             }}
           >
-            <option value="">{t('common.all')} · {t('knowledge.category')}</option>
+            <option value="">
+              {t('common.all')} · {t('knowledge.category')}
+            </option>
             {categoryOptions.map((value) => (
               <option key={value} value={value}>
                 {value}
@@ -299,10 +301,15 @@ export default function KnowledgePage() {
                 <h3 className="text-sm font-semibold leading-snug text-graydark dark:text-white">
                   {article.title}
                 </h3>
-                <p className="line-clamp-3 text-sm text-body dark:text-bodydark">{article.content}</p>
+                <p className="line-clamp-3 text-sm text-body dark:text-bodydark">
+                  {article.content}
+                </p>
                 <div className="mt-auto flex flex-wrap items-center gap-1 pt-1">
                   {article.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="rounded-md bg-graylight px-1.5 py-0.5 text-[11px] text-bodystroke dark:bg-boxdark-3">
+                    <span
+                      key={tag}
+                      className="rounded-md bg-graylight px-1.5 py-0.5 text-[11px] text-bodystroke dark:bg-boxdark-3"
+                    >
                       #{tag}
                     </span>
                   ))}
@@ -347,7 +354,11 @@ export default function KnowledgePage() {
                 {t('common.delete')}
               </Button>
               {!viewing.published && (
-                <Button variant="secondary" onClick={() => void doPublish(viewing)} loading={publishArticle.isPending}>
+                <Button
+                  variant="secondary"
+                  onClick={() => void doPublish(viewing)}
+                  loading={publishArticle.isPending}
+                >
                   <Send className="size-4" />
                   {t('knowledge.publish')}
                 </Button>
@@ -377,7 +388,10 @@ export default function KnowledgePage() {
             {viewing.tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {viewing.tags.map((tag) => (
-                  <span key={tag} className="rounded-md bg-graylight px-2 py-0.5 text-xs text-bodystroke dark:bg-boxdark-3">
+                  <span
+                    key={tag}
+                    className="rounded-md bg-graylight px-2 py-0.5 text-xs text-bodystroke dark:bg-boxdark-3"
+                  >
                     #{tag}
                   </span>
                 ))}
@@ -441,11 +455,19 @@ export default function KnowledgePage() {
 
           <FormField label={t('knowledge.content')} required error={formErrors.content}>
             <div className="flex gap-2">
-              <Button variant={preview ? 'secondary' : 'primary'} size="sm" onClick={() => setPreview(false)}>
+              <Button
+                variant={preview ? 'secondary' : 'primary'}
+                size="sm"
+                onClick={() => setPreview(false)}
+              >
                 <Pencil className="size-3.5" />
                 {t('knowledge.write')}
               </Button>
-              <Button variant={preview ? 'primary' : 'secondary'} size="sm" onClick={() => setPreview(true)}>
+              <Button
+                variant={preview ? 'primary' : 'secondary'}
+                size="sm"
+                onClick={() => setPreview(true)}
+              >
                 <Eye className="size-3.5" />
                 {t('knowledge.preview')}
               </Button>

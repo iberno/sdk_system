@@ -1,12 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsIn,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsIn, IsOptional, IsString } from 'class-validator';
 import { Priority, TicketStatus, TicketType } from '@prisma/client';
 import { PaginationDto } from '../../../common/dto/pagination.dto.js';
 
@@ -83,7 +77,10 @@ export class QueryTicketsDto extends PaginationDto {
   @IsIn(['createdAt', 'priority', 'status'])
   sortBy?: 'createdAt' | 'priority' | 'status';
 
-  @ApiPropertyOptional({ enum: ['ASC', 'DESC', 'asc', 'desc'], description: 'Case-insensitive (minúsculo é normalizado no serviço)' })
+  @ApiPropertyOptional({
+    enum: ['ASC', 'DESC', 'asc', 'desc'],
+    description: 'Case-insensitive (minúsculo é normalizado no serviço)',
+  })
   @IsOptional()
   @IsIn(['ASC', 'DESC', 'asc', 'desc'])
   order?: 'ASC' | 'DESC' | 'asc' | 'desc';

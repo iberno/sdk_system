@@ -28,8 +28,15 @@ import { RequestTicketApprovalDto } from '../approvals/dto/approval.dto.js';
 import { QueryTicketsDto } from './dto/query-tickets.dto.js';
 import { CreateTicketDto } from './dto/create-ticket.dto.js';
 import { UpdateTicketDto } from './dto/update-ticket.dto.js';
-import { AssignTicketDto, PickupTicketDto, ReassignTicketsDto } from './dto/assign-ticket.dto.js';
-import { CreateCommentDto, UpdateTicketStatusDto } from './dto/status-comment.dto.js';
+import {
+  AssignTicketDto,
+  PickupTicketDto,
+  ReassignTicketsDto,
+} from './dto/assign-ticket.dto.js';
+import {
+  CreateCommentDto,
+  UpdateTicketStatusDto,
+} from './dto/status-comment.dto.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
@@ -76,7 +83,9 @@ export class TicketsController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Cria ticket (auto-roteamento + SLA + ticketNumber)' })
+  @ApiOperation({
+    summary: 'Cria ticket (auto-roteamento + SLA + ticketNumber)',
+  })
   create(@Body() dto: CreateTicketDto, @CurrentUser() actor: UserContext) {
     return this.tickets.create(dto, actor);
   }
@@ -85,11 +94,13 @@ export class TicketsController {
   @HttpCode(HttpStatus.OK)
   @Roles('MANAGER', 'ADMIN')
   @ApiOperation({ summary: 'Reatribuição em lote (MANAGER/ADMIN)' })
-  reassign(
-    @Body() dto: ReassignTicketsDto,
-    @CurrentUser() actor: UserContext,
-  ) {
-    return this.tickets.reassign(dto.ticketIds, dto.assigneeId, dto.solverGroupId, actor);
+  reassign(@Body() dto: ReassignTicketsDto, @CurrentUser() actor: UserContext) {
+    return this.tickets.reassign(
+      dto.ticketIds,
+      dto.assigneeId,
+      dto.solverGroupId,
+      actor,
+    );
   }
 
   @Get(':id')
@@ -100,7 +111,9 @@ export class TicketsController {
 
   @Put(':id')
   @Roles('AGENT', 'MANAGER', 'ADMIN')
-  @ApiOperation({ summary: 'Atualiza campos (priority/impact/urgency: MANAGER+)' })
+  @ApiOperation({
+    summary: 'Atualiza campos (priority/impact/urgency: MANAGER+)',
+  })
   update(
     @Param('id') id: string,
     @Body() dto: UpdateTicketDto,
@@ -136,7 +149,9 @@ export class TicketsController {
   @Post(':id/request-approval')
   @HttpCode(HttpStatus.OK)
   @Roles('AGENT', 'MANAGER', 'ADMIN')
-  @ApiOperation({ summary: 'Submete ticket a um fluxo de aprovação (WAITING_APPROVAL)' })
+  @ApiOperation({
+    summary: 'Submete ticket a um fluxo de aprovação (WAITING_APPROVAL)',
+  })
   requestApproval(
     @Param('id') id: string,
     @Body() dto: RequestTicketApprovalDto,
@@ -185,7 +200,10 @@ export class TicketsController {
           cb(null, UPLOAD_DIR);
         },
         filename: (req, file, cb) => {
-          cb(null, `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')}`);
+          cb(
+            null,
+            `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')}`,
+          );
         },
       }),
       limits: { fileSize: MAX_FILE_SIZE },
@@ -213,12 +231,16 @@ export class TicketsController {
         error: 'UnprocessableEntity',
       });
     }
-    return this.tickets.addAttachment(id, {
-      filename: file.originalname,
-      url: join(UPLOAD_DIR, file.filename),
-      size: file.size,
-      mimetype: file.mimetype,
-    }, actor);
+    return this.tickets.addAttachment(
+      id,
+      {
+        filename: file.originalname,
+        url: join(UPLOAD_DIR, file.filename),
+        size: file.size,
+        mimetype: file.mimetype,
+      },
+      actor,
+    );
   }
 
   @Get(':id/attachments/:attachmentId/download')
@@ -230,7 +252,11 @@ export class TicketsController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const attachment = await this.tickets.getAttachment(id, attachmentId, actor);
+    const attachment = await this.tickets.getAttachment(
+      id,
+      attachmentId,
+      actor,
+    );
     if (!attachment || !existsSync(attachment.url)) {
       throw new UnprocessableEntityException({
         key: 'errors.not_found',

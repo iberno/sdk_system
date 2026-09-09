@@ -1,7 +1,20 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApprovalsService } from './approvals.service.js';
-import { ApproveDto, QueryApprovalsDto, RejectDto } from './dto/approval.dto.js';
+import {
+  ApproveDto,
+  QueryApprovalsDto,
+  RejectDto,
+} from './dto/approval.dto.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 

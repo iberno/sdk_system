@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { paginationArgs, paginationMeta } from '../../common/dto/pagination.dto.js';
+import {
+  paginationArgs,
+  paginationMeta,
+} from '../../common/dto/pagination.dto.js';
 import { AuditService } from '../audit/audit.service.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 import {
@@ -21,7 +24,10 @@ const ARTICLE_INCLUDE = {
 
 function assertTeam(actor: UserContext) {
   if (actor.role === 'USER') {
-    throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+    throw new ForbiddenException({
+      key: 'errors.forbidden',
+      error: 'Forbidden',
+    });
   }
 }
 
@@ -55,7 +61,11 @@ export class KnowledgeService {
 
     return {
       items: rows.map((a) => this.mapArticle(a)),
-      pagination: paginationMeta(query.page ?? 1, query.pageSize ?? 20, totalItems),
+      pagination: paginationMeta(
+        query.page ?? 1,
+        query.pageSize ?? 20,
+        totalItems,
+      ),
     };
   }
 
@@ -85,14 +95,21 @@ export class KnowledgeService {
 
     return {
       items: rows.map((a) => this.mapArticle(a)),
-      pagination: paginationMeta(query.page ?? 1, query.pageSize ?? 20, totalItems),
+      pagination: paginationMeta(
+        query.page ?? 1,
+        query.pageSize ?? 20,
+        totalItems,
+      ),
     };
   }
 
   async findOne(id: string, actor: UserContext) {
     const article = await this.getArticle(id);
     if (!this.canRead(article, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return this.mapArticle(article);
   }
@@ -190,7 +207,10 @@ export class KnowledgeService {
       },
     });
     if (!problem) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     if (problem.status !== 'RESOLVED' && problem.status !== 'CLOSED') {
       throw new UnprocessableEntityException({
@@ -221,7 +241,9 @@ export class KnowledgeService {
   }
 
   private canRead(
-    article: Prisma.KnowledgeArticleGetPayload<{ include: typeof ARTICLE_INCLUDE }>,
+    article: Prisma.KnowledgeArticleGetPayload<{
+      include: typeof ARTICLE_INCLUDE;
+    }>,
     actor: UserContext,
   ) {
     if (article.published) return true;
@@ -230,13 +252,22 @@ export class KnowledgeService {
   }
 
   private assertOwner(article: { authorId: string }, actor: UserContext) {
-    if (actor.role !== 'ADMIN' && actor.role !== 'MANAGER' && article.authorId !== actor.sub) {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+    if (
+      actor.role !== 'ADMIN' &&
+      actor.role !== 'MANAGER' &&
+      article.authorId !== actor.sub
+    ) {
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
   }
 
   private mapArticle(
-    article: Prisma.KnowledgeArticleGetPayload<{ include: typeof ARTICLE_INCLUDE }>,
+    article: Prisma.KnowledgeArticleGetPayload<{
+      include: typeof ARTICLE_INCLUDE;
+    }>,
   ) {
     return {
       id: article.id,
@@ -253,13 +284,18 @@ export class KnowledgeService {
 
   private async getArticle(
     id: string,
-  ): Promise<Prisma.KnowledgeArticleGetPayload<{ include: typeof ARTICLE_INCLUDE }>> {
+  ): Promise<
+    Prisma.KnowledgeArticleGetPayload<{ include: typeof ARTICLE_INCLUDE }>
+  > {
     const article = await this.prisma.knowledgeArticle.findUnique({
       where: { id },
       include: ARTICLE_INCLUDE,
     });
     if (!article) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return article;
   }

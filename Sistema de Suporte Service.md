@@ -1,5 +1,7 @@
 # Sistema de Suporte (Service Desk) ITIL v4
+
 ---
+
 # 1. OBJETIVO DO PROJETO
 
 Desenvolver uma plataforma corporativa de gerenciamento de tickets baseada nas melhores práticas do ITIL v4, com arquitetura moderna, modular, escalável e orientada a APIs.
@@ -10,7 +12,7 @@ Desenvolver uma plataforma corporativa de gerenciamento de tickets baseada nas m
 - ERD Diagrama Relacional
 - Fluxo de Atendimento
 
-- Fluxo de Aprovação 
+- Fluxo de Aprovação
 - Grupo Solucionador (N1, N2, N3, REDES, INFRA, DEVOPS ...)
 
 O sistema deverá atender processos de:
@@ -51,35 +53,33 @@ O sistema deverá atender processos de:
 
 ## Backend
 
-| Tecnologia | Finalidade |
-|---|---|
-| Node.js v24 | Runtime |
-| NestJS | Framework backend |
-| TypeScript | Linguagem principal |
-| Prisma ORM | ORM |
-| PostgreSQL v18 | Banco relacional |
-| JWT (Passport) | Autenticação |
-| Swagger | Documentação API |
-| Socket.IO | Realtime |
-| bcryptjs | Hash de senhas |
+| Tecnologia        | Finalidade                |
+| ----------------- | ------------------------- |
+| Node.js v24       | Runtime                   |
+| NestJS            | Framework backend         |
+| TypeScript        | Linguagem principal       |
+| Prisma ORM        | ORM                       |
+| PostgreSQL v18    | Banco relacional          |
+| JWT (Passport)    | Autenticação              |
+| Swagger           | Documentação API          |
+| Socket.IO         | Realtime                  |
+| bcryptjs          | Hash de senhas            |
 | @nestjs/throttler | Rate limiter (30 req/60s) |
 
 ---
 
 ## Frontend
 
-| Tecnologia | Finalidade |
-|---|---|
-| React | Frontend |
-| Vite | Build |
-| TypeScript | Linguagem |
-| TailwindCSS v4 (TailAdmin) | 
+| Tecnologia                         | Finalidade              |
+| ---------------------------------- | ----------------------- |
+| React                              | Frontend                |
+| Vite                               | Build                   |
+| TypeScript                         | Linguagem               |
+| TailwindCSS v4 (TailAdmin)         |
 | Componentes Globais TailwindCSS v4 |
-| TanStack Query (React Query) | Cache e requests |
-| Zustand | Gerenciamento de estado |
-| Axios | HTTP Client |
-| Socket.IO Client | Realtime |
-| React Router | Roteamento |
-| lucide-react | Ícones SVG |
-
- 
+| TanStack Query (React Query)       | Cache e requests        |
+| Zustand                            | Gerenciamento de estado |
+| Axios                              | HTTP Client             |
+| Socket.IO Client                   | Realtime                |
+| React Router                       | Roteamento              |
+| lucide-react                       | Ícones SVG              |

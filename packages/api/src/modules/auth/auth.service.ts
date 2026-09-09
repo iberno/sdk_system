@@ -41,15 +41,24 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException({ key: 'errors.invalid_credentials', error: 'Unauthorized' });
+      throw new UnauthorizedException({
+        key: 'errors.invalid_credentials',
+        error: 'Unauthorized',
+      });
     }
     if (user.status !== 'ACTIVE') {
-      throw new UnauthorizedException({ key: 'errors.account_inactive', error: 'Unauthorized' });
+      throw new UnauthorizedException({
+        key: 'errors.account_inactive',
+        error: 'Unauthorized',
+      });
     }
 
     const valid = await compare(password, user.password);
     if (!valid) {
-      throw new UnauthorizedException({ key: 'errors.invalid_credentials', error: 'Unauthorized' });
+      throw new UnauthorizedException({
+        key: 'errors.invalid_credentials',
+        error: 'Unauthorized',
+      });
     }
 
     return {
@@ -127,7 +136,9 @@ export class AuthService {
     const user = await this.validateUser(email, password);
     const accessToken = this.signAccessToken(user);
     const refreshToken = await this.createRefreshToken(user.id);
-    const expiresIn = ttlToSeconds(this.config.get<string>('JWT_ACCESS_EXPIRES_IN') ?? '15m');
+    const expiresIn = ttlToSeconds(
+      this.config.get<string>('JWT_ACCESS_EXPIRES_IN') ?? '15m',
+    );
 
     await this.audit.log({
       action: 'LOGIN',
@@ -153,12 +164,18 @@ export class AuthService {
     });
 
     if (!stored || stored.revoked || stored.expiresAt < new Date()) {
-      throw new UnauthorizedException({ key: 'errors.invalid_refresh_token', error: 'Unauthorized' });
+      throw new UnauthorizedException({
+        key: 'errors.invalid_refresh_token',
+        error: 'Unauthorized',
+      });
     }
 
     const user = stored.user;
     if (user.status !== 'ACTIVE') {
-      throw new UnauthorizedException({ key: 'errors.account_inactive', error: 'Unauthorized' });
+      throw new UnauthorizedException({
+        key: 'errors.account_inactive',
+        error: 'Unauthorized',
+      });
     }
 
     await this.prisma.refreshToken.update({
@@ -175,7 +192,9 @@ export class AuthService {
       solverGroupId: user.solverGroupId,
     });
     const rotated = await this.createRefreshToken(user.id);
-    const expiresIn = ttlToSeconds(this.config.get<string>('JWT_ACCESS_EXPIRES_IN') ?? '15m');
+    const expiresIn = ttlToSeconds(
+      this.config.get<string>('JWT_ACCESS_EXPIRES_IN') ?? '15m',
+    );
 
     return {
       accessToken,

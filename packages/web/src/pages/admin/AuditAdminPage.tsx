@@ -32,7 +32,10 @@ const ENTITIES = [
 
 const ACTIONS = ['CREATE', 'UPDATE', 'DELETE', 'COMMENT', 'LOGIN', 'LOGOUT']
 
-const ACTION_TONE: Record<string, 'success' | 'info' | 'error' | 'primary' | 'warning' | 'neutral'> = {
+const ACTION_TONE: Record<
+  string,
+  'success' | 'info' | 'error' | 'primary' | 'warning' | 'neutral'
+> = {
   CREATE: 'success',
   UPDATE: 'info',
   DELETE: 'error',
@@ -78,13 +81,17 @@ export default function AuditAdminPage() {
 
   const columns: Array<Column<AuditLogEntry>> = useMemo(() => {
     const formatDateTime = (iso: string) =>
-      new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso))
+      new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(
+        new Date(iso),
+      )
     return [
       {
         key: 'createdAt',
         header: t('audit.when'),
         render: (row) => (
-          <span className="tabular-nums text-body dark:text-bodydark">{formatDateTime(row.createdAt)}</span>
+          <span className="tabular-nums text-body dark:text-bodydark">
+            {formatDateTime(row.createdAt)}
+          </span>
         ),
       },
       {
@@ -95,7 +102,9 @@ export default function AuditAdminPage() {
             <div className="flex items-center gap-2.5">
               <Avatar name={row.user.name} size="sm" />
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-graydark dark:text-white">{row.user.name}</span>
+                <span className="text-sm font-medium text-graydark dark:text-white">
+                  {row.user.name}
+                </span>
                 <span className="text-xs text-bodystroke">{row.user.email}</span>
               </div>
             </div>
@@ -106,9 +115,7 @@ export default function AuditAdminPage() {
       {
         key: 'action',
         header: t('audit.action'),
-        render: (row) => (
-          <Badge tone={ACTION_TONE[row.action] ?? 'neutral'}>{row.action}</Badge>
-        ),
+        render: (row) => <Badge tone={ACTION_TONE[row.action] ?? 'neutral'}>{row.action}</Badge>,
       },
       {
         key: 'entity',
@@ -188,7 +195,9 @@ export default function AuditAdminPage() {
       <Card bodyClassName="p-0">
         <div className="grid grid-cols-1 gap-3 border-b border-stroke p-4 dark:border-strokedark sm:grid-cols-2 lg:grid-cols-4">
           <Select value={entity} onChange={(event) => setEntity(event.target.value)}>
-            <option value="">{t('common.all')} · {t('audit.entity')}</option>
+            <option value="">
+              {t('common.all')} · {t('audit.entity')}
+            </option>
             {ENTITIES.map((value) => (
               <option key={value} value={value}>
                 {value}
@@ -196,7 +205,9 @@ export default function AuditAdminPage() {
             ))}
           </Select>
           <Select value={action} onChange={(event) => setAction(event.target.value)}>
-            <option value="">{t('common.all')} · {t('audit.action')}</option>
+            <option value="">
+              {t('common.all')} · {t('audit.action')}
+            </option>
             {ACTIONS.map((value) => (
               <option key={value} value={value}>
                 {value}

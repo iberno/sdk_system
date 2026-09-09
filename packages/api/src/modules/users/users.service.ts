@@ -12,7 +12,10 @@ import { AuditService } from '../audit/audit.service.js';
 import { CreateUserDto, UpdateUserDto } from './dto/update-user.dto.js';
 import { QueryUsersDto } from './dto/query-users.dto.js';
 import { PaginatedResult } from '../../common/interceptors/transform.interceptor.js';
-import { paginationArgs, paginationMeta } from '../../common/dto/pagination.dto.js';
+import {
+  paginationArgs,
+  paginationMeta,
+} from '../../common/dto/pagination.dto.js';
 import { UserContext } from '../auth/interfaces/auth-user.interface.js';
 
 const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
@@ -54,7 +57,15 @@ export class UsersService {
   ) {}
 
   async findAll(query: QueryUsersDto): Promise<PaginatedResult<unknown>> {
-    const { page = 1, pageSize = 20, search, role, companyId, solverGroupId, status } = query;
+    const {
+      page = 1,
+      pageSize = 20,
+      search,
+      role,
+      companyId,
+      solverGroupId,
+      status,
+    } = query;
     const where: Prisma.UserWhereInput = {
       ...(search
         ? {
@@ -92,12 +103,17 @@ export class UsersService {
       this.prisma.user.count({ where }),
     ]);
 
-    return { items: users, pagination: paginationMeta(page, pageSize, totalItems) };
+    return {
+      items: users,
+      pagination: paginationMeta(page, pageSize, totalItems),
+    };
   }
 
   async findDirectory(query: QueryUsersDto, actor: UserContext) {
     const companyId =
-      actor.role === 'USER' ? actor.companyId : (query.companyId ?? actor.companyId);
+      actor.role === 'USER'
+        ? actor.companyId
+        : (query.companyId ?? actor.companyId);
     const where: Prisma.UserWhereInput = {
       status: Status.ACTIVE,
       ...(companyId ? { companyId } : {}),
@@ -148,14 +164,20 @@ export class UsersService {
       },
     });
     if (!user) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return { ...user, permissions: ROLE_PERMISSIONS[user.role] };
   }
 
   async create(dto: CreateUserDto, actor: UserContext) {
     if (dto.role === UserRole.ADMIN && actor.role !== UserRole.ADMIN) {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
     await this.assertEmailAvailable(dto.email);
 
@@ -197,7 +219,12 @@ export class UsersService {
       entity: 'User',
       entityId: user.id,
       userId: actor.sub,
-      newData: { name: user.name, email: user.email, role: user.role, companyId: user.companyId },
+      newData: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        companyId: user.companyId,
+      },
     });
     return user;
   }
@@ -210,12 +237,18 @@ export class UsersService {
       (dto.solverGroupId && dto.solverGroupId !== existing.solverGroupId)
     ) {
       if (actor.role !== UserRole.ADMIN) {
-        throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+        throw new ForbiddenException({
+          key: 'errors.forbidden',
+          error: 'Forbidden',
+        });
       }
     }
 
     if (dto.role === UserRole.ADMIN && actor.role !== UserRole.ADMIN) {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
     if (dto.email && dto.email !== existing.email) {
       await this.assertEmailAvailable(dto.email);
@@ -230,7 +263,9 @@ export class UsersService {
       ...(dto.password ? { password: await hash(dto.password, 10) } : {}),
       ...(dto.locale ? { locale: dto.locale } : {}),
       ...(dto.role ? { role: dto.role } : {}),
-      ...(dto.solverGroupId !== undefined ? { solverGroupId: dto.solverGroupId } : {}),
+      ...(dto.solverGroupId !== undefined
+        ? { solverGroupId: dto.solverGroupId }
+        : {}),
       ...(dto.companyId !== undefined ? { companyId: dto.companyId } : {}),
     };
 
@@ -256,8 +291,11 @@ export class UsersService {
       userId: actor.sub,
       oldData: {
         ...(dto.name ? { name: existing.name } : {}),
-        ...(dto.role && dto.role !== existing.role ? { role: existing.role } : {}),
-        ...(dto.solverGroupId !== undefined && dto.solverGroupId !== existing.solverGroupId
+        ...(dto.role && dto.role !== existing.role
+          ? { role: existing.role }
+          : {}),
+        ...(dto.solverGroupId !== undefined &&
+        dto.solverGroupId !== existing.solverGroupId
           ? { solverGroupId: existing.solverGroupId }
           : {}),
         ...(dto.companyId !== undefined && dto.companyId !== existing.companyId
@@ -267,7 +305,8 @@ export class UsersService {
       newData: {
         ...(dto.name ? { name: dto.name } : {}),
         ...(dto.role && dto.role !== existing.role ? { role: dto.role } : {}),
-        ...(dto.solverGroupId !== undefined && dto.solverGroupId !== existing.solverGroupId
+        ...(dto.solverGroupId !== undefined &&
+        dto.solverGroupId !== existing.solverGroupId
           ? { solverGroupId: dto.solverGroupId }
           : {}),
         ...(dto.companyId !== undefined && dto.companyId !== existing.companyId
@@ -281,10 +320,16 @@ export class UsersService {
   async updateStatus(id: string, status: Status, actor: UserContext) {
     const existing = await this.findEntity(id);
     if (actor.role === UserRole.USER) {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
     if (existing.role === UserRole.ADMIN && actor.role !== UserRole.ADMIN) {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
     const updated = await this.prisma.user.update({
       where: { id },
@@ -305,7 +350,10 @@ export class UsersService {
   private async findEntity(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return user;
   }
@@ -313,12 +361,17 @@ export class UsersService {
   private async assertEmailAvailable(email: string) {
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) {
-      throw new ConflictException({ key: 'errors.email_taken', error: 'Conflict' });
+      throw new ConflictException({
+        key: 'errors.email_taken',
+        error: 'Conflict',
+      });
     }
   }
 
   private async assertGroupUsable(solverGroupId: string) {
-    const group = await this.prisma.solverGroup.findUnique({ where: { id: solverGroupId } });
+    const group = await this.prisma.solverGroup.findUnique({
+      where: { id: solverGroupId },
+    });
     if (!group || group.status !== Status.ACTIVE) {
       throw new UnprocessableEntityException({
         key: 'business.group_inactive',

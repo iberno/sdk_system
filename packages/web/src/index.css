@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @config "../tailwind.config.ts";
 
 /* Dark mode por classe (TailAdmin) */
@@ -7,7 +7,7 @@
 /* Tokens do tema — paleta Meta (#0082fb / #0064e0 / #f1f5f8 / #1c2b33)
    com derivações de tonalidade para hover e dark mode */
 @theme {
-  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
 
   /* Meta 1 — primária viva */
   --color-primary: #0082fb;

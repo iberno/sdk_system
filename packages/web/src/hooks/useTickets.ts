@@ -9,10 +9,7 @@ export function useTickets(params?: TicketParams) {
   return useQuery({
     queryKey: ['tickets', params],
     queryFn: async () => {
-      const { data: body } = await api.get<ApiListResponse<TicketListItem>>(
-        '/tickets',
-        { params },
-      )
+      const { data: body } = await api.get<ApiListResponse<TicketListItem>>('/tickets', { params })
       return { items: body.data, pagination: body.pagination }
     },
   })
@@ -22,9 +19,11 @@ export function useTicket(id: string | undefined) {
   return useQuery({
     queryKey: ['ticket', id],
     queryFn: async () => {
-      const { data: body } = await api.get<{ statusCode: number; message: string; data: TicketDetail }>(
-        `/tickets/${id}`,
-      )
+      const { data: body } = await api.get<{
+        statusCode: number
+        message: string
+        data: TicketDetail
+      }>(`/tickets/${id}`)
       return body.data
     },
     enabled: Boolean(id),

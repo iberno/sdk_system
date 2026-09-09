@@ -78,7 +78,10 @@ export class UpdateUserDto {
   @IsString()
   companyId?: string;
 
-  @ApiPropertyOptional({ enum: UserRole, description: 'Só alterável por ADMIN' })
+  @ApiPropertyOptional({
+    enum: UserRole,
+    description: 'Só alterável por ADMIN',
+  })
   @IsOptional()
   @IsEnum(UserRole)
   role?: UserRole;

@@ -45,7 +45,9 @@ export class CreateRoutingRuleDto {
   @IsEnum(RoutingStrategy)
   strategy!: RoutingStrategy;
 
-  @ApiPropertyOptional({ description: 'Obrigatório para TO_GROUP/ROUND_ROBIN/LEAST_LOADED' })
+  @ApiPropertyOptional({
+    description: 'Obrigatório para TO_GROUP/ROUND_ROBIN/LEAST_LOADED',
+  })
   @IsOptional()
   @IsString()
   targetGroupId?: string;

@@ -44,9 +44,7 @@ export default function ForgotPasswordPage() {
               <h1 className="text-2xl font-semibold tracking-tight text-graydark dark:text-white">
                 {t('auth.resetSentTitle')}
               </h1>
-              <p className="mt-1.5 text-sm text-bodystroke">
-                {t('auth.resetSentSubtitle')}
-              </p>
+              <p className="mt-1.5 text-sm text-bodystroke">{t('auth.resetSentSubtitle')}</p>
             </div>
             <Link
               to="/login"
@@ -61,9 +59,7 @@ export default function ForgotPasswordPage() {
             <h1 className="text-2xl font-semibold tracking-tight text-graydark dark:text-white">
               {t('auth.resetTitle')}
             </h1>
-            <p className="mt-1.5 text-sm text-bodystroke">
-              {t('auth.resetSubtitle')}
-            </p>
+            <p className="mt-1.5 text-sm text-bodystroke">{t('auth.resetSubtitle')}</p>
 
             {error && (
               <p className="mt-4 rounded-lg border border-error/30 bg-error/10 px-3 py-2.5 text-sm text-error">
@@ -87,12 +83,7 @@ export default function ForgotPasswordPage() {
                 </div>
               </FormField>
 
-              <Button
-                type="submit"
-                loading={submitting}
-                className="mt-1 w-full"
-                size="lg"
-              >
+              <Button type="submit" loading={submitting} className="mt-1 w-full" size="lg">
                 {t('auth.resetSend')}
               </Button>
             </form>

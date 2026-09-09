@@ -83,7 +83,9 @@ function AgentPicker({
             key={agent.id}
             className={cn(
               'flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors',
-              checked ? 'bg-primary/10 dark:bg-primary/15' : 'hover:bg-graylight dark:hover:bg-boxdark-2',
+              checked
+                ? 'bg-primary/10 dark:bg-primary/15'
+                : 'hover:bg-graylight dark:hover:bg-boxdark-2',
             )}
           >
             <span
@@ -261,7 +263,9 @@ export default function GroupsAdminPage() {
         key: 'agentsCount',
         header: t('admin.agentsCount'),
         align: 'right',
-        render: (row) => <span className="tabular-nums text-body dark:text-bodydark">{row.agentsCount}</span>,
+        render: (row) => (
+          <span className="tabular-nums text-body dark:text-bodydark">{row.agentsCount}</span>
+        ),
       },
       {
         key: 'openTickets',
@@ -401,7 +405,10 @@ export default function GroupsAdminPage() {
           </FormField>
 
           <FormField label={t('admin.level')} required>
-            <Select value={form.level} onChange={(event) => setForm({ ...form, level: event.target.value })}>
+            <Select
+              value={form.level}
+              onChange={(event) => setForm({ ...form, level: event.target.value })}
+            >
               {LEVEL_ORDER.map((value) => (
                 <option key={value} value={value}>
                   {t(`domain.level.${value}`)}
@@ -411,7 +418,12 @@ export default function GroupsAdminPage() {
           </FormField>
 
           {!editing && (
-            <FormField label={t('admin.agents')} required error={formErrors.agents} hint={t('admin.groupMinOneAgent')}>
+            <FormField
+              label={t('admin.agents')}
+              required
+              error={formErrors.agents}
+              hint={t('admin.groupMinOneAgent')}
+            >
               <AgentPicker selected={selectedAgents} onChange={setSelectedAgents} />
             </FormField>
           )}
@@ -450,9 +462,7 @@ export default function GroupsAdminPage() {
           ) : (
             <AgentPicker selected={memberSelection} onChange={setMemberSelection} />
           )}
-          {!isAdmin && (
-            <p className="text-xs text-bodystroke">{t('admin.roleHintManager')}</p>
-          )}
+          {!isAdmin && <p className="text-xs text-bodystroke">{t('admin.roleHintManager')}</p>}
         </div>
       </Modal>
 

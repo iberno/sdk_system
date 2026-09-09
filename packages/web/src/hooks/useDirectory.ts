@@ -7,9 +7,11 @@ export function useSolverGroups(enabled = true) {
   return useQuery({
     queryKey: ['solver-groups'],
     queryFn: async () => {
-      const { data: body } = await api.get<{ statusCode: number; message: string; data: SolverGroupOption[] }>(
-        '/solver-groups',
-      )
+      const { data: body } = await api.get<{
+        statusCode: number
+        message: string
+        data: SolverGroupOption[]
+      }>('/solver-groups')
       return body.data
     },
     enabled,

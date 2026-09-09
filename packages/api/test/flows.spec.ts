@@ -22,8 +22,15 @@ describe('Service Desk flows (e2e)', () => {
     await app.close();
   });
 
-  const req = (method: string, path: string, token?: string, body?: unknown) => {
-    let r = request(app.getHttpServer())[method.toLowerCase() as 'post'](`/api${path}`);
+  const req = (
+    method: string,
+    path: string,
+    token?: string,
+    body?: unknown,
+  ) => {
+    let r = request(app.getHttpServer())[method.toLowerCase() as 'post'](
+      `/api${path}`,
+    );
     if (token) r = r.set('Authorization', `Bearer ${token}`);
     if (body !== undefined) r = r.send(body as object);
     return r;
@@ -35,7 +42,10 @@ describe('Service Desk flows (e2e)', () => {
   };
 
   const login = async (email: string, password = 'Senha@123') => {
-    const res = await req('POST', '/auth/login', undefined, { email, password });
+    const res = await req('POST', '/auth/login', undefined, {
+      email,
+      password,
+    });
     return { status: res.status, data: res.body?.data, body: res.body };
   };
 
@@ -86,10 +96,20 @@ describe('Service Desk flows (e2e)', () => {
         password: 'Senha@123',
         role: 'AGENT',
       };
-      const denied = await req('POST', '/users', bruno.data.accessToken, payload);
+      const denied = await req(
+        'POST',
+        '/users',
+        bruno.data.accessToken,
+        payload,
+      );
       expect(denied.status).toBe(403);
       await wait(400);
-      const created = await req('POST', '/users', admin.data.accessToken, payload);
+      const created = await req(
+        'POST',
+        '/users',
+        admin.data.accessToken,
+        payload,
+      );
       expect2xx(created.status);
       expect(created.body?.data?.email).toBe(payload.email);
     });
@@ -132,10 +152,15 @@ describe('Service Desk flows (e2e)', () => {
       expect2xx(updated.status);
       await wait(400);
 
-      const comment = await req('POST', `/tickets/${ticketId}/comments`, token, {
-        content: 'comentário público do agente',
-        visibility: 'PUBLIC',
-      });
+      const comment = await req(
+        'POST',
+        `/tickets/${ticketId}/comments`,
+        token,
+        {
+          content: 'comentário público do agente',
+          visibility: 'PUBLIC',
+        },
+      );
       expect2xx(comment.status);
       expect(comment.body?.data?.visibility).toBe('PUBLIC');
       await wait(400);
@@ -156,13 +181,18 @@ describe('Service Desk flows (e2e)', () => {
       const manager = await login('manager@sdesk.dev');
       const companyId = bruno.data.user.companyId;
 
-      const flow = await req('POST', '/approval-flows', admin.data.accessToken, {
-        name: `E2E Flow ${Date.now()}`,
-        entityType: 'TICKET',
-        status: 'ACTIVE',
-        companyId,
-        rules: { stages: [{ order: 1, approverRole: 'MANAGER' }] },
-      });
+      const flow = await req(
+        'POST',
+        '/approval-flows',
+        admin.data.accessToken,
+        {
+          name: `E2E Flow ${Date.now()}`,
+          entityType: 'TICKET',
+          status: 'ACTIVE',
+          companyId,
+          rules: { stages: [{ order: 1, approverRole: 'MANAGER' }] },
+        },
+      );
       expect2xx(flow.status);
       const flowId = flow.body?.data?.id;
       await wait(400);
@@ -186,7 +216,11 @@ describe('Service Desk flows (e2e)', () => {
       expect(pending.body?.data?.status).toBe('WAITING_APPROVAL');
       await wait(400);
 
-      const list = await req('GET', '/approvals?status=PENDING', manager.data.accessToken);
+      const list = await req(
+        'GET',
+        '/approvals?status=PENDING',
+        manager.data.accessToken,
+      );
       expect(list.status).toBe(200);
       const approval = (list.body?.data ?? []).find(
         (a: { entity?: { type: string; id: string } }) =>
@@ -205,7 +239,11 @@ describe('Service Desk flows (e2e)', () => {
       expect2xx(decided.status);
       await wait(400);
 
-      const after = await req('GET', `/tickets/${ticketId}`, manager.data.accessToken);
+      const after = await req(
+        'GET',
+        `/tickets/${ticketId}`,
+        manager.data.accessToken,
+      );
       expect(after.body?.data?.status).not.toBe('WAITING_APPROVAL');
     });
   });
@@ -215,7 +253,11 @@ describe('Service Desk flows (e2e)', () => {
       const bruno = await login('bruno@sdesk.dev');
       const manager = await login('manager@sdesk.dev');
 
-      const groups = await req('GET', '/solver-groups', manager.data.accessToken);
+      const groups = await req(
+        'GET',
+        '/solver-groups',
+        manager.data.accessToken,
+      );
       expect(groups.status).toBe(200);
       const arr = groups.body?.data ?? [];
       expect(arr.length).toBeGreaterThan(0);
@@ -244,7 +286,11 @@ describe('Service Desk flows (e2e)', () => {
       expect2xx(reassign.status);
       await wait(400);
 
-      const after = await req('GET', `/tickets/${ticketId}`, manager.data.accessToken);
+      const after = await req(
+        'GET',
+        `/tickets/${ticketId}`,
+        manager.data.accessToken,
+      );
       expect(after.body?.data?.solverGroup?.id).toBe(target.id);
     });
   });

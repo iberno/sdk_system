@@ -17,7 +17,7 @@ Autenticação via JWT Bearer Token. Respostas em formato JSON padrão.
 {
   "statusCode": 200,
   "message": "Operação realizada com sucesso",
-  "data": { }
+  "data": {}
 }
 ```
 
@@ -53,12 +53,14 @@ Autenticação via JWT Bearer Token. Respostas em formato JSON padrão.
 4. Fallback `pt-BR`
 
 **Exemplo:**
+
 ```
 POST /api/tickets?lang=en-US          → mensagens em inglês
 POST /api/tickets                      → usa Accept-Language, depois User.locale
 ```
 
 **Domínios de mensagens (arquivos de tradução da API):**
+
 - `errors.*` — erros HTTP/infra
 - `validation.*` — erros de validação (class-validator)
 - `business.*` — regras de negócio (ex: grupo sem agente, agente fora do grupo)
@@ -86,6 +88,7 @@ POST /api/tickets                      → usa Accept-Language, depois User.loca
 Autentica usuário e retorna access + refresh token.
 
 **Request:**
+
 ```json
 {
   "email": "admin@sdesk.com",
@@ -94,6 +97,7 @@ Autentica usuário e retorna access + refresh token.
 ```
 
 **Response (200):**
+
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -114,6 +118,7 @@ Autentica usuário e retorna access + refresh token.
 Gira tokens usando refresh token válido.
 
 **Request:**
+
 ```json
 {
   "refreshToken": "d1f2a3b4c5e6f7a8b9c0d1e2f3a4b5c6..."
@@ -121,6 +126,7 @@ Gira tokens usando refresh token válido.
 ```
 
 **Response (200):**
+
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -146,17 +152,19 @@ Authorization: Bearer <accessToken>
 Lista usuários com filtros e paginação.
 
 **Query Params:**
-| Param | Tipo | Opcional |
-|-------|------|----------|
-| `page` | number | Sim (default: 1) |
-| `pageSize` | number | Sim (default: 20) |
-| `search` | string | Sim (nome/email) |
-| `role` | string | Sim (ADMIN, MANAGER,...) |
-| `companyId` | uuid | Sim |
-| `solverGroupId` | uuid | Sim |
-| `status` | string | Sim |
+
+| Param           | Tipo   | Opcional                 |
+| --------------- | ------ | ------------------------ |
+| `page`          | number | Sim (default: 1)         |
+| `pageSize`      | number | Sim (default: 20)        |
+| `search`        | string | Sim (nome/email)         |
+| `role`          | string | Sim (ADMIN, MANAGER,...) |
+| `companyId`     | uuid   | Sim                      |
+| `solverGroupId` | uuid   | Sim                      |
+| `status`        | string | Sim                      |
 
 **Response (200):**
+
 ```json
 {
   "data": [
@@ -178,7 +186,7 @@ Lista usuários com filtros e paginação.
       "createdAt": "2026-01-01T10:00:00Z"
     }
   ],
-  "pagination": { }
+  "pagination": {}
 }
 ```
 
@@ -187,6 +195,7 @@ Lista usuários com filtros e paginação.
 Cria usuário.
 
 **Request:**
+
 ```json
 {
   "name": "João Silva",
@@ -214,11 +223,7 @@ Detalhes do usuário (com permissões efetivas).
     "name": "N1",
     "level": "N1"
   },
-  "permissions": [
-    "ticket.create",
-    "ticket.update",
-    "ticket.assign"
-  ]
+  "permissions": ["ticket.create", "ticket.update", "ticket.assign"]
 }
 ```
 
@@ -238,15 +243,16 @@ Altera status do usuário (ACTIVE/INACTIVE/PENDING).
 
 ### CRUD Complet /companies
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/companies` | Lista empresas |
-| POST | `/companies` | Cria empresa |
-| GET | `/companies/:id` | Detalhes |
-| PUT | `/companies/:id` | Atualiza |
+| Método | Rota             | Descrição              |
+| ------ | ---------------- | ---------------------- |
+| GET    | `/companies`     | Lista empresas         |
+| POST   | `/companies`     | Cria empresa           |
+| GET    | `/companies/:id` | Detalhes               |
+| PUT    | `/companies/:id` | Atualiza               |
 | DELETE | `/companies/:id` | Desativa (soft delete) |
 
 **Modelo:**
+
 ```json
 {
   "id": "uuid",
@@ -264,15 +270,16 @@ Altera status do usuário (ACTIVE/INACTIVE/PENDING).
 
 ### CRUD /solver-groups
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/solver-groups` | Lista grupos |
-| POST | `/solver-groups` | Cria grupo |
-| GET | `/solver-groups/:id` | Detalhes |
-| PUT | `/solver-groups/:id` | Atualiza |
-| PATCH | `/solver-groups/:id/status` | Ativa/Desativa |
+| Método | Rota                        | Descrição      |
+| ------ | --------------------------- | -------------- |
+| GET    | `/solver-groups`            | Lista grupos   |
+| POST   | `/solver-groups`            | Cria grupo     |
+| GET    | `/solver-groups/:id`        | Detalhes       |
+| PUT    | `/solver-groups/:id`        | Atualiza       |
+| PATCH  | `/solver-groups/:id/status` | Ativa/Desativa |
 
 **Modelo:**
+
 ```json
 {
   "id": "uuid",
@@ -290,22 +297,24 @@ Altera status do usuário (ACTIVE/INACTIVE/PENDING).
 
 **Regras do Grupo Solucionador:**
 
-| Regra | Descrição |
-|-------|-----------|
+| Regra             | Descrição                                              |
+| ----------------- | ------------------------------------------------------ |
 | Mínimo de agentes | **1 agente obrigatório** (validação na criação/edição) |
-| Máximo | Ilimitado |
-| Vínculo | Grupo ← usuários AGENT via `solver_group_id` |
-| Exclusividade | Um agente pertence a **1** grupo |
-| Grupo vazio | Não pode ser criado/associado sem ao menos 1 agente |
-| Nível | O nível (N1..N3, DEVOPS...) define o fluxo de escala |
+| Máximo            | Ilimitado                                              |
+| Vínculo           | Grupo ← usuários AGENT via `solver_group_id`           |
+| Exclusividade     | Um agente pertence a **1** grupo                       |
+| Grupo vazio       | Não pode ser criado/associado sem ao menos 1 agente    |
+| Nível             | O nível (N1..N3, DEVOPS...) define o fluxo de escala   |
 
 **Editar agentes do grupo:**
+
 ```
 PUT /solver-groups/:id/agents
 {
   "agentIds": ["uuid1", "uuid2", "uuid3"]  // substitui a lista (mín. 1)
 }
 ```
+
 > Ao remover um agente, tickets `IN_PROGRESS` dele continuam com ele; novos tickets seguem as regras de roteamento.
 
 ---
@@ -314,16 +323,17 @@ PUT /solver-groups/:id/agents
 
 ### CRUD /routing-rules
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/routing-rules` | Lista regras |
-| POST | `/routing-rules` | Cria regra |
-| GET | `/routing-rules/:id` | Detalhes |
-| PUT | `/routing-rules/:id` | Atualiza |
-| PATCH | `/routing-rules/:id/status` | Ativa/Desativa |
-| POST | `/routing-rules/reorder` | Define ordem de avaliação |
+| Método | Rota                        | Descrição                 |
+| ------ | --------------------------- | ------------------------- |
+| GET    | `/routing-rules`            | Lista regras              |
+| POST   | `/routing-rules`            | Cria regra                |
+| GET    | `/routing-rules/:id`        | Detalhes                  |
+| PUT    | `/routing-rules/:id`        | Atualiza                  |
+| PATCH  | `/routing-rules/:id/status` | Ativa/Desativa            |
+| POST   | `/routing-rules/reorder`    | Define ordem de avaliação |
 
 **Request POST:**
+
 ```json
 {
   "name": "Incidentes críticos → N2",
@@ -337,17 +347,18 @@ PUT /solver-groups/:id/agents
 
 **Estratégias (RoutingStrategy):**
 
-| Estratégia | Comportamento | Pré-requisito |
-|------------|---------------|---------------|
-| `TO_GROUP` | Direciona para grupo fixo (agente fica null) | `targetGroupId` obrigatório |
-| `ROUND_ROBIN` | Atribui ao próximo agente do grupo em ciclo | `targetGroupId` obrigatório |
+| Estratégia     | Comportamento                                        | Pré-requisito               |
+| -------------- | ---------------------------------------------------- | --------------------------- |
+| `TO_GROUP`     | Direciona para grupo fixo (agente fica null)         | `targetGroupId` obrigatório |
+| `ROUND_ROBIN`  | Atribui ao próximo agente do grupo em ciclo          | `targetGroupId` obrigatório |
 | `LEAST_LOADED` | Atribui ao agente do grupo com menos tickets abertos | `targetGroupId` obrigatório |
-| `MANUAL` | Sem auto-atribuição; MANAGER/ADMIN distribui | `targetGroupId` opcional |
+| `MANUAL`       | Sem auto-atribuição; MANAGER/ADMIN distribui         | `targetGroupId` opcional    |
 
 **Avaliação:** regras são testadas em ordem crescente de `order`. A primeira que casar
 tipo + prioridade + categoria domina. Ticket sem regra → grupo padrão da empresa.
 
 **Response GET `/routing-rules`:**
+
 ```json
 {
   "data": [
@@ -375,25 +386,27 @@ tipo + prioridade + categoria domina. Ticket sem regra → grupo padrão da empr
 Lista tickets com filtros avançados.
 
 **Query Params:**
-| Param | Tipo | Descrição |
-|-------|------|-----------|
-| `page` | number | Paginação |
-| `pageSize` | number | Limite (max 100) |
-| `search` | string | Busca por título ou **ticketNumber** (ex: `SD-2026-000124`) |
-| `ticketNumber` | string | Busca exata por número amigável |
-| `status` | TicketStatus | Filtro por status |
-| `type` | TicketType | INCIDENT/SERVICE_REQUEST |
-| `priority` | Priority | LOW/MEDIUM/HIGH/CRITICAL |
-| `assigneeId` | uuid | Atribuído a |
-| `requesterId` | uuid | Solicitante (quem abriu) |
-| `beneficiaryId` | uuid | Beneficiário (quem recebe o serviço) |
-| `companyId` | uuid | Empresa |
-| `solverGroupId` | uuid | Grupo |
-| `slaBreached` | boolean | SLA violado |
-| `sortBy` | string | createdAt, priority, status |
-| `order` | string | ASC/DESC |
+
+| Param           | Tipo         | Descrição                                                   |
+| --------------- | ------------ | ----------------------------------------------------------- |
+| `page`          | number       | Paginação                                                   |
+| `pageSize`      | number       | Limite (max 100)                                            |
+| `search`        | string       | Busca por título ou **ticketNumber** (ex: `SD-2026-000124`) |
+| `ticketNumber`  | string       | Busca exata por número amigável                             |
+| `status`        | TicketStatus | Filtro por status                                           |
+| `type`          | TicketType   | INCIDENT/SERVICE_REQUEST                                    |
+| `priority`      | Priority     | LOW/MEDIUM/HIGH/CRITICAL                                    |
+| `assigneeId`    | uuid         | Atribuído a                                                 |
+| `requesterId`   | uuid         | Solicitante (quem abriu)                                    |
+| `beneficiaryId` | uuid         | Beneficiário (quem recebe o serviço)                        |
+| `companyId`     | uuid         | Empresa                                                     |
+| `solverGroupId` | uuid         | Grupo                                                       |
+| `slaBreached`   | boolean      | SLA violado                                                 |
+| `sortBy`        | string       | createdAt, priority, status                                 |
+| `order`         | string       | ASC/DESC                                                    |
 
 **Response (200):**
+
 ```json
 {
   "data": [
@@ -419,7 +432,7 @@ Lista tickets com filtros avançados.
       "resolvedAt": null
     }
   ],
-  "pagination": { }
+  "pagination": {}
 }
 ```
 
@@ -428,12 +441,13 @@ Lista tickets com filtros avançados.
 Cria ticket.
 
 **Request:**
+
 ```json
 {
   "title": "Servidor fora do ar",
   "description": "Erro 500 ao acessar painel principal",
   "type": "INCIDENT",
-  "beneficiaryId": "uuid"  // opcional - se omitido, assume o solicitante
+  "beneficiaryId": "uuid" // opcional - se omitido, assume o solicitante
 }
 ```
 
@@ -462,12 +476,14 @@ Após criar, o sistema roda as `RoutingRule`, gera o `ticketNumber` e popula o d
   }
 }
 ```
+
 > Se `strategy = ROUND_ROBIN` ou `LEAST_LOADED`, `assignee` vem preenchido.
 > O `ticketNumber` é gerado atomicamente (`SequenceCounter`) — formato `SD-{ano}-{sequência}`.
 
 ### GET `/tickets/:id`
 
 Detalhe completo do ticket com histórico e comentários.
+
 > **Visibilidade:** Solicitante e Beneficiário recebem apenas comentários `PUBLIC`.
 > Comentários `INTERNAL` só aparecem para agentes/equipe.
 
@@ -524,39 +540,41 @@ Detalhe completo do ticket com histórico e comentários.
 
 Atualiza campos do ticket (somente AGENT/MANAGER/ADMIN).
 
-| Campo | Regra |
-|-------|-------|
-| `title` | Qualquer agente |
-| `description` | Qualquer agente |
-| `priority` | MANAGER+ (altera SLA) |
-| `impact` | MANAGER+ |
-| `urgency` | MANAGER+ |
-| `status` | Agente responsável |
+| Campo         | Regra                 |
+| ------------- | --------------------- |
+| `title`       | Qualquer agente       |
+| `description` | Qualquer agente       |
+| `priority`    | MANAGER+ (altera SLA) |
+| `impact`      | MANAGER+              |
+| `urgency`     | MANAGER+              |
+| `status`      | Agente responsável    |
 
 ### POST `/tickets/:id/assign`
 
 Atribui ou reatribui ticket para **grupo e/ou agente**.
 
 **Request:**
+
 ```json
 {
-  "assigneeId": "uuid",      // opcional - agente específico
-  "solverGroupId": "uuid"    // opcional - grupo (mín. um dos dois)
+  "assigneeId": "uuid", // opcional - agente específico
+  "solverGroupId": "uuid" // opcional - grupo (mín. um dos dois)
 }
 ```
 
 **Contratos de validação:**
 
-| Caso | Comportamento |
-|------|---------------|
+| Caso               | Comportamento                                                        |
+| ------------------ | -------------------------------------------------------------------- |
 | Só `solverGroupId` | Ticket entra na fila do grupo; qualquer agente do grupo pode assumir |
-| Só `assigneeId` | Atribui direto ao agente (que deve ser AGENT + ACTIVE) |
-| Grupo + Agente | Agente **deve pertencer** ao grupo (senão → `422 Unprocessable`) |
-| Nem um nem outro | `400 Bad Request` |
-| Grupo inativo | `422` - grupo não recebe tickets |
-| Agente inativo | `422` - agente não recebe tickets |
+| Só `assigneeId`    | Atribui direto ao agente (que deve ser AGENT + ACTIVE)               |
+| Grupo + Agente     | Agente **deve pertencer** ao grupo (senão → `422 Unprocessable`)     |
+| Nem um nem outro   | `400 Bad Request`                                                    |
+| Grupo inativo      | `422` - grupo não recebe tickets                                     |
+| Agente inativo     | `422` - agente não recebe tickets                                    |
 
 **Response (200):**
+
 ```json
 {
   "id": "uuid",
@@ -568,9 +586,7 @@ Atribui ou reatribui ticket para **grupo e/ou agente**.
     "strategy": null,
     "routingRuleId": null
   },
-  "history": [
-    { "field": "assigneeId", "oldValue": null, "newValue": "uuid", "createdAt": "..." }
-  ]
+  "history": [{ "field": "assigneeId", "oldValue": null, "newValue": "uuid", "createdAt": "..." }]
 }
 ```
 
@@ -580,7 +596,7 @@ Agente assume um ticket que está na **fila do grupo** (agente ainda não atribu
 
 ```json
 {
-  "solverGroupId": "uuid"  // grupo ao qual o agente pertence
+  "solverGroupId": "uuid" // grupo ao qual o agente pertence
 }
 ```
 
@@ -607,6 +623,7 @@ Tickets na fila (sem agente) para pickup — filtra por grupo do usuário autent
 Transição de status (valida transições válidas).
 
 **Request:**
+
 ```json
 {
   "status": "RESOLVED",
@@ -627,10 +644,10 @@ Adiciona comentário.
 
 **Visibilidade permitida ao criar:**
 
-| `visibility` | Quem pode criar | Quem vê |
-|--------------|-----------------|---------|
-| `PUBLIC` | Qualquer participante | Solicitante, beneficiário, agentes, aprovadores |
-| `INTERNAL` | Apenas equipe (AGENT/MANAGER/ADMIN ou do grupo solucionador) | **Somente equipe de atendimento** |
+| `visibility` | Quem pode criar                                              | Quem vê                                         |
+| ------------ | ------------------------------------------------------------ | ----------------------------------------------- |
+| `PUBLIC`     | Qualquer participante                                        | Solicitante, beneficiário, agentes, aprovadores |
+| `INTERNAL`   | Apenas equipe (AGENT/MANAGER/ADMIN ou do grupo solucionador) | **Somente equipe de atendimento**               |
 
 > **Regra de ouro:** `INTERNAL` é exclusivo da equipe. Solicitante, **beneficiário e
 > aprovadores** nunca o veem (lado "cliente"), mesmo que tenham role administrativa
@@ -650,15 +667,16 @@ Exporta CSV/Excel com filtros atuais.
 
 ### CRUD /sla-policies
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/sla-policies` | Lista políticas |
-| POST | `/sla-policies` | Cria política |
-| GET | `/sla-policies/:id` | Detalhes |
-| PUT | `/sla-policies/:id` | Atualiza |
-| PATCH | `/sla-policies/:id/status` | Ativa/Desativa |
+| Método | Rota                       | Descrição       |
+| ------ | -------------------------- | --------------- |
+| GET    | `/sla-policies`            | Lista políticas |
+| POST   | `/sla-policies`            | Cria política   |
+| GET    | `/sla-policies/:id`        | Detalhes        |
+| PUT    | `/sla-policies/:id`        | Atualiza        |
+| PATCH  | `/sla-policies/:id/status` | Ativa/Desativa  |
 
 **Request POST:**
+
 ```json
 {
   "name": "Incidente Crítico",
@@ -676,18 +694,19 @@ Exporta CSV/Excel com filtros atuais.
 
 ### CRUD /problems
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/problems` | Lista problemas |
-| POST | `/problems` | Cria problema |
-| GET | `/problems/:id` | Detalhes |
-| PUT | `/problems/:id` | Atualiza |
-| POST | `/problems/:id/link-ticket` | Vincula ticket |
-| DELETE | `/problems/:id/unlink-ticket` | Desvincula ticket |
-| POST | `/problems/:id/propose-change` | Cria proposta de mudança a partir do problema |
-| POST | `/problems/:id/publish-article` | Gera artigo de conhecimento a partir de problema RESOLVED/CLOSED |
+| Método | Rota                            | Descrição                                                        |
+| ------ | ------------------------------- | ---------------------------------------------------------------- |
+| GET    | `/problems`                     | Lista problemas                                                  |
+| POST   | `/problems`                     | Cria problema                                                    |
+| GET    | `/problems/:id`                 | Detalhes                                                         |
+| PUT    | `/problems/:id`                 | Atualiza                                                         |
+| POST   | `/problems/:id/link-ticket`     | Vincula ticket                                                   |
+| DELETE | `/problems/:id/unlink-ticket`   | Desvincula ticket                                                |
+| POST   | `/problems/:id/propose-change`  | Cria proposta de mudança a partir do problema                    |
+| POST   | `/problems/:id/publish-article` | Gera artigo de conhecimento a partir de problema RESOLVED/CLOSED |
 
 **Request POST:**
+
 ```json
 {
   "title": "Falhas recorrentes no login",
@@ -702,19 +721,20 @@ Exporta CSV/Excel com filtros atuais.
 
 ### CRUD /changes
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/changes` | Lista mudanças |
-| POST | `/changes` | Cria mudança |
-| GET | `/changes/:id` | Detalhes |
-| PUT | `/changes/:id` | Atualiza |
-| POST | `/changes/:id/submit` | Envia para aprovação |
-| POST | `/changes/:id/execute` | Executa mudança |
-| POST | `/changes/:id/complete` | Conclui mudança (`IN_PROGRESS -> COMPLETED`) |
-| POST | `/changes/:id/rollback` | Executa rollback |
-| POST | `/changes/:id/link-ticket` | Vincula ticket |
+| Método | Rota                       | Descrição                                    |
+| ------ | -------------------------- | -------------------------------------------- |
+| GET    | `/changes`                 | Lista mudanças                               |
+| POST   | `/changes`                 | Cria mudança                                 |
+| GET    | `/changes/:id`             | Detalhes                                     |
+| PUT    | `/changes/:id`             | Atualiza                                     |
+| POST   | `/changes/:id/submit`      | Envia para aprovação                         |
+| POST   | `/changes/:id/execute`     | Executa mudança                              |
+| POST   | `/changes/:id/complete`    | Conclui mudança (`IN_PROGRESS -> COMPLETED`) |
+| POST   | `/changes/:id/rollback`    | Executa rollback                             |
+| POST   | `/changes/:id/link-ticket` | Vincula ticket                               |
 
 **Request POST:**
+
 ```json
 {
   "title": "Migração de banco de dados",
@@ -744,6 +764,7 @@ GET /approvals?status=PENDING
 ```
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -786,14 +807,15 @@ GET /approvals?status=PENDING
 
 ### CRUD /approval-flows
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/approval-flows` | Lista fluxos |
-| POST | `/approval-flows` | Cria fluxo |
-| GET | `/approval-flows/:id` | Detalhes |
-| PUT | `/approval-flows/:id` | Atualiza |
+| Método | Rota                  | Descrição    |
+| ------ | --------------------- | ------------ |
+| GET    | `/approval-flows`     | Lista fluxos |
+| POST   | `/approval-flows`     | Cria fluxo   |
+| GET    | `/approval-flows/:id` | Detalhes     |
+| PUT    | `/approval-flows/:id` | Atualiza     |
 
 **Request POST:**
+
 ```json
 {
   "name": "Mudança em produção",
@@ -822,17 +844,18 @@ GET /approvals?status=PENDING
 
 ### CRUD /knowledge
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/knowledge` | Lista artigos publicados |
-| GET | `/knowledge?draft=true` | Lista rascunhos (AGENT+) |
-| POST | `/knowledge` | Cria artigo |
-| GET | `/knowledge/:id` | Detalhes |
-| PUT | `/knowledge/:id` | Atualiza |
-| POST | `/knowledge/:id/publish` | Publica |
-| DELETE | `/knowledge/:id` | Remove |
+| Método | Rota                     | Descrição                |
+| ------ | ------------------------ | ------------------------ |
+| GET    | `/knowledge`             | Lista artigos publicados |
+| GET    | `/knowledge?draft=true`  | Lista rascunhos (AGENT+) |
+| POST   | `/knowledge`             | Cria artigo              |
+| GET    | `/knowledge/:id`         | Detalhes                 |
+| PUT    | `/knowledge/:id`         | Atualiza                 |
+| POST   | `/knowledge/:id/publish` | Publica                  |
+| DELETE | `/knowledge/:id`         | Remove                   |
 
 **Request POST:**
+
 ```json
 {
   "title": "Como resetar senha do usuário",
@@ -851,18 +874,20 @@ GET /approvals?status=PENDING
 Lista logs de auditoria.
 
 **Query Params:**
-| Param | Tipo | Descrição |
-|-------|------|-----------|
-| `entity` | string | Ticket, User, Change |
-| `entityId` | uuid | Id da entidade |
-| `action` | string | CREATE, UPDATE, LOGIN |
-| `userId` | uuid | Usuário que executou |
-| `startDate` | datetime | Filtro inicial |
-| `endDate` | datetime | Filtro final |
-| `page` | number | Paginação |
-| `pageSize` | number | Limite |
+
+| Param       | Tipo     | Descrição             |
+| ----------- | -------- | --------------------- |
+| `entity`    | string   | Ticket, User, Change  |
+| `entityId`  | uuid     | Id da entidade        |
+| `action`    | string   | CREATE, UPDATE, LOGIN |
+| `userId`    | uuid     | Usuário que executou  |
+| `startDate` | datetime | Filtro inicial        |
+| `endDate`   | datetime | Filtro final          |
+| `page`      | number   | Paginação             |
+| `pageSize`  | number   | Limite                |
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -891,6 +916,7 @@ Lista logs de auditoria.
 Resumo operacional para o dashboard.
 
 **Response:**
+
 ```json
 {
   "period": { "start": "2026-01-01", "end": "2026-01-07" },
@@ -938,27 +964,27 @@ Resumo operacional para o dashboard.
 `GET /socket.io` (namespace raiz). Autenticação via `auth.token` ou `query.token` com o **mesmo JWT** de acesso (`LoginResponse.accessToken`). Conexões sem token ou com token inválido são desconectadas.
 
 ```js
-const socket = io('http://localhost:3000', { auth: { token: accessToken } });
+const socket = io('http://localhost:3000', { auth: { token: accessToken } })
 ```
 
 ### Rooms
 
-| Room | Destino | Quem entra |
-|------|---------|-----------|
-| `company:{companyId}` | todos da empresa | qualquer usuário com a empresa |
-| `user:{userId}` | um usuário específico | o próprio usuário |
-| `group:{solverGroupId}` | grupo solucionador | usuários com `solverGroupId` |
+| Room                    | Destino               | Quem entra                     |
+| ----------------------- | --------------------- | ------------------------------ |
+| `company:{companyId}`   | todos da empresa      | qualquer usuário com a empresa |
+| `user:{userId}`         | um usuário específico | o próprio usuário              |
+| `group:{solverGroupId}` | grupo solucionador    | usuários com `solverGroupId`   |
 
 ### Eventos emitidos
 
-| Evento | Emissão | Payload principal |
-|--------|---------|-------------------|
-| `ticket.created` | empresa + grupo + requester/beneficiary | `{ ticketId, ticketNumber, title, type, priority, status, companyId, requesterId, beneficiaryId, solverGroupId, assigneeId, createdAt }` |
-| `ticket.updated` | empresa | `{ ticketId, ticketNumber, title, status, priority, companyId, updatedAt }` |
-| `ticket.assigned` | room do agente (`user:{assigneeId}`) | `{ ticketId, ticketNumber, title, type, priority, companyId, assignedBy, assignedAt }` |
-| `ticket.commented` | empresa (público) / equipe não-participante (INTERNAL) | `{ ticketId, ticketNumber, commentId, authorId, companyId, visibility, content, createdAt, exceptUserIds? }` |
-| `approval.pending` | room do aprovador (`user:{approverId}`) | `{ approvalId, order, flowName, entityType, ticketId?, changeId? }` |
-| `sla.breached` | empresa + grupo | `{ ticketId, ticketNumber, companyId, solverGroupId, slaResolveAt }` |
+| Evento             | Emissão                                                | Payload principal                                                                                                                        |
+| ------------------ | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `ticket.created`   | empresa + grupo + requester/beneficiary                | `{ ticketId, ticketNumber, title, type, priority, status, companyId, requesterId, beneficiaryId, solverGroupId, assigneeId, createdAt }` |
+| `ticket.updated`   | empresa                                                | `{ ticketId, ticketNumber, title, status, priority, companyId, updatedAt }`                                                              |
+| `ticket.assigned`  | room do agente (`user:{assigneeId}`)                   | `{ ticketId, ticketNumber, title, type, priority, companyId, assignedBy, assignedAt }`                                                   |
+| `ticket.commented` | empresa (público) / equipe não-participante (INTERNAL) | `{ ticketId, ticketNumber, commentId, authorId, companyId, visibility, content, createdAt, exceptUserIds? }`                             |
+| `approval.pending` | room do aprovador (`user:{approverId}`)                | `{ approvalId, order, flowName, entityType, ticketId?, changeId? }`                                                                      |
+| `sla.breached`     | empresa + grupo                                        | `{ ticketId, ticketNumber, companyId, solverGroupId, slaResolveAt }`                                                                     |
 
 **Filtro de participação no Socket.IO:** para `visibility: INTERNAL`, o evento `ticket.commented` **não** é emitido para `company:{companyId}` de forma indiscriminada — é entregue apenas a sockets de usuários não-`USER` e que **não** são participantes do ticket (requesters, beneficiário e aprovadores, de acordo com `exceptUserIds`). Comentários `PUBLIC` seguem emitidos para a empresa toda.
 
@@ -966,23 +992,23 @@ const socket = io('http://localhost:3000', { auth: { token: accessToken } });
 
 ## Resumo de Endpoints
 
-| Área | Métodos | Total |
-|------|---------|-------|
-| /auth | POST ×3, GET ×1 | 4 |
-| /users | GET ×2, POST, PUT, PATCH | 5 |
-| /companies | CRUD | 5 |
-| /solver-groups | CRUD + status + agents | 6 |
-| /routing-rules | CRUD + status + reorder | 6 |
-| /tickets | GET ×3, POST ×7 | 10 |
-| /sla-policies | CRUD + status | 5 |
-| /problems | CRUD + link/unlink | 7 |
-| /changes | CRUD + actions | 8 |
-| /approvals | GET, POST ×2 | 3 |
-| /approval-flows | CRUD | 4 |
-| /knowledge | CRUD + publish | 7 |
-| /audit | GET | 1 |
-| /dashboard | GET | 1 |
-| **Total** | | **72** |
+| Área            | Métodos                  | Total  |
+| --------------- | ------------------------ | ------ |
+| /auth           | POST ×3, GET ×1          | 4      |
+| /users          | GET ×2, POST, PUT, PATCH | 5      |
+| /companies      | CRUD                     | 5      |
+| /solver-groups  | CRUD + status + agents   | 6      |
+| /routing-rules  | CRUD + status + reorder  | 6      |
+| /tickets        | GET ×3, POST ×7          | 10     |
+| /sla-policies   | CRUD + status            | 5      |
+| /problems       | CRUD + link/unlink       | 7      |
+| /changes        | CRUD + actions           | 8      |
+| /approvals      | GET, POST ×2             | 3      |
+| /approval-flows | CRUD                     | 4      |
+| /knowledge      | CRUD + publish           | 7      |
+| /audit          | GET                      | 1      |
+| /dashboard      | GET                      | 1      |
+| **Total**       |                          | **72** |
 
 ---
 

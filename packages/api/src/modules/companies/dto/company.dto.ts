@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { Status } from '@prisma/client';
 
 export class CreateCompanyDto {
@@ -9,7 +15,10 @@ export class CreateCompanyDto {
   @MaxLength(120)
   name!: string;
 
-  @ApiProperty({ example: '12.345.678/0001-90', description: 'CNPJ válido (14 dígitos)' })
+  @ApiProperty({
+    example: '12.345.678/0001-90',
+    description: 'CNPJ válido (14 dígitos)',
+  })
   @IsString()
   @IsNotEmpty()
   cnpj!: string;
@@ -46,7 +55,10 @@ export function isValidCnpj(cnpj: string): boolean {
   if (new Set(digits).size === 1) return false;
 
   const calcDigit = (base: string): number => {
-    const weights = base.length === 12 ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2] : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    const weights =
+      base.length === 12
+        ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+        : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
     const sum = base
       .split('')
       .reduce((acc, digit, i) => acc + Number(digit) * weights[i], 0);

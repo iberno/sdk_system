@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ForbiddenException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { TicketsService } from './tickets.service.js';
 
 function makeService() {
@@ -66,8 +69,13 @@ describe('TicketsService', () => {
   describe('checkSlaState', () => {
     it('does nothing when the ticket is already breached', async () => {
       const { service, prisma, realtime } = makeService();
-      const svc = service as never as { checkSlaState: (t: never) => Promise<boolean> };
-      const ok = await svc.checkSlaState({ ...baseTicket, slaBreached: true } as never);
+      const svc = service as never as {
+        checkSlaState: (t: never) => Promise<boolean>;
+      };
+      const ok = await svc.checkSlaState({
+        ...baseTicket,
+        slaBreached: true,
+      } as never);
       expect(ok).toBe(false);
       expect(prisma.ticket.update).not.toHaveBeenCalled();
       expect(realtime.emitSlaBreached).not.toHaveBeenCalled();
@@ -75,7 +83,9 @@ describe('TicketsService', () => {
 
     it('does nothing for RESOLVED/CLOSED or null SLA', async () => {
       const { service, prisma, realtime } = makeService();
-      const svc = service as never as { checkSlaState: (t: never) => Promise<boolean> };
+      const svc = service as never as {
+        checkSlaState: (t: never) => Promise<boolean>;
+      };
       await svc.checkSlaState({ ...baseTicket, status: 'RESOLVED' } as never);
       await svc.checkSlaState({ ...baseTicket, status: 'CLOSED' } as never);
       await svc.checkSlaState({ ...baseTicket, slaResolveAt: null } as never);
@@ -85,7 +95,9 @@ describe('TicketsService', () => {
 
     it('does nothing when SLA is still within time', async () => {
       const { service, prisma, realtime } = makeService();
-      const svc = service as never as { checkSlaState: (t: never) => Promise<boolean> };
+      const svc = service as never as {
+        checkSlaState: (t: never) => Promise<boolean>;
+      };
       await svc.checkSlaState({ ...baseTicket } as never);
       expect(prisma.ticket.update).not.toHaveBeenCalled();
       expect(realtime.emitSlaBreached).not.toHaveBeenCalled();
@@ -93,9 +105,14 @@ describe('TicketsService', () => {
 
     it('marks breach and emits sla.breached on overdue open ticket', async () => {
       const { service, prisma, realtime } = makeService();
-      const svc = service as never as { checkSlaState: (t: never) => Promise<boolean> };
+      const svc = service as never as {
+        checkSlaState: (t: never) => Promise<boolean>;
+      };
       prisma.ticket.update.mockResolvedValue({});
-      const overdue = { ...baseTicket, slaResolveAt: new Date(Date.now() - 3_600_000) };
+      const overdue = {
+        ...baseTicket,
+        slaResolveAt: new Date(Date.now() - 3_600_000),
+      };
       const isBreach = await svc.checkSlaState(overdue as never);
 
       expect(isBreach).toBe(true);
@@ -104,7 +121,11 @@ describe('TicketsService', () => {
         data: { slaBreached: true },
       });
       expect(realtime.emitSlaBreached).toHaveBeenCalledWith(
-        expect.objectContaining({ ticketId: 't1', companyId: 'c1', solverGroupId: 'g1' }),
+        expect.objectContaining({
+          ticketId: 't1',
+          companyId: 'c1',
+          solverGroupId: 'g1',
+        }),
       );
     });
   });
@@ -115,15 +136,20 @@ describe('TicketsService', () => {
       const svc = service as never as {
         addComment: (id: string, dto: never, actor: never) => Promise<unknown>;
       };
-      (service as unknown as { getTicketDetail: () => Promise<unknown> }).getTicketDetail =
-        vi.fn().mockResolvedValue(baseTicket);
+      (
+        service as unknown as { getTicketDetail: () => Promise<unknown> }
+      ).getTicketDetail = vi.fn().mockResolvedValue(baseTicket);
       await expect(
-        svc.addComment('t1', { content: 'x', visibility: 'INTERNAL' } as never, {
-          ...adminActor,
-          role: 'USER',
-          sub: 'some-user',
-          solverGroupId: null,
-        } as never),
+        svc.addComment(
+          't1',
+          { content: 'x', visibility: 'INTERNAL' } as never,
+          {
+            ...adminActor,
+            role: 'USER',
+            sub: 'some-user',
+            solverGroupId: null,
+          } as never,
+        ),
       ).rejects.toBeInstanceOf(ForbiddenException);
     });
 
@@ -132,8 +158,9 @@ describe('TicketsService', () => {
       const svc = service as never as {
         addComment: (id: string, dto: never, actor: never) => Promise<unknown>;
       };
-      (service as unknown as { getTicketDetail: () => Promise<unknown> }).getTicketDetail =
-        vi.fn().mockResolvedValue(baseTicket);
+      (
+        service as unknown as { getTicketDetail: () => Promise<unknown> }
+      ).getTicketDetail = vi.fn().mockResolvedValue(baseTicket);
       prisma.ticketComment.create.mockResolvedValue({
         id: 'cm1',
         content: 'vejo',
@@ -142,14 +169,26 @@ describe('TicketsService', () => {
         author: { id: 'admin1', name: 'Admin', role: 'ADMIN' },
       });
 
-      await svc.addComment('t1', { content: 'vejo', visibility: 'INTERNAL' } as never, adminActor as never);
+      await svc.addComment(
+        't1',
+        { content: 'vejo', visibility: 'INTERNAL' } as never,
+        adminActor as never,
+      );
 
       expect(prisma.ticketComment.create).toHaveBeenCalledTimes(1);
       expect(audit.log).toHaveBeenCalledWith(
-        expect.objectContaining({ action: 'COMMENT', entity: 'Ticket', entityId: 't1' }),
+        expect.objectContaining({
+          action: 'COMMENT',
+          entity: 'Ticket',
+          entityId: 't1',
+        }),
       );
       expect(realtime.emitTicketCommented).toHaveBeenCalledWith(
-        expect.objectContaining({ ticketId: 't1', commentId: 'cm1', companyId: 'c1' }),
+        expect.objectContaining({
+          ticketId: 't1',
+          commentId: 'cm1',
+          companyId: 'c1',
+        }),
       );
     });
 
@@ -158,10 +197,17 @@ describe('TicketsService', () => {
       const svc = service as never as {
         addComment: (id: string, dto: never, actor: never) => Promise<unknown>;
       };
-      (service as unknown as { getTicketDetail: () => Promise<unknown> }).getTicketDetail =
-        vi.fn().mockResolvedValue({ ...baseTicket, status: 'CLOSED' });
+      (
+        service as unknown as { getTicketDetail: () => Promise<unknown> }
+      ).getTicketDetail = vi
+        .fn()
+        .mockResolvedValue({ ...baseTicket, status: 'CLOSED' });
       await expect(
-        svc.addComment('t1', { content: 'x', visibility: 'PUBLIC' } as never, adminActor as never),
+        svc.addComment(
+          't1',
+          { content: 'x', visibility: 'PUBLIC' } as never,
+          adminActor as never,
+        ),
       ).rejects.toBeInstanceOf(UnprocessableEntityException);
     });
   });

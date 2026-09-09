@@ -23,11 +23,11 @@ export function useDashboardSummary() {
   return useQuery({
     queryKey: ['dashboard-summary'],
     queryFn: async () => {
-      const {
-        data: body,
-      } = await api.get<{ statusCode: number; message: string; data: DashboardSummary }>(
-        '/dashboard/summary',
-      )
+      const { data: body } = await api.get<{
+        statusCode: number
+        message: string
+        data: DashboardSummary
+      }>('/dashboard/summary')
       return body.data
     },
   })

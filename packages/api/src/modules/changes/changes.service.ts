@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common';
 import { ChangeStatus, Prisma, Status } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { paginationArgs, paginationMeta } from '../../common/dto/pagination.dto.js';
+import {
+  paginationArgs,
+  paginationMeta,
+} from '../../common/dto/pagination.dto.js';
 import { ApprovalsService } from '../approvals/approvals.service.js';
 import { AuditService } from '../audit/audit.service.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
@@ -107,7 +110,8 @@ export class ChangesService {
         requester: c.requester,
         solverGroup: c.solverGroup,
         problem: c.problemProposal,
-        approvalsPending: c.approvals.filter((a) => a.status === 'PENDING').length,
+        approvalsPending: c.approvals.filter((a) => a.status === 'PENDING')
+          .length,
         createdAt: c.createdAt,
         updatedAt: c.updatedAt,
       })),
@@ -118,7 +122,10 @@ export class ChangesService {
   async findOne(id: string, actor: UserContext) {
     const change = await this.getDetail(id);
     if (!this.isVisible(change, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return this.mapDetail(change);
   }
@@ -166,7 +173,10 @@ export class ChangesService {
     this.assertTeam(actor);
     const prev = await this.getDetail(id);
     if (!this.isVisible(prev, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     if (LOCKED_STATUSES.includes(prev.status)) {
       throw new UnprocessableEntityException({
@@ -179,12 +189,16 @@ export class ChangesService {
       await this.assertSolverGroup(dto.solverGroupId, prev.companyId);
     }
 
-    const nextScheduledAt = dto.scheduledAt ? new Date(dto.scheduledAt) : undefined;
+    const nextScheduledAt = dto.scheduledAt
+      ? new Date(dto.scheduledAt)
+      : undefined;
     const updated = await this.prisma.change.update({
       where: { id },
       data: {
         ...(dto.title ? { title: dto.title } : {}),
-        ...(dto.description !== undefined ? { description: dto.description } : {}),
+        ...(dto.description !== undefined
+          ? { description: dto.description }
+          : {}),
         ...(dto.type ? { type: dto.type } : {}),
         ...(dto.risk ? { risk: dto.risk } : {}),
         ...(dto.reason ? { reason: dto.reason } : {}),
@@ -223,7 +237,10 @@ export class ChangesService {
     this.assertTeam(actor);
     const change = await this.getDetail(id);
     if (!this.isVisible(change, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     if (change.status !== 'DRAFT') {
       throw new UnprocessableEntityException({
@@ -280,7 +297,10 @@ export class ChangesService {
     this.assertTeam(actor);
     const change = await this.getDetail(id);
     if (!this.isVisible(change, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     if (change.status === 'SCHEDULED' || change.status === 'APPROVED') {
       const updated = await this.prisma.change.update({
@@ -325,7 +345,10 @@ export class ChangesService {
     this.assertTeam(actor);
     const change = await this.getDetail(id);
     if (!this.isVisible(change, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     if (change.status !== 'IN_PROGRESS') {
       throw new UnprocessableEntityException({
@@ -353,9 +376,14 @@ export class ChangesService {
     this.assertTeam(actor);
     const change = await this.getDetail(id);
     if (!this.isVisible(change, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
-    const ticket = await this.prisma.ticket.findUnique({ where: { id: dto.ticketId } });
+    const ticket = await this.prisma.ticket.findUnique({
+      where: { id: dto.ticketId },
+    });
     if (!ticket || ticket.companyId !== change.companyId) {
       throw new UnprocessableEntityException({
         key: 'business.ticket_link_invalid',
@@ -395,7 +423,10 @@ export class ChangesService {
       },
     });
     if (!problem || !this.isCompanyVisible(problem.companyId, actor)) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     if (problem.proposedChangeId) {
       throw new UnprocessableEntityException({
@@ -435,7 +466,10 @@ export class ChangesService {
       include: DETAIL_INCLUDE,
     });
     if (!full) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return this.mapDetail(full);
   }
@@ -481,7 +515,10 @@ export class ChangesService {
 
   private assertTeam(actor: UserContext) {
     if (actor.role === 'USER') {
-      throw new ForbiddenException({ key: 'errors.forbidden', error: 'Forbidden' });
+      throw new ForbiddenException({
+        key: 'errors.forbidden',
+        error: 'Forbidden',
+      });
     }
   }
 
@@ -490,7 +527,10 @@ export class ChangesService {
     return actor.companyId != null && companyId === actor.companyId;
   }
 
-  private isVisible(change: { companyId: string }, actor: UserContext): boolean {
+  private isVisible(
+    change: { companyId: string },
+    actor: UserContext,
+  ): boolean {
     return this.isCompanyVisible(change.companyId, actor);
   }
 
@@ -510,15 +550,22 @@ export class ChangesService {
         error: 'UnprocessableEntity',
       });
     }
-    const company = await this.prisma.company.findUnique({ where: { id: companyId } });
+    const company = await this.prisma.company.findUnique({
+      where: { id: companyId },
+    });
     if (!company || company.status !== Status.ACTIVE) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return companyId;
   }
 
   private async assertSolverGroup(groupId: string, _companyId: string) {
-    const group = await this.prisma.solverGroup.findUnique({ where: { id: groupId } });
+    const group = await this.prisma.solverGroup.findUnique({
+      where: { id: groupId },
+    });
     if (!group || group.status !== Status.ACTIVE) {
       throw new UnprocessableEntityException({
         key: 'business.group_invalid',
@@ -533,7 +580,10 @@ export class ChangesService {
       include: DETAIL_INCLUDE,
     });
     if (!change) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return change;
   }

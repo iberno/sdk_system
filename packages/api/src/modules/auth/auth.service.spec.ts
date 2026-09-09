@@ -77,26 +77,29 @@ describe('AuthService', () => {
     it('rejects when user does not exist', async () => {
       const { service, prisma } = makeService();
       prisma.user.findUnique.mockResolvedValue(null);
-      await expect(service.validateUser('nope@x.com', 'x')).rejects.toBeInstanceOf(
-        UnauthorizedException,
-      );
+      await expect(
+        service.validateUser('nope@x.com', 'x'),
+      ).rejects.toBeInstanceOf(UnauthorizedException);
     });
 
     it('rejects inactive account', async () => {
       const { service, prisma } = makeService();
-      prisma.user.findUnique.mockResolvedValue({ ...userRow, status: 'INACTIVE' });
-      await expect(service.validateUser('bruno@sdesk.dev', 'Senha@123')).rejects.toBeInstanceOf(
-        UnauthorizedException,
-      );
+      prisma.user.findUnique.mockResolvedValue({
+        ...userRow,
+        status: 'INACTIVE',
+      });
+      await expect(
+        service.validateUser('bruno@sdesk.dev', 'Senha@123'),
+      ).rejects.toBeInstanceOf(UnauthorizedException);
     });
 
     it('rejects wrong password', async () => {
       const { service, prisma } = makeService();
       prisma.user.findUnique.mockResolvedValue(userRow);
       (compare as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(false);
-      await expect(service.validateUser('bruno@sdesk.dev', 'errada')).rejects.toBeInstanceOf(
-        UnauthorizedException,
-      );
+      await expect(
+        service.validateUser('bruno@sdesk.dev', 'errada'),
+      ).rejects.toBeInstanceOf(UnauthorizedException);
     });
   });
 
@@ -126,7 +129,12 @@ describe('AuthService', () => {
 
       await service.login('bruno@sdesk.dev', 'Senha@123');
       expect(audit.log).toHaveBeenCalledWith(
-        expect.objectContaining({ action: 'LOGIN', entity: 'User', entityId: 'u1', userId: 'u1' }),
+        expect.objectContaining({
+          action: 'LOGIN',
+          entity: 'User',
+          entityId: 'u1',
+          userId: 'u1',
+        }),
       );
     });
   });
@@ -135,21 +143,27 @@ describe('AuthService', () => {
     it('rejects unknown/revoked/expired token', async () => {
       const { service, prisma } = makeService();
       prisma.refreshToken.findUnique.mockResolvedValue(null);
-      await expect(service.refresh('anything')).rejects.toBeInstanceOf(UnauthorizedException);
+      await expect(service.refresh('anything')).rejects.toBeInstanceOf(
+        UnauthorizedException,
+      );
 
       prisma.refreshToken.findUnique.mockResolvedValue({
         id: 'rt1',
         revoked: true,
         expiresAt: new Date(Date.now() + 1000),
       });
-      await expect(service.refresh('anything')).rejects.toBeInstanceOf(UnauthorizedException);
+      await expect(service.refresh('anything')).rejects.toBeInstanceOf(
+        UnauthorizedException,
+      );
 
       prisma.refreshToken.findUnique.mockResolvedValue({
         id: 'rt1',
         revoked: false,
         expiresAt: new Date(Date.now() - 1000),
       });
-      await expect(service.refresh('anything')).rejects.toBeInstanceOf(UnauthorizedException);
+      await expect(service.refresh('anything')).rejects.toBeInstanceOf(
+        UnauthorizedException,
+      );
     });
 
     it('rejects when user is inactive', async () => {
@@ -160,7 +174,9 @@ describe('AuthService', () => {
         expiresAt: new Date(Date.now() + 1000),
         user: { ...userRow, status: 'INACTIVE' },
       });
-      await expect(service.refresh('anything')).rejects.toBeInstanceOf(UnauthorizedException);
+      await expect(service.refresh('anything')).rejects.toBeInstanceOf(
+        UnauthorizedException,
+      );
     });
 
     it('rotates the token (revokes old, stores new) and returns new access', async () => {
@@ -200,7 +216,11 @@ describe('AuthService', () => {
         data: { revoked: true },
       });
       expect(audit.log).toHaveBeenCalledWith(
-        expect.objectContaining({ action: 'LOGOUT', entityId: 'u1', userId: 'u1' }),
+        expect.objectContaining({
+          action: 'LOGOUT',
+          entityId: 'u1',
+          userId: 'u1',
+        }),
       );
     });
   });

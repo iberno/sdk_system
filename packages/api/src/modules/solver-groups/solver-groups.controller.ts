@@ -53,7 +53,10 @@ export class SolverGroupsController {
   @Patch(':id/status')
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Ativa/desativa grupo (ativação exige ≥1 agente)' })
-  updateStatus(@Param('id') id: string, @Body() dto: UpdateSolverGroupStatusDto) {
+  updateStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateSolverGroupStatusDto,
+  ) {
     return this.solverGroupsService.updateStatus(id, dto.status);
   }
 }

@@ -39,8 +39,12 @@ describe('SlaService', () => {
 
       expect(result.responseMinutes).toBe(15);
       expect(result.resolveMinutes).toBe(240);
-      expect(result.slaResponseAt.getTime()).toBeGreaterThanOrEqual(now + 15 * 60_000);
-      expect(result.slaResolveAt.getTime()).toBeGreaterThanOrEqual(now + 240 * 60_000);
+      expect(result.slaResponseAt.getTime()).toBeGreaterThanOrEqual(
+        now + 15 * 60_000,
+      );
+      expect(result.slaResolveAt.getTime()).toBeGreaterThanOrEqual(
+        now + 240 * 60_000,
+      );
     });
 
     it('falls back to defaults (480/2880) with no policy', async () => {
@@ -89,14 +93,16 @@ describe('SlaService', () => {
   it('findOne throws NotFound when missing', async () => {
     const { service, prisma } = makeService();
     prisma.sLAPolicy.findUnique.mockResolvedValue(null);
-    await expect(service.findOne('nope')).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.findOne('nope')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 
   it('updateStatus/thrown NotFound are deferred by findOne validation', async () => {
     const { service, prisma } = makeService();
     prisma.sLAPolicy.findUnique.mockResolvedValue(null);
-    await expect(service.updateStatus('nope', Status.INACTIVE)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(
+      service.updateStatus('nope', Status.INACTIVE),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 });

@@ -27,7 +27,10 @@ export class CategoriesService {
   async findOne(id: string) {
     return this.prisma.category.findUnique({
       where: { id },
-      select: { ...CATEGORY_SELECT, children: { select: { id: true, name: true, path: true, depth: true } } },
+      select: {
+        ...CATEGORY_SELECT,
+        children: { select: { id: true, name: true, path: true, depth: true } },
+      },
     });
   }
 }

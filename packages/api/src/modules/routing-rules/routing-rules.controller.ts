@@ -53,7 +53,10 @@ export class RoutingRulesController {
   @Patch(':id/status')
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Ativa/desativa regra' })
-  updateStatus(@Param('id') id: string, @Body() dto: UpdateRoutingRuleStatusDto) {
+  updateStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateRoutingRuleStatusDto,
+  ) {
     return this.routingRulesService.updateStatus(id, dto.status);
   }
 }

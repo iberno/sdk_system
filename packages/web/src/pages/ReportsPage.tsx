@@ -1,13 +1,6 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  AlertTriangle,
-  BarChart3,
-  CheckCircle2,
-  Clock,
-  Inbox,
-  Timer,
-} from 'lucide-react'
+import { AlertTriangle, BarChart3, CheckCircle2, Clock, Inbox, Timer } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 import { useDashboardSummary } from '@/hooks/useDashboard'
@@ -55,7 +48,12 @@ function MetricCard({ metric }: { metric: Metric }) {
             {metric.value}
           </span>
         </div>
-        <div className={cn('flex size-9 shrink-0 items-center justify-center rounded-lg', metric.iconClass)}>
+        <div
+          className={cn(
+            'flex size-9 shrink-0 items-center justify-center rounded-lg',
+            metric.iconClass,
+          )}
+        >
           <Icon className="size-4.5" />
         </div>
       </div>
@@ -115,12 +113,7 @@ function TrendChart({ trend }: { trend: DashboardSummary['trend'] }) {
 
   return (
     <div className="w-full">
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        className="h-56 w-full"
-        role="img"
-        aria-label="tendência"
-      >
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-56 w-full" role="img" aria-label="tendência">
         {[0, 0.5, 1].map((f) => {
           const gy = PAD.top + innerH - f * innerH
           const value = Math.round(f * niceMax)
@@ -200,7 +193,15 @@ function DonutChart({
   return (
     <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
       <svg viewBox="0 0 100 100" className="size-36 shrink-0" role="img" aria-label="distribuição">
-        <circle cx="50" cy="50" r={R} fill="none" stroke="currentColor" strokeWidth="14" className="text-stroke/70 dark:text-strokedark" />
+        <circle
+          cx="50"
+          cy="50"
+          r={R}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="14"
+          className="text-stroke/70 dark:text-strokedark"
+        />
         {segments.map((d, index) => (
           <circle
             key={d.key}
@@ -335,9 +336,7 @@ export default function ReportsPage() {
     },
   ]
 
-  const periodLabel = data
-    ? `${shortDate(data.period.start)} – ${shortDate(data.period.end)}`
-    : ''
+  const periodLabel = data ? `${shortDate(data.period.start)} – ${shortDate(data.period.end)}` : ''
 
   return (
     <div className="flex flex-col gap-5">
@@ -345,9 +344,7 @@ export default function ReportsPage() {
         <h1 className="text-lg font-semibold tracking-tight text-graydark dark:text-white">
           {t('nav.reports')}
         </h1>
-        <p className="text-sm text-bodystroke">
-          {data ? periodLabel : t('common.loading')}
-        </p>
+        <p className="text-sm text-bodystroke">{data ? periodLabel : t('common.loading')}</p>
       </div>
 
       {isError && (
@@ -434,7 +431,10 @@ export default function ReportsPage() {
             <Skeleton className="h-40 w-full rounded-lg" />
           ) : data && sortedStatus.length > 0 ? (
             <BarList
-              data={sortedStatus.map((d) => ({ label: t(`domain.status.${d.key}`), value: d.value }))}
+              data={sortedStatus.map((d) => ({
+                label: t(`domain.status.${d.key}`),
+                value: d.value,
+              }))}
               color="#0082fb"
             />
           ) : (

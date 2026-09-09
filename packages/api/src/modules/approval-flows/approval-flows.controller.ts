@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApprovalFlowsService } from './approval-flows.service.js';
 import {
@@ -19,14 +28,20 @@ export class ApprovalFlowsController {
   @Get()
   @Roles('ADMIN', 'MANAGER')
   @ApiOperation({ summary: 'Lista fluxos de aprovação' })
-  findAll(@Query() query: QueryApprovalFlowsDto, @CurrentUser() actor: UserContext) {
+  findAll(
+    @Query() query: QueryApprovalFlowsDto,
+    @CurrentUser() actor: UserContext,
+  ) {
     return this.flows.findAll(query, actor);
   }
 
   @Post()
   @Roles('ADMIN', 'MANAGER')
   @ApiOperation({ summary: 'Cria fluxo (valida rules.stages)' })
-  create(@Body() dto: CreateApprovalFlowDto, @CurrentUser() actor: UserContext) {
+  create(
+    @Body() dto: CreateApprovalFlowDto,
+    @CurrentUser() actor: UserContext,
+  ) {
     return this.flows.create(dto, actor);
   }
 

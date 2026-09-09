@@ -11,7 +11,9 @@ export function useKnowledgeArticles(
   return useQuery({
     queryKey: ['knowledge', params],
     queryFn: async () => {
-      const { data: body } = await api.get<ApiListResponse<KnowledgeArticle>>('/knowledge', { params })
+      const { data: body } = await api.get<ApiListResponse<KnowledgeArticle>>('/knowledge', {
+        params,
+      })
       return { items: body.data, pagination: body.pagination }
     },
     enabled,

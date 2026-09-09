@@ -22,7 +22,11 @@ interface SearchableSelectProps {
 }
 
 const normalize = (text: string): string =>
-  text.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  text
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
 
 export function SearchableSelect({
   options,
@@ -137,9 +141,7 @@ export function SearchableSelect({
           className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-stroke bg-white py-1 shadow-dropdown dark:border-strokedark dark:bg-boxdark-3"
         >
           {filtered.length === 0 && (
-            <li className="px-3.5 py-2 text-sm text-bodystroke">
-              {emptyMessage ?? 'No results'}
-            </li>
+            <li className="px-3.5 py-2 text-sm text-bodystroke">{emptyMessage ?? 'No results'}</li>
           )}
           {filtered.map((option, index) => (
             <li key={option.value}>

@@ -27,7 +27,9 @@ export class RoutingRulesService {
     return this.prisma.routingRule.findMany({
       where: { status: { not: Status.INACTIVE } },
       orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
-      include: { targetGroup: { select: { id: true, name: true, level: true } } },
+      include: {
+        targetGroup: { select: { id: true, name: true, level: true } },
+      },
     });
   }
 
@@ -47,7 +49,9 @@ export class RoutingRulesService {
         order: dto.order ?? count,
         status: dto.status ?? Status.ACTIVE,
       },
-      include: { targetGroup: { select: { id: true, name: true, level: true } } },
+      include: {
+        targetGroup: { select: { id: true, name: true, level: true } },
+      },
     });
     return row;
   }
@@ -57,22 +61,30 @@ export class RoutingRulesService {
     if (dto.strategy || dto.targetGroupId !== undefined) {
       await this.assertStrategy(
         dto.strategy ?? current.strategy,
-        dto.targetGroupId !== undefined ? dto.targetGroupId : current.targetGroupId ?? undefined,
+        dto.targetGroupId !== undefined
+          ? dto.targetGroupId
+          : (current.targetGroupId ?? undefined),
       );
     }
     const row = await this.prisma.routingRule.update({
       where: { id },
       data: {
         ...(dto.name ? { name: dto.name } : {}),
-        ...(dto.description !== undefined ? { description: dto.description } : {}),
+        ...(dto.description !== undefined
+          ? { description: dto.description }
+          : {}),
         ...(dto.ticketType ? { ticketType: dto.ticketType } : {}),
         ...(dto.priority ? { priority: dto.priority } : {}),
         ...(dto.category !== undefined ? { category: dto.category } : {}),
         ...(dto.strategy ? { strategy: dto.strategy } : {}),
-        ...(dto.targetGroupId !== undefined ? { targetGroupId: dto.targetGroupId } : {}),
+        ...(dto.targetGroupId !== undefined
+          ? { targetGroupId: dto.targetGroupId }
+          : {}),
         ...(dto.order !== undefined ? { order: dto.order } : {}),
       },
-      include: { targetGroup: { select: { id: true, name: true, level: true } } },
+      include: {
+        targetGroup: { select: { id: true, name: true, level: true } },
+      },
     });
     return row;
   }
@@ -84,11 +96,17 @@ export class RoutingRulesService {
       select: { id: true },
     });
     if (existing.length !== new Set(ids).size) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     await this.prisma.$transaction(
       dto.rules.map((r) =>
-        this.prisma.routingRule.update({ where: { id: r.id }, data: { order: r.order } }),
+        this.prisma.routingRule.update({
+          where: { id: r.id },
+          data: { order: r.order },
+        }),
       ),
     );
     return this.findAll();
@@ -96,7 +114,11 @@ export class RoutingRulesService {
 
   async updateStatus(id: string, status: Status) {
     const rule = await this.findEntity(id);
-    if (status === Status.ACTIVE && rule.targetGroupId && rule.strategy !== RoutingStrategy.MANUAL) {
+    if (
+      status === Status.ACTIVE &&
+      rule.targetGroupId &&
+      rule.strategy !== RoutingStrategy.MANUAL
+    ) {
       const group = await this.prisma.solverGroup.findUnique({
         where: { id: rule.targetGroupId },
       });
@@ -110,7 +132,9 @@ export class RoutingRulesService {
     return this.prisma.routingRule.update({
       where: { id },
       data: { status },
-      include: { targetGroup: { select: { id: true, name: true, level: true } } },
+      include: {
+        targetGroup: { select: { id: true, name: true, level: true } },
+      },
     });
   }
 
@@ -123,9 +147,7 @@ export class RoutingRulesService {
     const rules = await this.prisma.routingRule.findMany({
       where: {
         status: Status.ACTIVE,
-        ...(companyId
-          ? { OR: [{ companyId: null }, { companyId }] }
-          : {}),
+        ...(companyId ? { OR: [{ companyId: null }, { companyId }] } : {}),
       },
       orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
       include: { targetGroup: true },
@@ -259,7 +281,10 @@ export class RoutingRulesService {
   private async findEntity(id: string) {
     const rule = await this.prisma.routingRule.findUnique({ where: { id } });
     if (!rule) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return rule;
   }

@@ -9,11 +9,5 @@ interface PlaceholderPageProps {
 
 export default function PlaceholderPage({ icon }: PlaceholderPageProps) {
   const { t } = useTranslation()
-  return (
-    <EmptyState
-      icon={icon}
-      title={t('common.empty')}
-      description={t('common.loading')}
-    />
-  )
+  return <EmptyState icon={icon} title={t('common.empty')} description={t('common.loading')} />
 }

@@ -42,7 +42,10 @@ export class SlaService {
   async findOne(id: string) {
     const policy = await this.prisma.sLAPolicy.findUnique({ where: { id } });
     if (!policy) {
-      throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
+      throw new NotFoundException({
+        key: 'errors.not_found',
+        error: 'NotFound',
+      });
     }
     return policy;
   }
@@ -53,7 +56,9 @@ export class SlaService {
       where: { id },
       data: {
         ...(dto.name ? { name: dto.name } : {}),
-        ...(dto.description !== undefined ? { description: dto.description } : {}),
+        ...(dto.description !== undefined
+          ? { description: dto.description }
+          : {}),
         ...(dto.responseTime ? { responseTime: dto.responseTime } : {}),
         ...(dto.resolveTime ? { resolveTime: dto.resolveTime } : {}),
       },
@@ -83,9 +88,14 @@ export class SlaService {
   }
 
   private async assertUniquePair(type: SLAType, priority: Priority) {
-    const existing = await this.prisma.sLAPolicy.findFirst({ where: { type, priority } });
+    const existing = await this.prisma.sLAPolicy.findFirst({
+      where: { type, priority },
+    });
     if (existing) {
-      throw new ConflictException({ key: 'errors.conflict', error: 'Conflict' });
+      throw new ConflictException({
+        key: 'errors.conflict',
+        error: 'Conflict',
+      });
     }
   }
 }

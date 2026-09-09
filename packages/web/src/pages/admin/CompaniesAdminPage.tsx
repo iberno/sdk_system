@@ -110,7 +110,11 @@ export default function CompaniesAdminPage() {
 
   const columns: Array<Column<AdminCompany>> = useMemo(() => {
     const formatDate = (iso: string) =>
-      new Intl.DateTimeFormat(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' }).format(new Date(iso))
+      new Intl.DateTimeFormat(undefined, {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      }).format(new Date(iso))
     return [
       {
         key: 'name',
@@ -140,20 +144,26 @@ export default function CompaniesAdminPage() {
         key: 'usersCount',
         header: t('admin.usersCount'),
         align: 'right',
-        render: (row) => <span className="tabular-nums text-body dark:text-bodydark">{row.usersCount}</span>,
+        render: (row) => (
+          <span className="tabular-nums text-body dark:text-bodydark">{row.usersCount}</span>
+        ),
       },
       {
         key: 'ticketsCount',
         header: t('admin.ticketsCount'),
         align: 'right',
-        render: (row) => <span className="tabular-nums text-body dark:text-bodydark">{row.ticketsCount}</span>,
+        render: (row) => (
+          <span className="tabular-nums text-body dark:text-bodydark">{row.ticketsCount}</span>
+        ),
       },
       {
         key: 'createdAt',
         header: t('dashboard.created'),
         align: 'right',
         render: (row) => (
-          <span className="tabular-nums text-body dark:text-bodydark">{formatDate(row.createdAt)}</span>
+          <span className="tabular-nums text-body dark:text-bodydark">
+            {formatDate(row.createdAt)}
+          </span>
         ),
       },
       {
@@ -273,7 +283,10 @@ export default function CompaniesAdminPage() {
 
           {!editing && (
             <FormField label={t('common.status')}>
-              <Select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}>
+              <Select
+                value={form.status}
+                onChange={(event) => setForm({ ...form, status: event.target.value })}
+              >
                 {['ACTIVE', 'INACTIVE', 'PENDING'].map((value) => (
                   <option key={value} value={value}>
                     {t(`domain.status.${value}`)}

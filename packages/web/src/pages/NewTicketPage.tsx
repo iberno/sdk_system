@@ -20,7 +20,9 @@ import { useCategories, useCompanyOptions, useUserDirectory } from '@/hooks/useT
 import { cn } from '@/lib/utils'
 
 const formatDateTime = (iso: string) =>
-  new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso))
+  new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(
+    new Date(iso),
+  )
 
 export default function NewTicketPage() {
   const { t } = useTranslation()
@@ -267,7 +269,9 @@ export default function NewTicketPage() {
                 'dark:border-strokedark dark:bg-boxdark-3',
               )}
             >
-              <span className="text-sm font-medium text-graydark dark:text-white">{user?.name}</span>
+              <span className="text-sm font-medium text-graydark dark:text-white">
+                {user?.name}
+              </span>
               <span className="text-sm text-bodystroke">{user?.email}</span>
             </div>
           </FormField>
@@ -309,10 +313,7 @@ export default function NewTicketPage() {
             />
           </FormField>
 
-          <FormField
-            label={t('tickets.beneficiary')}
-            hint={t('tickets.beneficiaryHint')}
-          >
+          <FormField label={t('tickets.beneficiary')} hint={t('tickets.beneficiaryHint')}>
             <SearchableSelect
               options={directoryOptions}
               value={beneficiaryId}
@@ -354,10 +355,7 @@ export default function NewTicketPage() {
           </FormField>
         </div>
 
-        <FormField
-          label={t('tickets.categoryField')}
-          hint={t('tickets.categoryHint')}
-        >
+        <FormField label={t('tickets.categoryField')} hint={t('tickets.categoryHint')}>
           <div className="flex flex-col gap-4">
             <Select
               value={catRootId ?? ''}
@@ -367,10 +365,7 @@ export default function NewTicketPage() {
                 setCatActionId(null)
               }}
               disabled={categoriesQuery.isLoading}
-              options={[
-                { value: '', label: t('tickets.categoryPlaceholder') },
-                ...categoryRoots,
-              ]}
+              options={[{ value: '', label: t('tickets.categoryPlaceholder') }, ...categoryRoots]}
             />
 
             {catRootId && categorySubs.length > 0 && (
@@ -391,10 +386,7 @@ export default function NewTicketPage() {
               <Select
                 value={catActionId ?? ''}
                 onChange={(event) => setCatActionId(event.target.value || null)}
-                options={[
-                  { value: '', label: t('tickets.actionPlaceholder') },
-                  ...categoryActions,
-                ]}
+                options={[{ value: '', label: t('tickets.actionPlaceholder') }, ...categoryActions]}
               />
             )}
           </div>

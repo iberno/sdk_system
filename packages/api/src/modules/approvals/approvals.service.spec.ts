@@ -58,7 +58,12 @@ describe('ApprovalsService', () => {
   describe('requestForTicket', () => {
     it('creates pending approvals and emits approval.pending per approver', async () => {
       const { service, prisma, realtime } = makeService();
-      const approver = { id: 'manager1', status: 'ACTIVE', solverGroupId: 'g1', role: 'MANAGER' };
+      const approver = {
+        id: 'manager1',
+        status: 'ACTIVE',
+        solverGroupId: 'g1',
+        role: 'MANAGER',
+      };
       prisma.approvalFlow.findUnique.mockResolvedValue(flow);
       prisma.ticket.findUnique.mockResolvedValue({
         id: 't1',
@@ -67,12 +72,13 @@ describe('ApprovalsService', () => {
       });
       prisma.approval.findFirst.mockResolvedValue(null);
       prisma.user.findFirst.mockResolvedValueOnce(approver);
-      prisma.$transaction.mockImplementation(async (fn: (tx: Record<string, unknown>) => Promise<unknown>) =>
-        fn({
-          ticket: { update: vi.fn() },
-          ticketHistory: { create: vi.fn() },
-          approval: { createMany: vi.fn() },
-        }),
+      prisma.$transaction.mockImplementation(
+        async (fn: (tx: Record<string, unknown>) => Promise<unknown>) =>
+          fn({
+            ticket: { update: vi.fn() },
+            ticketHistory: { create: vi.fn() },
+            approval: { createMany: vi.fn() },
+          }),
       );
       prisma.approval.findMany.mockResolvedValue([
         { id: 'ap1', order: 1, approverId: 'manager1' },
@@ -81,7 +87,9 @@ describe('ApprovalsService', () => {
       const result = await service.requestForTicket('flow1', 't1', actor);
 
       expect(result.status).toBe('WAITING_APPROVAL');
-      expect(prisma.approvalFlow.findUnique).toHaveBeenCalledWith({ where: { id: 'flow1' } });
+      expect(prisma.approvalFlow.findUnique).toHaveBeenCalledWith({
+        where: { id: 'flow1' },
+      });
       // approve steps resolved + approvals pending
       expect(realtime.emitApprovalPending).toHaveBeenCalledTimes(1);
       expect(realtime.emitApprovalPending).toHaveBeenCalledWith(
@@ -99,48 +107,66 @@ describe('ApprovalsService', () => {
     it('throws when flow does not exist or is not ACTIVE', async () => {
       const { service, prisma } = makeService();
       prisma.approvalFlow.findUnique.mockResolvedValue(null);
-      await expect(service.requestForTicket('flow1', 't1', actor)).rejects.toBeInstanceOf(
-        UnprocessableEntityException,
-      );
+      await expect(
+        service.requestForTicket('flow1', 't1', actor),
+      ).rejects.toBeInstanceOf(UnprocessableEntityException);
 
-      prisma.approvalFlow.findUnique.mockResolvedValue({ ...flow, status: Status.INACTIVE });
-      await expect(service.requestForTicket('flow1', 't1', actor)).rejects.toBeInstanceOf(
-        UnprocessableEntityException,
-      );
+      prisma.approvalFlow.findUnique.mockResolvedValue({
+        ...flow,
+        status: Status.INACTIVE,
+      });
+      await expect(
+        service.requestForTicket('flow1', 't1', actor),
+      ).rejects.toBeInstanceOf(UnprocessableEntityException);
     });
 
     it('throws for entity mismatch / ticket not found / company mismatch / closed ticket', async () => {
       const { service, prisma } = makeService();
-      prisma.approvalFlow.findUnique.mockResolvedValue({ ...flow, entityType: 'CHANGE' });
-      await expect(service.requestForTicket('flow1', 't1', actor)).rejects.toBeInstanceOf(
-        UnprocessableEntityException,
-      );
+      prisma.approvalFlow.findUnique.mockResolvedValue({
+        ...flow,
+        entityType: 'CHANGE',
+      });
+      await expect(
+        service.requestForTicket('flow1', 't1', actor),
+      ).rejects.toBeInstanceOf(UnprocessableEntityException);
 
       prisma.approvalFlow.findUnique.mockResolvedValue(flow);
       prisma.ticket.findUnique.mockResolvedValue(null);
-      await expect(service.requestForTicket('flow1', 't1', actor)).rejects.toBeInstanceOf(
-        NotFoundException,
-      );
+      await expect(
+        service.requestForTicket('flow1', 't1', actor),
+      ).rejects.toBeInstanceOf(NotFoundException);
 
-      prisma.ticket.findUnique.mockResolvedValue({ id: 't1', companyId: 'other', status: 'OPEN' });
-      await expect(service.requestForTicket('flow1', 't1', actor)).rejects.toBeInstanceOf(
-        UnprocessableEntityException,
-      );
+      prisma.ticket.findUnique.mockResolvedValue({
+        id: 't1',
+        companyId: 'other',
+        status: 'OPEN',
+      });
+      await expect(
+        service.requestForTicket('flow1', 't1', actor),
+      ).rejects.toBeInstanceOf(UnprocessableEntityException);
 
-      prisma.ticket.findUnique.mockResolvedValue({ id: 't1', companyId: 'c1', status: 'RESOLVED' });
-      await expect(service.requestForTicket('flow1', 't1', actor)).rejects.toBeInstanceOf(
-        UnprocessableEntityException,
-      );
+      prisma.ticket.findUnique.mockResolvedValue({
+        id: 't1',
+        companyId: 'c1',
+        status: 'RESOLVED',
+      });
+      await expect(
+        service.requestForTicket('flow1', 't1', actor),
+      ).rejects.toBeInstanceOf(UnprocessableEntityException);
     });
 
     it('throws when an approval is already in flight', async () => {
       const { service, prisma } = makeService();
       prisma.approvalFlow.findUnique.mockResolvedValue(flow);
-      prisma.ticket.findUnique.mockResolvedValue({ id: 't1', companyId: 'c1', status: 'OPEN' });
+      prisma.ticket.findUnique.mockResolvedValue({
+        id: 't1',
+        companyId: 'c1',
+        status: 'OPEN',
+      });
       prisma.approval.findFirst.mockResolvedValue({ id: 'ap1' });
-      await expect(service.requestForTicket('flow1', 't1', actor)).rejects.toBeInstanceOf(
-        UnprocessableEntityException,
-      );
+      await expect(
+        service.requestForTicket('flow1', 't1', actor),
+      ).rejects.toBeInstanceOf(UnprocessableEntityException);
     });
   });
 

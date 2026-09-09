@@ -36,7 +36,11 @@ export function useCreateUser() {
   return useMutation({
     mutationFn: async (payload: Record<string, unknown>) =>
       (await api.post('/users', payload)).data,
-    onSuccess: () => invalidate(queryClient, [['admin', 'users'], ['users', 'directory']]),
+    onSuccess: () =>
+      invalidate(queryClient, [
+        ['admin', 'users'],
+        ['users', 'directory'],
+      ]),
   })
 }
 
@@ -45,7 +49,11 @@ export function useUpdateUser() {
   return useMutation({
     mutationFn: async ({ id, ...payload }: { id: string } & Record<string, unknown>) =>
       (await api.put(`/users/${id}`, payload)).data,
-    onSuccess: () => invalidate(queryClient, [['admin', 'users'], ['users', 'directory']]),
+    onSuccess: () =>
+      invalidate(queryClient, [
+        ['admin', 'users'],
+        ['users', 'directory'],
+      ]),
   })
 }
 
@@ -54,7 +62,11 @@ export function useUpdateUserStatus() {
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) =>
       (await api.patch(`/users/${id}/status`, { status })).data,
-    onSuccess: () => invalidate(queryClient, [['admin', 'users'], ['users', 'directory']]),
+    onSuccess: () =>
+      invalidate(queryClient, [
+        ['admin', 'users'],
+        ['users', 'directory'],
+      ]),
   })
 }
 
@@ -75,8 +87,13 @@ export function useAdminCompanies() {
 export function useCreateCompany() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: Record<string, unknown>) => (await api.post('/companies', payload)).data,
-    onSuccess: () => invalidate(queryClient, [['admin', 'companies'], ['companies', 'options']]),
+    mutationFn: async (payload: Record<string, unknown>) =>
+      (await api.post('/companies', payload)).data,
+    onSuccess: () =>
+      invalidate(queryClient, [
+        ['admin', 'companies'],
+        ['companies', 'options'],
+      ]),
   })
 }
 
@@ -85,7 +102,11 @@ export function useUpdateCompany() {
   return useMutation({
     mutationFn: async ({ id, ...payload }: { id: string } & Record<string, unknown>) =>
       (await api.put(`/companies/${id}`, payload)).data,
-    onSuccess: () => invalidate(queryClient, [['admin', 'companies'], ['companies', 'options']]),
+    onSuccess: () =>
+      invalidate(queryClient, [
+        ['admin', 'companies'],
+        ['companies', 'options'],
+      ]),
   })
 }
 
@@ -94,7 +115,11 @@ export function useUpdateCompanyStatus() {
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) =>
       (await api.patch(`/companies/${id}/status`, { status })).data,
-    onSuccess: () => invalidate(queryClient, [['admin', 'companies'], ['companies', 'options']]),
+    onSuccess: () =>
+      invalidate(queryClient, [
+        ['admin', 'companies'],
+        ['companies', 'options'],
+      ]),
   })
 }
 
@@ -104,9 +129,11 @@ export function useAdminGroups() {
   return useQuery({
     queryKey: ['admin', 'groups'],
     queryFn: async () => {
-      const { data: body } = await api.get<{ statusCode: number; message: string; data: AdminGroup[] }>(
-        '/solver-groups',
-      )
+      const { data: body } = await api.get<{
+        statusCode: number
+        message: string
+        data: AdminGroup[]
+      }>('/solver-groups')
       return body.data
     },
   })
@@ -116,9 +143,11 @@ export function useAdminGroupDetail(id: string | null) {
   return useQuery({
     queryKey: ['admin', 'groups', id],
     queryFn: async () => {
-      const { data: body } = await api.get<{ statusCode: number; message: string; data: AdminGroupDetail }>(
-        `/solver-groups/${id}`,
-      )
+      const { data: body } = await api.get<{
+        statusCode: number
+        message: string
+        data: AdminGroupDetail
+      }>(`/solver-groups/${id}`)
       return body.data
     },
     enabled: Boolean(id),
@@ -128,7 +157,8 @@ export function useAdminGroupDetail(id: string | null) {
 export function useCreateGroup() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: Record<string, unknown>) => (await api.post('/solver-groups', payload)).data,
+    mutationFn: async (payload: Record<string, unknown>) =>
+      (await api.post('/solver-groups', payload)).data,
     onSuccess: () => invalidate(queryClient, [['admin', 'groups'], ['solver-groups']]),
   })
 }
@@ -148,11 +178,7 @@ export function useReplaceGroupAgents() {
     mutationFn: async ({ id, agentIds }: { id: string; agentIds: string[] }) =>
       (await api.put(`/solver-groups/${id}/agents`, { agentIds })).data,
     onSuccess: () =>
-      invalidate(queryClient, [
-        ['admin', 'groups'],
-        ['solver-groups'],
-        ['users', 'agents'],
-      ]),
+      invalidate(queryClient, [['admin', 'groups'], ['solver-groups'], ['users', 'agents']]),
   })
 }
 
@@ -297,12 +323,7 @@ export function useApproveApproval() {
   return useMutation({
     mutationFn: async ({ id, comment }: { id: string; comment?: string }) =>
       (await api.post(`/approvals/${id}/approve`, { comment })).data,
-    onSuccess: () =>
-      invalidate(queryClient, [
-        ['approvals'],
-        ['tickets'],
-        ['ticket'],
-      ]),
+    onSuccess: () => invalidate(queryClient, [['approvals'], ['tickets'], ['ticket']]),
   })
 }
 
@@ -311,12 +332,7 @@ export function useRejectApproval() {
   return useMutation({
     mutationFn: async ({ id, comment }: { id: string; comment: string }) =>
       (await api.post(`/approvals/${id}/reject`, { comment })).data,
-    onSuccess: () =>
-      invalidate(queryClient, [
-        ['approvals'],
-        ['tickets'],
-        ['ticket'],
-      ]),
+    onSuccess: () => invalidate(queryClient, [['approvals'], ['tickets'], ['ticket']]),
   })
 }
 
@@ -336,9 +352,11 @@ export function useAdminSla() {
   return useQuery({
     queryKey: ['admin', 'sla'],
     queryFn: async () => {
-      const { data: body } = await api.get<{ statusCode: number; message: string; data: SlaPolicy[] }>(
-        '/sla-policies',
-      )
+      const { data: body } = await api.get<{
+        statusCode: number
+        message: string
+        data: SlaPolicy[]
+      }>('/sla-policies')
       return body.data
     },
   })
@@ -347,7 +365,8 @@ export function useAdminSla() {
 export function useCreateSlaPolicy() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: Record<string, unknown>) => (await api.post('/sla-policies', payload)).data,
+    mutationFn: async (payload: Record<string, unknown>) =>
+      (await api.post('/sla-policies', payload)).data,
     onSuccess: () => invalidate(queryClient, [['admin', 'sla']]),
   })
 }

@@ -20,11 +20,7 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
   return (
     <div className="min-h-dvh bg-white dark:bg-boxdark-2 lg:grid lg:grid-cols-2">
       <div className="relative hidden overflow-hidden lg:block">
-        <img
-          src={LOGIN_SPLASH_IMAGE}
-          alt=""
-          className="absolute inset-0 size-full object-cover"
-        />
+        <img src={LOGIN_SPLASH_IMAGE} alt="" className="absolute inset-0 size-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-boxdark via-boxdark/55 to-primary/25" />
         <div className="relative z-10 flex size-full flex-col justify-between p-10">
           <div className="flex items-center gap-2.5">
@@ -38,9 +34,7 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
             <h1 className="max-w-md text-3xl font-semibold leading-tight tracking-tight text-white">
               {t('auth.leftTitle')}
             </h1>
-            <p className="mt-3 max-w-md text-sm text-slate-200">
-              {t('auth.leftSubtitle')}
-            </p>
+            <p className="mt-3 max-w-md text-sm text-slate-200">{t('auth.leftSubtitle')}</p>
             <div className="mt-6 flex flex-wrap gap-2">
               <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur">
                 {t('auth.statOpen')}
@@ -77,11 +71,7 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
             title={t('layout.toggleTheme')}
             className="rounded-lg p-2 text-body hover:bg-graylight hover:text-graydark dark:text-bodydark dark:hover:bg-boxdark-2"
           >
-            {theme === 'dark' ? (
-              <Sun className="size-5" />
-            ) : (
-              <Moon className="size-5" />
-            )}
+            {theme === 'dark' ? <Sun className="size-5" /> : <Moon className="size-5" />}
           </button>
         </div>
 

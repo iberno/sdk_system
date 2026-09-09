@@ -73,7 +73,7 @@ interface SlaBreachedEvent {
 export function useRealtimeEvents() {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
-  const increment = useNotificationsStore((s) => s.increment)
+  const addNotification = useNotificationsStore((s) => s.add)
 
   useEffect(() => {
     const socket = connectSocket()
@@ -82,7 +82,12 @@ export function useRealtimeEvents() {
     const onTicketCreated = (payload: TicketCreatedEvent) => {
       void queryClient.invalidateQueries({ queryKey: ['tickets'] })
       toast.info(t('realtime.ticketCreated', { number: payload.ticketNumber }))
-      increment()
+      addNotification({
+        type: 'ticket_created',
+        title: payload.ticketNumber,
+        message: payload.title,
+        ticketId: payload.ticketId,
+      })
     }
     const onTicketUpdated = (payload: TicketUpdatedEvent) => {
       void queryClient.invalidateQueries({ queryKey: ['tickets'] })
@@ -90,21 +95,42 @@ export function useRealtimeEvents() {
     }
     const onTicketCommented = (payload: TicketCommentedEvent) => {
       void queryClient.invalidateQueries({ queryKey: ['ticket', payload.ticketId] })
+      addNotification({
+        type: 'ticket_commented',
+        title: payload.ticketNumber,
+        message: t('realtime.ticketCommented', { number: payload.ticketNumber }),
+        ticketId: payload.ticketId,
+      })
     }
     const onTicketAssigned = (payload: TicketAssignedEvent) => {
       void queryClient.invalidateQueries({ queryKey: ['tickets'] })
       void queryClient.invalidateQueries({ queryKey: ['ticket', payload.ticketId] })
       toast.info(t('realtime.ticketAssigned', { number: payload.ticketNumber }))
-      increment()
+      addNotification({
+        type: 'ticket_assigned',
+        title: payload.ticketNumber,
+        message: t('realtime.ticketAssigned', { number: payload.ticketNumber }),
+        ticketId: payload.ticketId,
+      })
     }
     const onApprovalPending = (payload: ApprovalPendingEvent) => {
       toast.warning(t('realtime.approvalPending', { flow: payload.flowName }))
-      increment()
+      addNotification({
+        type: 'approval_pending',
+        title: t('realtime.approvalPending', { flow: payload.flowName }),
+        message: payload.entityType === 'TICKET' ? t('nav.tickets') : t('nav.changes'),
+        ticketId: payload.ticketId,
+      })
     }
     const onSlaBreached = (payload: SlaBreachedEvent) => {
       void queryClient.invalidateQueries({ queryKey: ['tickets'] })
       toast.warning(t('realtime.slaBreached', { number: payload.ticketNumber }))
-      increment()
+      addNotification({
+        type: 'sla_breached',
+        title: payload.ticketNumber,
+        message: t('realtime.slaBreached', { number: payload.ticketNumber }),
+        ticketId: payload.ticketId,
+      })
     }
 
     socket.on('ticket.created', onTicketCreated)
@@ -122,5 +148,5 @@ export function useRealtimeEvents() {
       socket.off('approval.pending', onApprovalPending)
       socket.off('sla.breached', onSlaBreached)
     }
-  }, [queryClient, t, increment])
+  }, [queryClient, t, addNotification])
 }
