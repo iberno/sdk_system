@@ -21,7 +21,7 @@ export const PRIORITY_TONE: Record<string, BadgeTone> = {
   LOW: 'neutral',
 }
 
-export const TYPE_ORDER = ['INCIDENT', 'SERVICE_REQUEST', 'CHANGE_REQUEST', 'PROBLEM'] as const
+export const TYPE_ORDER = ['INCIDENT', 'SERVICE_REQUEST'] as const
 
 export const TYPE_TONE: Record<string, BadgeTone> = {
   INCIDENT: 'error',
