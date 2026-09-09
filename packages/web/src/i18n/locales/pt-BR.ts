@@ -461,6 +461,15 @@ export const ptBR = {
     reason: 'Motivo da mudança',
     plan: 'Plano de execução',
     rollbackPlan: 'Plano de reversão',
+    scheduledAt: 'Agendado para',
+  },
+  problems: {
+    rootCause: 'Causa raiz',
+    workaround: 'Solução alternativa',
+    solution: 'Solução definitiva',
+    recurrence: 'Recorrência',
+    actions: 'Ações',
+    proposeChange: 'Propor mudança',
   },
   approvals: {
     subtitle: 'Solicitações que aguardam (ou aguardaram) sua decisão.',

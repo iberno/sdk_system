@@ -13,7 +13,9 @@ import ForgotPasswordPage from '@/pages/ForgotPasswordPage'
 import LoginPage from '@/pages/LoginPage'
 import NewTicketPage from '@/pages/NewTicketPage'
 import ProblemsPage from '@/pages/ProblemsPage'
+import ProblemDetailPage from '@/pages/ProblemDetailPage'
 import ChangesPage from '@/pages/ChangesPage'
+import ChangeDetailPage from '@/pages/ChangeDetailPage'
 import ApprovalsPage from '@/pages/ApprovalsPage'
 import ReportsPage from '@/pages/ReportsPage'
 import TicketDetailPage from '@/pages/TicketDetailPage'
@@ -69,7 +71,9 @@ const router = createBrowserRouter([
       { path: 'tickets/:id', element: <TicketDetailPage /> },
       { path: 'approvals', element: <ApprovalsPage /> },
       { path: 'changes', element: <ChangesPage /> },
+      { path: 'changes/:id', element: <ChangeDetailPage /> },
       { path: 'problems', element: <ProblemsPage /> },
+      { path: 'problems/:id', element: <ProblemDetailPage /> },
       { path: 'knowledge', element: <KnowledgePage /> },
       {
         path: 'reports',

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Bug, Plus, Search } from 'lucide-react'
 
@@ -15,7 +16,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { Table, type Column } from '@/components/ui/Table'
 import { Textarea } from '@/components/ui/Textarea'
 import { toast } from '@/components/ui/toast-store'
-import { useCreateProblem, useProblems, useUpdateProblem } from '@/hooks/useProblemsChanges'
+import { useCreateProblem, useProblems } from '@/hooks/useProblemsChanges'
 import { PRIORITY_TONE, STATUS_TONE } from '@/lib/domain'
 import type { ProblemListItem } from '@/types/problem-change'
 
@@ -29,7 +30,6 @@ export default function ProblemsPage() {
   const [status, setStatus] = useState('')
   const [page, setPage] = useState(1)
   const [modalOpen, setModalOpen] = useState(false)
-  const [editing, setEditing] = useState<ProblemListItem | null>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [impact, setImpact] = useState('MEDIUM')
@@ -43,21 +43,11 @@ export default function ProblemsPage() {
   })
 
   const createProblem = useCreateProblem()
-  const updateProblem = useUpdateProblem()
 
   const openCreate = () => {
-    setEditing(null)
     setTitle('')
     setDescription('')
     setImpact('MEDIUM')
-    setModalOpen(true)
-  }
-
-  const openEdit = (problem: ProblemListItem) => {
-    setEditing(problem)
-    setTitle(problem.title)
-    setDescription(problem.description)
-    setImpact(problem.impact)
     setModalOpen(true)
   }
 
@@ -68,22 +58,12 @@ export default function ProblemsPage() {
     }
     setSaving(true)
     try {
-      if (editing) {
-        await updateProblem.mutateAsync({
-          id: editing.id,
-          title: title.trim(),
-          description: description.trim(),
-          impact,
-        })
-        toast.success(t('admin.saved'))
-      } else {
-        await createProblem.mutateAsync({
-          title: title.trim(),
-          description: description.trim(),
-          impact,
-        })
-        toast.success(t('admin.saved'))
-      }
+      await createProblem.mutateAsync({
+        title: title.trim(),
+        description: description.trim(),
+        impact,
+      })
+      toast.success(t('admin.saved'))
       setModalOpen(false)
     } catch {
       toast.error(t('admin.saveError'))
@@ -104,10 +84,10 @@ export default function ProblemsPage() {
         key: 'title',
         header: t('common.title'),
         render: (row) => (
-          <div className="flex flex-col">
+          <Link to={`/problems/${row.id}`} className="flex flex-col hover:opacity-80">
             <span className="text-sm font-medium text-graydark dark:text-white">{row.title}</span>
             <span className="text-xs text-bodystroke line-clamp-1">{row.description}</span>
-          </div>
+          </Link>
         ),
       },
       {
@@ -151,16 +131,6 @@ export default function ProblemsPage() {
           <span className="tabular-nums text-body dark:text-bodydark">
             {formatDate(row.createdAt)}
           </span>
-        ),
-      },
-      {
-        key: 'actions',
-        header: t('common.actions'),
-        align: 'right',
-        render: (row) => (
-          <Button variant="secondary" size="sm" onClick={() => openEdit(row)}>
-            {t('common.edit')}
-          </Button>
         ),
       },
     ]
@@ -256,7 +226,7 @@ export default function ProblemsPage() {
 
       <Modal
         open={modalOpen}
-        title={editing ? t('admin.editProblem') : t('admin.newProblem')}
+        title={t('admin.newProblem')}
         onClose={() => setModalOpen(false)}
         footer={
           <>
