@@ -48,8 +48,18 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     sectionKey: 'nav.changes',
     items: [
-      { labelKey: 'nav.changes', href: '/changes', icon: GitBranch },
-      { labelKey: 'nav.problems', href: '/problems', icon: Wrench },
+      {
+        labelKey: 'nav.changes',
+        href: '/changes',
+        icon: GitBranch,
+        roles: ['AGENT', 'MANAGER', 'ADMIN'],
+      },
+      {
+        labelKey: 'nav.problems',
+        href: '/problems',
+        icon: Wrench,
+        roles: ['AGENT', 'MANAGER', 'ADMIN'],
+      },
     ],
   },
   {
