@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/Header'
 import { PageTransition } from '@/components/layout/PageTransition'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { NAV_SECTIONS } from '@/config/nav'
+import { api, unwrap } from '@/lib/api'
 import { connectSocket, disconnectSocket } from '@/lib/socket'
 import { useRealtimeEvents } from '@/hooks/useRealtime'
 import { usePermissions } from '@/hooks/usePermissions'
@@ -19,6 +20,7 @@ export default function AppLayout() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar)
   const { pathname } = useLocation()
   const accessToken = useAuthStore((s) => s.accessToken)
+  const setUser = useAuthStore((s) => s.setUser)
   const { hasPermission } = usePermissions()
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -30,6 +32,27 @@ export default function AppLayout() {
       return
     }
     connectSocket()
+
+    api
+      .get('/auth/me')
+      .then(({ data }) => {
+        const me = unwrap<{
+          id: string
+          name: string
+          email: string
+          role: string
+          permissions: string[]
+          companyId: string
+          locale?: string
+          solverGroupId?: string | null
+        }>(data)
+        const current = useAuthStore.getState().user
+        if (current && JSON.stringify(current.permissions) !== JSON.stringify(me.permissions)) {
+          setUser({ ...current, permissions: me.permissions })
+        }
+      })
+      .catch(() => {})
+
     return () => {
       disconnectSocket()
     }

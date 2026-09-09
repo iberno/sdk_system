@@ -1064,6 +1064,12 @@ async function main() {
       action: 'view',
       description: 'Visualizar relatórios',
     },
+    {
+      code: '*',
+      module: '*',
+      action: '*',
+      description: 'Acesso total (wildcard)',
+    },
   ];
 
   for (const p of permissionsData) {
@@ -1078,7 +1084,7 @@ async function main() {
   const permMap = new Map(allPermissions.map((p) => [p.code, p.id]));
 
   const rolePermissions: Record<string, string[]> = {
-    ADMIN: allPermissions.map((p) => p.code),
+    ADMIN: ['*'],
     MANAGER: [
       'tickets.create',
       'tickets.read',
