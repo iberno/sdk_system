@@ -397,6 +397,11 @@ export const esES = {
     assignSubmit: 'Asignar',
     addedAttachment: 'Adjunto enviado correctamente.',
     attachmentError: 'No se pudo enviar el adjunto.',
+    uploading: 'Enviando...',
+    related: 'Relacionados',
+    relatedProblem: 'Problema vinculado',
+    relatedChange: 'Cambio vinculado',
+    relatedKb: 'Artículo de la base de conocimiento',
     statusUpdated: 'Ticket actualizado.',
   },
 }

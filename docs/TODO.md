@@ -517,8 +517,8 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
   - MANAGER/ADMIN: atribuir a qualquer agente/grupo + tudo do AGENT
   - USER: comentar (apenas PUBLIC), fechar (RESOLVED→CLOSED) e reabrir (CLOSED→IN_PROGRESS)
 - [x] Anexos: visualizar/baixar via `/tickets/:id/attachments/:aid/download` (axios + blob); upload na criação (team)
-- [ ] Links: problema, mudança, artigos KB
-- [ ] Upload de anexo direto no detalhe
+- [x] Links: problema, mudança, artigos KB (seção "Relacionados" no detalhe; artigos sugeridos pela categoria do ticket, com link para a busca da KB)
+- [x] Upload de anexo direto no detalhe (time; na seção de anexos)
 
 ---
 

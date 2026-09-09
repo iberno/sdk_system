@@ -396,6 +396,11 @@ export const ptBR = {
     assignSubmit: 'Atribuir',
     addedAttachment: 'Anexo enviado com sucesso.',
     attachmentError: 'Não foi possível enviar o anexo.',
+    uploading: 'Enviando...',
+    related: 'Relacionados',
+    relatedProblem: 'Problema vinculado',
+    relatedChange: 'Mudança vinculada',
+    relatedKb: 'Artigo da base de conhecimento',
     statusUpdated: 'Chamado atualizado.',
   },
 }

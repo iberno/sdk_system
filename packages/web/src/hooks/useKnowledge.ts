@@ -4,13 +4,17 @@ import { api } from '@/lib/api'
 import type { ApiListResponse } from '@/types/ticket'
 import type { KnowledgeArticle } from '@/types/knowledge'
 
-export function useKnowledgeArticles(params?: Record<string, string | number | boolean | undefined>) {
+export function useKnowledgeArticles(
+  params?: Record<string, string | number | boolean | undefined>,
+  enabled = true,
+) {
   return useQuery({
     queryKey: ['knowledge', params],
     queryFn: async () => {
       const { data: body } = await api.get<ApiListResponse<KnowledgeArticle>>('/knowledge', { params })
       return { items: body.data, pagination: body.pagination }
     },
+    enabled,
   })
 }
 

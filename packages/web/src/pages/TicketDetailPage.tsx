@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -8,12 +8,16 @@ import {
   ClipboardList,
   FileText,
   History,
+  BookOpen,
+  GitBranch,
   MessageSquare,
+  Paperclip,
   Send,
   Sparkles,
   Tag,
   UserCheck,
   Users,
+  Wrench,
 } from 'lucide-react'
 
 import { Avatar } from '@/components/ui/Avatar'
@@ -31,9 +35,11 @@ import {
   useAddComment,
   useChangeStatus,
   usePickupTicket,
+  useUploadAttachment,
 } from '@/hooks/useTicketMutations'
 import { useTicket } from '@/hooks/useTickets'
 import { useAgents, useSolverGroups } from '@/hooks/useDirectory'
+import { useKnowledgeArticles } from '@/hooks/useKnowledge'
 import { useAuthStore } from '@/stores/authStore'
 import { api } from '@/lib/api'
 import { PRIORITY_TONE, STATUS_TONE, TYPE_TONE } from '@/lib/domain'
@@ -86,11 +92,19 @@ export default function TicketDetailPage() {
   const commentMutation = useAddComment(id)
   const pickupMutation = usePickupTicket(id)
   const assignMutation = useAssignTicket(id)
+  const uploadMutation = useUploadAttachment(id)
 
   const { data: agents = [] } = useAgents(isManagerAdmin)
   const { data: groups = [] } = useSolverGroups(isTeam)
   const [assignTo, setAssignTo] = useState('')
   const [assignGroup, setAssignGroup] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const categoryLeaf = ticket?.category?.path?.split(' > ').pop() ?? ''
+  const kbQuery = useKnowledgeArticles(
+    categoryLeaf ? { search: categoryLeaf, pageSize: 3 } : undefined,
+    Boolean(categoryLeaf),
+  )
 
   const actions = useMemo(() => {
     if (!ticket) return []
@@ -159,6 +173,16 @@ export default function TicketDetailPage() {
       toast.success(t('tickets.statusUpdated'))
     } catch {
       toast.error(t('tickets.createError'))
+    }
+  }
+
+  const runUpload = async (file: File | undefined) => {
+    if (!file || !ticket) return
+    try {
+      await uploadMutation.mutateAsync(file)
+      toast.success(t('tickets.addedAttachment'))
+    } catch {
+      toast.error(t('tickets.attachmentError'))
     }
   }
 
@@ -337,6 +361,28 @@ export default function TicketDetailPage() {
                 ))}
               </ul>
             )}
+            {isTeam && (
+              <div className="mt-2 border-t border-stroke pt-3 dark:border-strokedark">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadMutation.isPending}
+                  className="inline-flex items-center gap-2 rounded-lg border border-dashed border-bodystroke px-3.5 py-2 text-sm text-bodystroke transition-colors hover:border-primary hover:text-primary disabled:opacity-60 dark:border-strokedark dark:text-bodydark"
+                >
+                  <Paperclip className="size-4" />
+                  {uploadMutation.isPending ? t('tickets.uploading') : t('tickets.attach')}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  onChange={(event) => {
+                    void runUpload(event.target.files?.[0])
+                    event.target.value = ''
+                  }}
+                />
+              </div>
+            )}
           </Card>
 
           <Card
@@ -512,6 +558,58 @@ export default function TicketDetailPage() {
               <TimelineRow label={t('tickets.closedOn')} date={ticket.timeline.closedAt} datetime />
             </div>
           </Card>
+
+          {(ticket.relatedProblem || ticket.relatedChanges.length > 0 || (kbQuery.data?.items ?? []).length > 0) && (
+            <Card title={t('tickets.related')} bodyClassName="flex flex-col gap-1.5">
+              {ticket.relatedProblem && (
+                <Link
+                  to="/problems"
+                  className="group flex items-center gap-2.5 rounded-lg border border-stroke px-3 py-2.5 transition-colors hover:border-primary dark:border-strokedark dark:hover:border-primary"
+                >
+                  <Wrench className="size-4 shrink-0 text-bodystroke group-hover:text-primary" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium text-graydark dark:text-white">
+                      {ticket.relatedProblem.title}
+                    </span>
+                    <span className="text-xs text-bodystroke">{t('tickets.relatedProblem')}</span>
+                  </span>
+                  <Badge tone="warning">{t(`domain.status.${ticket.relatedProblem.status}`)}</Badge>
+                </Link>
+              )}
+              {ticket.relatedChanges.map((change) => (
+                <Link
+                  key={change.id}
+                  to="/changes"
+                  className="group flex items-center gap-2.5 rounded-lg border border-stroke px-3 py-2.5 transition-colors hover:border-primary dark:border-strokedark dark:hover:border-primary"
+                >
+                  <GitBranch className="size-4 shrink-0 text-bodystroke group-hover:text-primary" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium text-graydark dark:text-white">
+                      {change.title}
+                    </span>
+                    <span className="text-xs text-bodystroke">{t('tickets.relatedChange')}</span>
+                  </span>
+                  <Badge tone="info">{t(`domain.status.${change.status}`)}</Badge>
+                </Link>
+              ))}
+              {(kbQuery.data?.items ?? []).map((article) => (
+                <Link
+                  key={article.id}
+                  to={`/knowledge?search=${encodeURIComponent(categoryLeaf)}`}
+                  className="group flex items-center gap-2.5 rounded-lg border border-stroke px-3 py-2.5 transition-colors hover:border-primary dark:border-strokedark dark:hover:border-primary"
+                >
+                  <BookOpen className="size-4 shrink-0 text-bodystroke group-hover:text-primary" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium text-graydark dark:text-white">
+                      {article.title}
+                    </span>
+                    <span className="text-xs text-bodystroke">{t('tickets.relatedKb')}</span>
+                  </span>
+                  <Badge tone="neutral">{article.category}</Badge>
+                </Link>
+              ))}
+            </Card>
+          )}
 
           {ticket.approvals.length > 0 && (
             <Card title={t('tickets.approvals')} bodyClassName="flex flex-col gap-2.5">

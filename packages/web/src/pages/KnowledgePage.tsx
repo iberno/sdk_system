@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 import { BookOpen, Eye, Pencil, Plus, Search, Send, Trash2 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/Badge'
@@ -57,7 +58,8 @@ export default function KnowledgePage() {
   const isTeam = user?.role !== 'USER'
 
   const [tab, setTab] = useState<'published' | 'drafts'>('published')
-  const [search, setSearch] = useState('')
+  const [searchParams] = useSearchParams()
+  const [search, setSearch] = useState(() => searchParams.get('search') ?? '')
   const [category, setCategory] = useState('')
   const [page, setPage] = useState(1)
   const [debouncedSearch, setDebouncedSearch] = useState('')

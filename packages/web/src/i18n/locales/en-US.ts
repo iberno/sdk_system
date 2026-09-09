@@ -397,6 +397,11 @@ export const enUS = {
     assignSubmit: 'Assign',
     addedAttachment: 'Attachment uploaded successfully.',
     attachmentError: 'Unable to upload the attachment.',
+    uploading: 'Uploading...',
+    related: 'Related',
+    relatedProblem: 'Linked problem',
+    relatedChange: 'Linked change',
+    relatedKb: 'Knowledge base article',
     statusUpdated: 'Ticket updated.',
   },
 }
