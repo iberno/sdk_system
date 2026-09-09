@@ -50,6 +50,7 @@ export const ptBR = {
     routingRules: 'Regras de Roteamento',
     audit: 'Auditoria',
     approvalFlows: 'Fluxos de Aprovação',
+    roles: 'Roles & Permissões',
     logout: 'Sair',
     profile: 'Perfil',
   },

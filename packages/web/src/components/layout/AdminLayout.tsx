@@ -1,35 +1,55 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { Building2, CheckSquare, Route, ScrollText, Timer, Users, UsersRound } from 'lucide-react'
-import { useAuthStore } from '@/stores/authStore'
+import {
+  Building2,
+  CheckSquare,
+  Route,
+  ScrollText,
+  Shield,
+  Timer,
+  Users,
+  UsersRound,
+} from 'lucide-react'
+import { usePermissions } from '@/hooks/usePermissions'
 import { cn } from '@/lib/utils'
 
 const TABS = [
-  { to: '/admin/users', labelKey: 'nav.users', icon: Users, roles: ['ADMIN', 'MANAGER'] },
-  { to: '/admin/companies', labelKey: 'nav.companies', icon: Building2, roles: ['ADMIN'] },
-  { to: '/admin/groups', labelKey: 'nav.groups', icon: UsersRound, roles: ['ADMIN', 'MANAGER'] },
-  { to: '/admin/sla', labelKey: 'nav.sla', icon: Timer, roles: ['ADMIN', 'MANAGER'] },
+  { to: '/admin/users', labelKey: 'nav.users', icon: Users, permission: 'admin.users' },
+  {
+    to: '/admin/companies',
+    labelKey: 'nav.companies',
+    icon: Building2,
+    permission: 'admin.companies',
+  },
+  { to: '/admin/groups', labelKey: 'nav.groups', icon: UsersRound, permission: 'admin.groups' },
+  { to: '/admin/sla', labelKey: 'nav.sla', icon: Timer, permission: 'admin.sla' },
   {
     to: '/admin/routing-rules',
     labelKey: 'nav.routingRules',
     icon: Route,
-    roles: ['ADMIN', 'MANAGER'],
+    permission: 'admin.routing',
   },
-  { to: '/admin/audit', labelKey: 'nav.audit', icon: ScrollText, roles: ['ADMIN', 'MANAGER'] },
+  { to: '/admin/audit', labelKey: 'nav.audit', icon: ScrollText, permission: 'admin.audit' },
   {
     to: '/admin/approval-flows',
     labelKey: 'nav.approvalFlows',
     icon: CheckSquare,
-    roles: ['ADMIN', 'MANAGER'],
+    permission: 'admin.flows',
+  },
+  {
+    to: '/admin/roles',
+    labelKey: 'nav.roles',
+    icon: Shield,
+    permission: 'admin.roles',
   },
 ] as const
 
 export default function AdminLayout() {
   const { t } = useTranslation()
-  const role = useAuthStore((s) => s.user?.role)
+  const { hasPermission } = usePermissions()
 
-  const tabs = TABS.filter((tab) => role && (tab.roles as readonly string[]).includes(role))
+  const tabs = TABS.filter((tab) => hasPermission(tab.permission))
 
   return (
     <div className="flex flex-col gap-5">

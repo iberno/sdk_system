@@ -9,6 +9,7 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { NAV_SECTIONS } from '@/config/nav'
 import { connectSocket, disconnectSocket } from '@/lib/socket'
 import { useRealtimeEvents } from '@/hooks/useRealtime'
+import { usePermissions } from '@/hooks/usePermissions'
 import { useAuthStore } from '@/stores/authStore'
 import { useUiStore } from '@/stores/uiStore'
 
@@ -18,7 +19,7 @@ export default function AppLayout() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar)
   const { pathname } = useLocation()
   const accessToken = useAuthStore((s) => s.accessToken)
-  const role = useAuthStore((s) => s.user?.role)
+  const { hasPermission } = usePermissions()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   useRealtimeEvents()
@@ -39,14 +40,14 @@ export default function AppLayout() {
       NAV_SECTIONS.map((section) => ({
         section: section.sectionKey ? t(section.sectionKey) : undefined,
         items: section.items
-          .filter((item) => !item.roles || (role && item.roles.includes(role)))
+          .filter((item) => !item.permissions || item.permissions.some((p) => hasPermission(p)))
           .map((item) => ({
             label: t(item.labelKey),
             href: item.href,
             icon: <item.icon className="size-5" />,
           })),
       })).filter((section) => section.items.length > 0),
-    [t, role],
+    [t, hasPermission],
   )
 
   return (

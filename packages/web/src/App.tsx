@@ -3,7 +3,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
 import { GuestRoute } from '@/components/auth/GuestRoute'
 import { RequireAuth } from '@/components/auth/RequireAuth'
-import { RequireRole } from '@/components/auth/RequireRole'
+import { RequirePermission } from '@/components/auth/RequirePermission'
 import AdminLayout from '@/components/layout/AdminLayout'
 import { Toaster } from '@/components/ui/Toast'
 import AppLayout from '@/components/layout/AppLayout'
@@ -80,17 +80,29 @@ const router = createBrowserRouter([
       {
         path: 'reports',
         element: (
-          <RequireRole roles={['ADMIN', 'MANAGER', 'AGENT']}>
+          <RequirePermission permissions={['reports.view']}>
             <ReportsPage />
-          </RequireRole>
+          </RequirePermission>
         ),
       },
       {
         path: 'admin',
         element: (
-          <RequireRole roles={['ADMIN', 'MANAGER']}>
+          <RequirePermission
+            permissions={[
+              'admin.users',
+              'admin.companies',
+              'admin.groups',
+              'admin.sla',
+              'admin.routing',
+              'admin.audit',
+              'admin.flows',
+              'admin.roles',
+            ]}
+            require="any"
+          >
             <AdminLayout />
-          </RequireRole>
+          </RequirePermission>
         ),
         children: [
           { index: true, element: <Navigate to="/admin/users" replace /> },

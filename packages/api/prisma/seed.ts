@@ -12,6 +12,8 @@ function hoursFromNow(h: number): Date {
 }
 
 async function clearAll() {
+  await prisma.rolePermission.deleteMany();
+  await prisma.permission.deleteMany();
   await prisma.refreshToken.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.knowledgeArticle.deleteMany();
@@ -849,6 +851,303 @@ async function main() {
       { ticketId: t5, approverId: managerId, order: 1, status: 'PENDING' },
     ],
   });
+
+  // ── Permissions ─────────────────────────────────────────────
+  const permissionsData = [
+    {
+      code: 'tickets.create',
+      module: 'tickets',
+      action: 'create',
+      description: 'Criar tickets',
+    },
+    {
+      code: 'tickets.read',
+      module: 'tickets',
+      action: 'read',
+      description: 'Visualizar tickets',
+    },
+    {
+      code: 'tickets.read.self',
+      module: 'tickets',
+      action: 'read.self',
+      description: 'Visualizar próprios tickets',
+    },
+    {
+      code: 'tickets.update',
+      module: 'tickets',
+      action: 'update',
+      description: 'Editar tickets',
+    },
+    {
+      code: 'tickets.assign',
+      module: 'tickets',
+      action: 'assign',
+      description: 'Atribuir tickets',
+    },
+    {
+      code: 'tickets.pickup',
+      module: 'tickets',
+      action: 'pickup',
+      description: 'Assumir tickets da fila',
+    },
+    {
+      code: 'tickets.comment',
+      module: 'tickets',
+      action: 'comment',
+      description: 'Comentar em tickets',
+    },
+    {
+      code: 'tickets.comment.self',
+      module: 'tickets',
+      action: 'comment.self',
+      description: 'Comentar em próprios tickets',
+    },
+    {
+      code: 'tickets.close',
+      module: 'tickets',
+      action: 'close',
+      description: 'Fechar tickets',
+    },
+    {
+      code: 'tickets.attach',
+      module: 'tickets',
+      action: 'attach',
+      description: 'Anexar arquivos',
+    },
+    {
+      code: 'tickets.approval',
+      module: 'tickets',
+      action: 'approval',
+      description: 'Solicitar aprovação',
+    },
+    {
+      code: 'changes.create',
+      module: 'changes',
+      action: 'create',
+      description: 'Criar mudanças',
+    },
+    {
+      code: 'changes.read',
+      module: 'changes',
+      action: 'read',
+      description: 'Visualizar mudanças',
+    },
+    {
+      code: 'changes.update',
+      module: 'changes',
+      action: 'update',
+      description: 'Editar mudanças',
+    },
+    {
+      code: 'changes.execute',
+      module: 'changes',
+      action: 'execute',
+      description: 'Executar mudanças',
+    },
+    {
+      code: 'changes.approve',
+      module: 'changes',
+      action: 'approve',
+      description: 'Aprovar mudanças',
+    },
+    {
+      code: 'changes.rollback',
+      module: 'changes',
+      action: 'rollback',
+      description: 'Reverter mudanças',
+    },
+    {
+      code: 'problems.create',
+      module: 'problems',
+      action: 'create',
+      description: 'Criar problemas',
+    },
+    {
+      code: 'problems.read',
+      module: 'problems',
+      action: 'read',
+      description: 'Visualizar problemas',
+    },
+    {
+      code: 'problems.update',
+      module: 'problems',
+      action: 'update',
+      description: 'Editar problemas',
+    },
+    {
+      code: 'problems.link',
+      module: 'problems',
+      action: 'link',
+      description: 'Vincular tickets a problemas',
+    },
+    {
+      code: 'approvals.read',
+      module: 'approvals',
+      action: 'read',
+      description: 'Visualizar aprovações',
+    },
+    {
+      code: 'approvals.decide',
+      module: 'approvals',
+      action: 'decide',
+      description: 'Aprovar/rejeitar',
+    },
+    {
+      code: 'admin.users',
+      module: 'admin',
+      action: 'users',
+      description: 'Gerenciar usuários',
+    },
+    {
+      code: 'admin.companies',
+      module: 'admin',
+      action: 'companies',
+      description: 'Gerenciar empresas',
+    },
+    {
+      code: 'admin.groups',
+      module: 'admin',
+      action: 'groups',
+      description: 'Gerenciar grupos',
+    },
+    {
+      code: 'admin.sla',
+      module: 'admin',
+      action: 'sla',
+      description: 'Gerenciar SLA',
+    },
+    {
+      code: 'admin.routing',
+      module: 'admin',
+      action: 'routing',
+      description: 'Gerenciar regras de roteamento',
+    },
+    {
+      code: 'admin.audit',
+      module: 'admin',
+      action: 'audit',
+      description: 'Visualizar audit log',
+    },
+    {
+      code: 'admin.flows',
+      module: 'admin',
+      action: 'flows',
+      description: 'Gerenciar fluxos de aprovação',
+    },
+    {
+      code: 'admin.roles',
+      module: 'admin',
+      action: 'roles',
+      description: 'Gerenciar roles e permissões',
+    },
+    {
+      code: 'knowledge.create',
+      module: 'knowledge',
+      action: 'create',
+      description: 'Criar artigos',
+    },
+    {
+      code: 'knowledge.read',
+      module: 'knowledge',
+      action: 'read',
+      description: 'Visualizar artigos',
+    },
+    {
+      code: 'knowledge.publish',
+      module: 'knowledge',
+      action: 'publish',
+      description: 'Publicar artigos',
+    },
+    {
+      code: 'reports.view',
+      module: 'reports',
+      action: 'view',
+      description: 'Visualizar relatórios',
+    },
+  ];
+
+  for (const p of permissionsData) {
+    await prisma.permission.upsert({
+      where: { code: p.code },
+      update: { description: p.description },
+      create: p,
+    });
+  }
+
+  const allPermissions = await prisma.permission.findMany();
+  const permMap = new Map(allPermissions.map((p) => [p.code, p.id]));
+
+  const rolePermissions: Record<string, string[]> = {
+    ADMIN: allPermissions.map((p) => p.code),
+    MANAGER: [
+      'tickets.create',
+      'tickets.read',
+      'tickets.update',
+      'tickets.assign',
+      'tickets.pickup',
+      'tickets.comment',
+      'tickets.close',
+      'tickets.attach',
+      'tickets.approval',
+      'changes.create',
+      'changes.read',
+      'changes.update',
+      'changes.approve',
+      'problems.create',
+      'problems.read',
+      'problems.update',
+      'problems.link',
+      'approvals.read',
+      'approvals.decide',
+      'admin.users',
+      'admin.companies',
+      'admin.groups',
+      'admin.sla',
+      'admin.routing',
+      'admin.flows',
+      'knowledge.create',
+      'knowledge.read',
+      'knowledge.publish',
+      'reports.view',
+    ],
+    AGENT: [
+      'tickets.create',
+      'tickets.read',
+      'tickets.update',
+      'tickets.assign',
+      'tickets.pickup',
+      'tickets.comment',
+      'tickets.close',
+      'tickets.attach',
+      'tickets.approval',
+      'changes.create',
+      'changes.read',
+      'problems.create',
+      'problems.read',
+      'problems.link',
+      'approvals.read',
+      'knowledge.create',
+      'knowledge.read',
+      'knowledge.publish',
+      'reports.view',
+    ],
+    USER: [
+      'tickets.create',
+      'tickets.read.self',
+      'tickets.comment.self',
+      'knowledge.read',
+    ],
+  };
+
+  for (const [role, codes] of Object.entries(rolePermissions)) {
+    await prisma.rolePermission.deleteMany({ where: { roleId: role } });
+    await prisma.rolePermission.createMany({
+      data: codes.map((code) => ({
+        roleId: role,
+        permissionId: permMap.get(code)!,
+      })),
+    });
+  }
 
   console.log('Seed concluído:');
   console.log(

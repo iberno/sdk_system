@@ -50,6 +50,7 @@ export const esES = {
     routingRules: 'Reglas de Enrutamiento',
     audit: 'Auditoría',
     approvalFlows: 'Flujos de Aprobación',
+    roles: 'Roles y Permisos',
     logout: 'Salir',
     profile: 'Perfil',
   },

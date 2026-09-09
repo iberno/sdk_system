@@ -1,9 +1,18 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { LogoutDto, RefreshTokenDto } from './dto/refresh-token.dto.js';
 import { Public } from '../../common/decorators/public.decorator.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { UserContext } from './interfaces/auth-user.interface.js';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -18,6 +27,14 @@ export class AuthController {
   })
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto.email, dto.password);
+  }
+
+  @Get('me')
+  @ApiOperation({
+    summary: 'Retorna dados do usuário autenticado + permissões',
+  })
+  getMe(@CurrentUser() user: UserContext) {
+    return this.authService.getMe(user.sub);
   }
 
   @Public()

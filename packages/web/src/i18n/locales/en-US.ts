@@ -50,6 +50,7 @@ export const enUS = {
     routingRules: 'Routing Rules',
     audit: 'Audit',
     approvalFlows: 'Approval Flows',
+    roles: 'Roles & Permissions',
     logout: 'Sign out',
     profile: 'Profile',
   },

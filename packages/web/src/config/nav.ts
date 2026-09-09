@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Route,
   ScrollText,
+  Shield,
   Ticket,
   Timer,
   TrendingUp,
@@ -20,7 +21,7 @@ export interface NavItem {
   labelKey: string
   href: string
   icon: LucideIcon
-  roles?: string[]
+  permissions?: string[]
 }
 
 export interface NavSection {
@@ -40,31 +41,33 @@ export const NAV_SECTIONS: NavSection[] = [
         labelKey: 'tickets.unassignedQueue',
         href: '/tickets/queue',
         icon: Inbox,
-        roles: ['AGENT', 'MANAGER', 'ADMIN'],
+        permissions: ['tickets.pickup'],
       },
-      { labelKey: 'nav.approvals', href: '/approvals', icon: CheckSquare },
+      {
+        labelKey: 'nav.approvals',
+        href: '/approvals',
+        icon: CheckSquare,
+        permissions: ['approvals.read'],
+      },
     ],
   },
   {
     sectionKey: 'nav.changes',
     items: [
-      {
-        labelKey: 'nav.changes',
-        href: '/changes',
-        icon: GitBranch,
-        roles: ['AGENT', 'MANAGER', 'ADMIN'],
-      },
-      {
-        labelKey: 'nav.problems',
-        href: '/problems',
-        icon: Wrench,
-        roles: ['AGENT', 'MANAGER', 'ADMIN'],
-      },
+      { labelKey: 'nav.changes', href: '/changes', icon: GitBranch, permissions: ['changes.read'] },
+      { labelKey: 'nav.problems', href: '/problems', icon: Wrench, permissions: ['problems.read'] },
     ],
   },
   {
     sectionKey: 'nav.knowledge',
-    items: [{ labelKey: 'nav.knowledge', href: '/knowledge', icon: BookOpen }],
+    items: [
+      {
+        labelKey: 'nav.knowledge',
+        href: '/knowledge',
+        icon: BookOpen,
+        permissions: ['knowledge.read'],
+      },
+    ],
   },
   {
     sectionKey: 'nav.reports',
@@ -73,39 +76,50 @@ export const NAV_SECTIONS: NavSection[] = [
         labelKey: 'nav.reports',
         href: '/reports',
         icon: TrendingUp,
-        roles: ['ADMIN', 'MANAGER', 'AGENT'],
+        permissions: ['reports.view'],
       },
     ],
   },
   {
     sectionKey: 'nav.admin',
     items: [
-      { labelKey: 'nav.users', href: '/admin/users', icon: Users, roles: ['ADMIN', 'MANAGER'] },
-      { labelKey: 'nav.companies', href: '/admin/companies', icon: Building2, roles: ['ADMIN'] },
+      { labelKey: 'nav.users', href: '/admin/users', icon: Users, permissions: ['admin.users'] },
+      {
+        labelKey: 'nav.companies',
+        href: '/admin/companies',
+        icon: Building2,
+        permissions: ['admin.companies'],
+      },
       {
         labelKey: 'nav.groups',
         href: '/admin/groups',
         icon: UsersRound,
-        roles: ['ADMIN', 'MANAGER'],
+        permissions: ['admin.groups'],
       },
-      { labelKey: 'nav.sla', href: '/admin/sla', icon: Timer, roles: ['ADMIN', 'MANAGER'] },
+      { labelKey: 'nav.sla', href: '/admin/sla', icon: Timer, permissions: ['admin.sla'] },
       {
         labelKey: 'nav.routingRules',
         href: '/admin/routing-rules',
         icon: Route,
-        roles: ['ADMIN', 'MANAGER'],
+        permissions: ['admin.routing'],
       },
       {
         labelKey: 'nav.audit',
         href: '/admin/audit',
         icon: ScrollText,
-        roles: ['ADMIN', 'MANAGER'],
+        permissions: ['admin.audit'],
       },
       {
         labelKey: 'nav.approvalFlows',
         href: '/admin/approval-flows',
         icon: CheckSquare,
-        roles: ['ADMIN', 'MANAGER'],
+        permissions: ['admin.flows'],
+      },
+      {
+        labelKey: 'nav.roles',
+        href: '/admin/roles',
+        icon: Shield,
+        permissions: ['admin.roles'],
       },
     ],
   },

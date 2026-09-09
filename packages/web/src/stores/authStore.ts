@@ -8,6 +8,7 @@ export interface AuthUser {
   name: string
   email: string
   role: string
+  permissions: string[]
   companyId: string
   locale?: string
   solverGroupId?: string | null

@@ -132,6 +132,33 @@ export class AuthService {
     };
   }
 
+  async getUserPermissions(role: string): Promise<string[]> {
+    const rolePerms = await this.prisma.rolePermission.findMany({
+      where: { roleId: role },
+      include: { permission: { select: { code: true } } },
+    });
+    return rolePerms.map((rp) => rp.permission.code);
+  }
+
+  async getMe(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        companyId: true,
+        solverGroupId: true,
+        locale: true,
+        status: true,
+      },
+    });
+    if (!user) return null;
+    const permissions = await this.getUserPermissions(user.role);
+    return { ...user, permissions };
+  }
+
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
     const accessToken = this.signAccessToken(user);
@@ -139,6 +166,7 @@ export class AuthService {
     const expiresIn = ttlToSeconds(
       this.config.get<string>('JWT_ACCESS_EXPIRES_IN') ?? '15m',
     );
+    const permissions = await this.getUserPermissions(user.role);
 
     await this.audit.log({
       action: 'LOGIN',
@@ -152,7 +180,7 @@ export class AuthService {
       accessToken,
       refreshToken,
       expiresIn,
-      user: this.sanitizeUser(user),
+      user: { ...this.sanitizeUser(user), permissions },
     };
   }
 
