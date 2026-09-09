@@ -97,3 +97,21 @@ export interface SlaPolicy {
   createdAt: string
   updatedAt: string
 }
+
+export interface ApprovalItem {
+  id: string
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  order: number
+  comment: string | null
+  flowName: string | null
+  entity: {
+    type: 'TICKET' | 'CHANGE'
+    id: string
+    reference?: string | null
+    title: string
+    requester?: string | null
+  } | null
+  approver: { id: string; name: string; email: string } | null
+  createdAt: string
+  updatedAt: string
+}

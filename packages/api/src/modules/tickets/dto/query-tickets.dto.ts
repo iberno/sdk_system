@@ -8,8 +8,9 @@ import {
   IsString,
 } from 'class-validator';
 import { Priority, TicketStatus, TicketType } from '@prisma/client';
+import { PaginationDto } from '../../../common/dto/pagination.dto.js';
 
-export class QueryTicketsDto {
+export class QueryTicketsDto extends PaginationDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
@@ -82,8 +83,8 @@ export class QueryTicketsDto {
   @IsIn(['createdAt', 'priority', 'status'])
   sortBy?: 'createdAt' | 'priority' | 'status';
 
-  @ApiPropertyOptional({ enum: ['ASC', 'DESC'] })
+  @ApiPropertyOptional({ enum: ['ASC', 'DESC', 'asc', 'desc'], description: 'Case-insensitive (minúsculo é normalizado no serviço)' })
   @IsOptional()
-  @IsIn(['ASC', 'DESC'])
-  order?: 'ASC' | 'DESC';
+  @IsIn(['ASC', 'DESC', 'asc', 'desc'])
+  order?: 'ASC' | 'DESC' | 'asc' | 'desc';
 }

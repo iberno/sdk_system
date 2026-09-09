@@ -54,7 +54,7 @@ export class UsersService {
   ) {}
 
   async findAll(query: QueryUsersDto): Promise<PaginatedResult<unknown>> {
-    const { page, pageSize, search, role, companyId, solverGroupId, status } = query;
+    const { page = 1, pageSize = 20, search, role, companyId, solverGroupId, status } = query;
     const where: Prisma.UserWhereInput = {
       ...(search
         ? {

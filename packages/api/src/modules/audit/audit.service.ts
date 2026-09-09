@@ -59,7 +59,7 @@ export class AuditService {
 
     const [rows, totalItems] = await Promise.all([
       this.prisma.auditLog.findMany({
-        ...paginationArgs(query.page, query.pageSize),
+        ...paginationArgs(query.page ?? 1, query.pageSize ?? 20),
         where,
         orderBy: { createdAt: 'desc' },
         include: { user: { select: { id: true, name: true, email: true } } },
@@ -81,7 +81,7 @@ export class AuditService {
         userAgent: row.userAgent,
         createdAt: row.createdAt,
       })),
-      pagination: paginationMeta(query.page, query.pageSize, totalItems),
+      pagination: paginationMeta(query.page ?? 1, query.pageSize ?? 20, totalItems),
     };
   }
 }

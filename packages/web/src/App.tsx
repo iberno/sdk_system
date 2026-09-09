@@ -13,6 +13,7 @@ import ForgotPasswordPage from '@/pages/ForgotPasswordPage'
 import LoginPage from '@/pages/LoginPage'
 import NewTicketPage from '@/pages/NewTicketPage'
 import PlaceholderPage from '@/pages/PlaceholderPage'
+import ApprovalsPage from '@/pages/ApprovalsPage'
 import ReportsPage from '@/pages/ReportsPage'
 import TicketDetailPage from '@/pages/TicketDetailPage'
 import TicketsPage from '@/pages/TicketsPage'
@@ -65,7 +66,7 @@ const router = createBrowserRouter([
       { path: 'tickets', element: <TicketsPage /> },
       { path: 'tickets/new', element: <NewTicketPage /> },
       { path: 'tickets/:id', element: <TicketDetailPage /> },
-      { path: 'approvals', element: <PlaceholderPage /> },
+      { path: 'approvals', element: <ApprovalsPage /> },
       { path: 'changes', element: <PlaceholderPage /> },
       { path: 'problems', element: <PlaceholderPage /> },
       { path: 'knowledge', element: <KnowledgePage /> },

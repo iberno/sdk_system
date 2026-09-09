@@ -59,7 +59,7 @@ export default function AppLayout() {
         onClose={() => setMobileOpen(false)}
       />
       <div
-        className={`flex min-h-dvh flex-col transition-[padding] duration-200 lg:${collapsed ? 'pl-20' : 'pl-64'}`}
+        className={`flex min-h-dvh flex-col transition-[padding] duration-200 ${collapsed ? 'lg:pl-20' : 'lg:pl-64'}`}
       >
         <Header onToggleSidebar={toggleSidebar} onOpenMobile={() => setMobileOpen(true)} />
         <main className="flex-1 p-4 sm:p-6">

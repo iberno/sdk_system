@@ -8,6 +8,7 @@ import type {
   AdminGroupDetail,
   AdminUser,
   ApprovalFlow,
+  ApprovalItem,
   AuditLogEntry,
   RoutingRule,
   SlaPolicy,
@@ -274,6 +275,50 @@ export function useApproverCandidates() {
 }
 
 // ---------- Audit ----------
+
+// ---------- Approvals (minhas) ----------
+
+export function useApprovals(status?: string) {
+  return useQuery({
+    queryKey: ['approvals', status],
+    queryFn: async () => {
+      const { data: body } = await api.get<{
+        statusCode: number
+        message: string
+        data: ApprovalItem[]
+      }>('/approvals', { params: status ? { status } : {} })
+      return body.data
+    },
+  })
+}
+
+export function useApproveApproval() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, comment }: { id: string; comment?: string }) =>
+      (await api.post(`/approvals/${id}/approve`, { comment })).data,
+    onSuccess: () =>
+      invalidate(queryClient, [
+        ['approvals'],
+        ['tickets'],
+        ['ticket'],
+      ]),
+  })
+}
+
+export function useRejectApproval() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, comment }: { id: string; comment: string }) =>
+      (await api.post(`/approvals/${id}/reject`, { comment })).data,
+    onSuccess: () =>
+      invalidate(queryClient, [
+        ['approvals'],
+        ['tickets'],
+        ['ticket'],
+      ]),
+  })
+}
 
 export function useAuditLogs(params?: Record<string, string | number | undefined>) {
   return useQuery({

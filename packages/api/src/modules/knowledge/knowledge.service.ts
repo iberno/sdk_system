@@ -45,7 +45,7 @@ export class KnowledgeService {
 
     const [rows, totalItems] = await Promise.all([
       this.prisma.knowledgeArticle.findMany({
-        ...paginationArgs(query.page, query.pageSize),
+        ...paginationArgs(query.page ?? 1, query.pageSize ?? 20),
         where,
         orderBy: { updatedAt: 'desc' },
         include: ARTICLE_INCLUDE,
@@ -55,7 +55,7 @@ export class KnowledgeService {
 
     return {
       items: rows.map((a) => this.mapArticle(a)),
-      pagination: paginationMeta(query.page, query.pageSize, totalItems),
+      pagination: paginationMeta(query.page ?? 1, query.pageSize ?? 20, totalItems),
     };
   }
 
@@ -75,7 +75,7 @@ export class KnowledgeService {
 
     const [rows, totalItems] = await Promise.all([
       this.prisma.knowledgeArticle.findMany({
-        ...paginationArgs(query.page, query.pageSize),
+        ...paginationArgs(query.page ?? 1, query.pageSize ?? 20),
         where,
         orderBy: { updatedAt: 'desc' },
         include: ARTICLE_INCLUDE,
@@ -85,7 +85,7 @@ export class KnowledgeService {
 
     return {
       items: rows.map((a) => this.mapArticle(a)),
-      pagination: paginationMeta(query.page, query.pageSize, totalItems),
+      pagination: paginationMeta(query.page ?? 1, query.pageSize ?? 20, totalItems),
     };
   }
 

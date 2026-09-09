@@ -19,7 +19,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, sections, currentPath, mobileOpen, onClose }: SidebarProps) {
   const { t } = useTranslation()
-  const width = collapsed ? 'w-20' : 'w-64'
+  const desktopWidth = collapsed ? 'lg:w-20' : 'lg:w-64'
 
   return (
     <>
@@ -32,7 +32,7 @@ export function Sidebar({ collapsed, sections, currentPath, mobileOpen, onClose 
         />
       ) : null}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col overflow-y-auto bg-gradient-to-b from-boxdark-2 to-boxdark text-white transition-transform duration-200 lg:z-30 lg:transition-[width] lg:${width} ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col overflow-y-auto bg-gradient-to-b from-boxdark-2 to-boxdark text-white transition-transform duration-200 lg:z-30 lg:transition-[width] ${desktopWidth} ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >

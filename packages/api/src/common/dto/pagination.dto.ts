@@ -8,7 +8,7 @@ export class PaginationDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  page: number = 1;
+  page?: number;
 
   @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 100 })
   @IsOptional()
@@ -16,7 +16,7 @@ export class PaginationDto {
   @IsInt()
   @Min(1)
   @Max(100)
-  pageSize: number = 20;
+  pageSize?: number;
 }
 
 export function paginationArgs(page: number, pageSize: number) {

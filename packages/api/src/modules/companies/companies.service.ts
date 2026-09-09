@@ -60,7 +60,7 @@ export class CompaniesService {
   }
 
   async findAll(query: PaginationDto): Promise<PaginatedResult<unknown>> {
-    const { page, pageSize } = query;
+    const { page = 1, pageSize = 20 } = query;
     const [rows, totalItems] = await Promise.all([
       this.prisma.company.findMany({
         ...paginationArgs(page, pageSize),
