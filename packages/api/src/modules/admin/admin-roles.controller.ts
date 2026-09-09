@@ -33,7 +33,7 @@ export class AdminRolesController {
       permissions: roleMap.get(role) ?? [],
     }));
 
-    return { data: roles };
+    return roles;
   }
 
   @Get('permissions')
@@ -42,7 +42,7 @@ export class AdminRolesController {
     const permissions = await this.prisma.permission.findMany({
       orderBy: [{ module: 'asc' }, { action: 'asc' }],
     });
-    return { data: permissions };
+    return permissions;
   }
 
   @Put(':role/permissions')
