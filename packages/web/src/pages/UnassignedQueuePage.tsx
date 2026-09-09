@@ -17,7 +17,7 @@ import type { TicketListItem } from '@/types/ticket'
 
 export default function UnassignedQueuePage() {
   const { t } = useTranslation()
-  const { data: tickets, isLoading, isError, refetch } = useUnassignedTickets()
+  const { data: tickets = [], isLoading, isError, refetch } = useUnassignedTickets()
   const [pickedUpId, setPickedUpId] = useState<string | null>(null)
   const pickupMutation = usePickupTicket(pickedUpId ?? '')
 
@@ -136,7 +136,7 @@ export default function UnassignedQueuePage() {
         ) : (
           <Table<TicketListItem>
             columns={columns}
-            rows={tickets ?? []}
+            rows={tickets}
             keyFor={(row) => row.id}
             loading={false}
             empty={t('tickets.noUnassigned')}

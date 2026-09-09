@@ -145,3 +145,55 @@ export function useRollbackChange() {
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['changes'] }),
   })
 }
+
+export function useLinkTicketToProblem(problemId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (ticketId: string) =>
+      unwrap<ProblemDetail>(await api.post(`/problems/${problemId}/link-ticket`, { ticketId })),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['problem', problemId] })
+      void qc.invalidateQueries({ queryKey: ['problems'] })
+    },
+  })
+}
+
+export function useUnlinkTicketFromProblem(problemId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (ticketId: string) =>
+      unwrap<ProblemDetail>(
+        await api.delete(`/problems/${problemId}/unlink-ticket`, { data: { ticketId } }),
+      ),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['problem', problemId] })
+      void qc.invalidateQueries({ queryKey: ['problems'] })
+    },
+  })
+}
+
+export function useLinkTicketToChange(changeId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (ticketId: string) =>
+      unwrap<ChangeDetail>(await api.post(`/changes/${changeId}/link-ticket`, { ticketId })),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['change', changeId] })
+      void qc.invalidateQueries({ queryKey: ['changes'] })
+    },
+  })
+}
+
+export function useUnlinkTicketFromChange(changeId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (ticketId: string) =>
+      unwrap<ChangeDetail>(
+        await api.delete(`/changes/${changeId}/unlink-ticket`, { data: { ticketId } }),
+      ),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['change', changeId] })
+      void qc.invalidateQueries({ queryKey: ['changes'] })
+    },
+  })
+}

@@ -19,8 +19,12 @@ export function useUnassignedTickets() {
   return useQuery({
     queryKey: ['tickets', 'unassigned'],
     queryFn: async () => {
-      const { data: body } = await api.get<ApiListResponse<TicketListItem>>('/tickets/unassigned')
-      return body.data
+      const { data: body } = await api.get<{
+        statusCode: number
+        message: string
+        data: { items: TicketListItem[] }
+      }>('/tickets/unassigned')
+      return body.data.items ?? []
     },
   })
 }
