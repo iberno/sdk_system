@@ -15,6 +15,7 @@ import NewTicketPage from '@/pages/NewTicketPage'
 import PlaceholderPage from '@/pages/PlaceholderPage'
 import TicketDetailPage from '@/pages/TicketDetailPage'
 import TicketsPage from '@/pages/TicketsPage'
+import KnowledgePage from '@/pages/KnowledgePage'
 import UsersAdminPage from '@/pages/admin/UsersAdminPage'
 import CompaniesAdminPage from '@/pages/admin/CompaniesAdminPage'
 import GroupsAdminPage from '@/pages/admin/GroupsAdminPage'
@@ -66,7 +67,7 @@ const router = createBrowserRouter([
       { path: 'approvals', element: <PlaceholderPage /> },
       { path: 'changes', element: <PlaceholderPage /> },
       { path: 'problems', element: <PlaceholderPage /> },
-      { path: 'knowledge', element: <PlaceholderPage /> },
+      { path: 'knowledge', element: <KnowledgePage /> },
       { path: 'reports', element: <PlaceholderPage /> },
       {
         path: 'admin',

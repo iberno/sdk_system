@@ -561,9 +561,9 @@ Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dado
 
 ### 15.6 Base de Conhecimento
 
-- [ ] Lista de artigos
-- [ ] Criar/editar com preview
-- [ ] Publicação
+- [x] Lista de artigos (publicados e rascunhos, busca + filtro por categoria, paginação)
+- [x] Criar/editar com preview (abas Escrever/Pré-visualizar; tags e categoria)
+- [x] Publicação (rascunho → publicado; edição/exclusão restritas a autor ou ADMIN/MANAGER)
 
 ### 15.7 Auditoria
 
