@@ -107,7 +107,9 @@ export class DashboardService {
 
     const resolutionDurations = avgResolution
       .filter((t) => t.resolvedAt)
-      .map((t) => (t.resolvedAt!.getTime() - t.createdAt.getTime()) / 3_600_000);
+      .map((t) =>
+        Math.max(0, t.resolvedAt!.getTime() - t.createdAt.getTime()) / 3_600_000,
+      );
     const avgResolutionHours =
       resolutionDurations.length > 0
         ? Math.round((resolutionDurations.reduce((a, b) => a + b, 0) / resolutionDurations.length) * 10) / 10

@@ -51,7 +51,14 @@ export const NAV_SECTIONS: NavSection[] = [
   },
   {
     sectionKey: 'nav.reports',
-    items: [{ labelKey: 'nav.reports', href: '/reports', icon: TrendingUp }],
+    items: [
+      {
+        labelKey: 'nav.reports',
+        href: '/reports',
+        icon: TrendingUp,
+        roles: ['ADMIN', 'MANAGER', 'AGENT'],
+      },
+    ],
   },
   {
     sectionKey: 'nav.admin',

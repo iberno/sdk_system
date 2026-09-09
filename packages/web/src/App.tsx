@@ -13,6 +13,7 @@ import ForgotPasswordPage from '@/pages/ForgotPasswordPage'
 import LoginPage from '@/pages/LoginPage'
 import NewTicketPage from '@/pages/NewTicketPage'
 import PlaceholderPage from '@/pages/PlaceholderPage'
+import ReportsPage from '@/pages/ReportsPage'
 import TicketDetailPage from '@/pages/TicketDetailPage'
 import TicketsPage from '@/pages/TicketsPage'
 import KnowledgePage from '@/pages/KnowledgePage'
@@ -68,7 +69,14 @@ const router = createBrowserRouter([
       { path: 'changes', element: <PlaceholderPage /> },
       { path: 'problems', element: <PlaceholderPage /> },
       { path: 'knowledge', element: <KnowledgePage /> },
-      { path: 'reports', element: <PlaceholderPage /> },
+      {
+        path: 'reports',
+        element: (
+          <RequireRole roles={['ADMIN', 'MANAGER', 'AGENT']}>
+            <ReportsPage />
+          </RequireRole>
+        ),
+      },
       {
         path: 'admin',
         element: (

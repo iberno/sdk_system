@@ -464,18 +464,18 @@ são pendentes. **`[x]`** são concluídos.
 Interligado ao backend (`GET /tickets` via React Query + axios com JWT) — dados reais do seed:
 
 - [x] Cards de KPI (abertos, em progresso, resolvidos, SLA) — computados dos tickets reais
-- [ ] Gráfico de tendência (últimos 30 dias)
-- [ ] Distribuição por prioridade (pie) — atual: progress bars por severidade
+- [x] Gráfico de tendência (últimos 30 dias) — página **Relatórios** (`/reports`, SVG: criados vs resolvidos)
+- [x] Distribuição por prioridade (pie) — página **Relatórios** (donut SVG)
 - [x] Distribuição por status (bar)
-- [ ] Distribuição por grupo (bar)
+- [x] Distribuição por grupo (bar) — página **Relatórios**
 - [x] Lista de tickets recentes (8 recentes, sorting client-side)
 - [x] Alertas SLA breach (chip no topo + KPI com contagem)
 - [x] Responsivo
 - [x] Estados de loading (skeleton), erro (retry) e vazio
 
-> **Nota:** gráfico de tendência, distribuição por prioridade (pie) e por grupo ficarão na página **Relatórios**
-> (decisão do usuário). O backend já expõe `GET /dashboard/summary` (roles team): totals, byPriority, byStatus,
-> byType, byGroup, trend 30d, avgFirstResponseMin e avgResolutionHours — usar nessa fase.
+> **Relatórios** (`GET /dashboard/summary`, roles team): KPIs (abertos/em andamento/resolvidos/breach,
+> 1ª resposta média, resolução média), tendência 30d (SVG), donut por prioridade, barras por
+> grupo/status/tipo. fix(api): clamp de `avgResolutionHours` a 0 (tickets do seed tinham resolvedAt < createdAt).
 
 ---
 
