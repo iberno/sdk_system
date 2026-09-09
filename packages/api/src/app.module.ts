@@ -40,6 +40,7 @@ import { KnowledgeModule } from './modules/knowledge/knowledge.module.js';
 import { RealtimeModule } from './modules/realtime/realtime.module.js';
 import { DashboardModule } from './modules/dashboard/dashboard.module.js';
 import { CategoriesModule } from './modules/categories/categories.module.js';
+import { AdminRolesController } from './modules/admin/admin-roles.controller.js';
 import { FallbackModule } from './common/modules/fallback/fallback.module.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -96,7 +97,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     }),
     FallbackModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, AdminRolesController],
   providers: [
     AppService,
     {
