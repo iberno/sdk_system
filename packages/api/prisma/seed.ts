@@ -13,6 +13,7 @@ function hoursFromNow(h: number): Date {
 
 async function clearAll() {
   await prisma.rolePermission.deleteMany();
+  await prisma.role.deleteMany();
   await prisma.permission.deleteMany();
   await prisma.refreshToken.deleteMany();
   await prisma.auditLog.deleteMany();
@@ -1077,6 +1078,21 @@ async function main() {
       where: { code: p.code },
       update: { description: p.description },
       create: p,
+    });
+  }
+
+  const defaultRoles = [
+    { id: 'ADMIN', name: 'ADMIN', label: 'Administrador', isSystem: true },
+    { id: 'MANAGER', name: 'MANAGER', label: 'Gerente', isSystem: true },
+    { id: 'AGENT', name: 'AGENT', label: 'Agente', isSystem: true },
+    { id: 'USER', name: 'USER', label: 'Usuário', isSystem: true },
+  ];
+
+  for (const r of defaultRoles) {
+    await prisma.role.upsert({
+      where: { id: r.id },
+      update: { label: r.label },
+      create: r,
     });
   }
 

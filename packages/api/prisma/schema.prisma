@@ -23,6 +23,17 @@ enum UserRole {
   USER
 }
 
+model Role {
+  id        String   @id
+  name      String   @unique
+  label     String
+  isSystem  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  permissions RolePermission[]
+}
+
 enum Status {
   ACTIVE
   INACTIVE
@@ -585,6 +596,7 @@ model RolePermission {
   createdAt    DateTime @default(now())
 
   permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, permissionId])
   @@index([roleId])

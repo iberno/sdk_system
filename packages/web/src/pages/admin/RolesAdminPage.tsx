@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Shield } from 'lucide-react'
+import { Shield, Plus, Pencil, Trash2 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { Modal } from '@/components/ui/Modal'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { toast } from '@/components/ui/toast-store'
 import { api, unwrap } from '@/lib/api'
@@ -20,14 +21,8 @@ interface Permission {
 interface RolePermissions {
   role: string
   label: string
+  isSystem: boolean
   permissions: string[]
-}
-
-const ROLE_LABELS: Record<string, string> = {
-  ADMIN: 'Administrador',
-  MANAGER: 'Gerente',
-  AGENT: 'Agente',
-  USER: 'Usuário',
 }
 
 const MODULE_LABELS: Record<string, string> = {
@@ -49,6 +44,16 @@ export default function RolesAdminPage() {
   const [saving, setSaving] = useState(false)
   const [selectedRole, setSelectedRole] = useState<string>('ADMIN')
   const [checked, setChecked] = useState<Set<string>>(new Set())
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [newRoleName, setNewRoleName] = useState('')
+  const [newRoleLabel, setNewRoleLabel] = useState('')
+  const [editLabel, setEditLabel] = useState('')
+
+  const selectedRoleData = useMemo(
+    () => roles.find((r) => r.role === selectedRole),
+    [roles, selectedRole],
+  )
 
   useEffect(() => {
     async function load() {
@@ -69,9 +74,8 @@ export default function RolesAdminPage() {
   }, [t])
 
   useEffect(() => {
-    const role = roles.find((r) => r.role === selectedRole)
-    setChecked(new Set(role?.permissions ?? []))
-  }, [selectedRole, roles])
+    setChecked(new Set(selectedRoleData?.permissions ?? []))
+  }, [selectedRole, selectedRoleData])
 
   const grouped = useMemo(() => {
     const map = new Map<string, Permission[]>()
@@ -120,6 +124,62 @@ export default function RolesAdminPage() {
     }
   }
 
+  const handleCreateRole = async () => {
+    if (!newRoleName.trim() || !newRoleLabel.trim()) {
+      toast.error(t('admin.fillAllFields'))
+      return
+    }
+    try {
+      const res = await api.post('/admin/roles', {
+        name: newRoleName.trim(),
+        label: newRoleLabel.trim(),
+      })
+      const created = unwrap<{ id: string; name: string; label: string }>(res)
+      setRoles((prev) => [
+        ...prev,
+        { role: created.id, label: created.label, isSystem: false, permissions: [] },
+      ])
+      setSelectedRole(created.id)
+      setShowCreateModal(false)
+      setNewRoleName('')
+      setNewRoleLabel('')
+      toast.success(t('admin.roleCreated'))
+    } catch {
+      toast.error(t('admin.roleCreateError'))
+    }
+  }
+
+  const handleEditLabel = async () => {
+    if (!editLabel.trim()) {
+      toast.error(t('admin.fillAllFields'))
+      return
+    }
+    try {
+      await api.put(`/admin/roles/${selectedRole}`, { label: editLabel.trim() })
+      setRoles((prev) =>
+        prev.map((r) => (r.role === selectedRole ? { ...r, label: editLabel.trim() } : r)),
+      )
+      setShowEditModal(false)
+      toast.success(t('admin.saved'))
+    } catch {
+      toast.error(t('admin.saveError'))
+    }
+  }
+
+  const handleDeleteRole = async (role: string) => {
+    if (!window.confirm(t('admin.confirmDeleteRole'))) return
+    try {
+      await api.delete(`/admin/roles/${role}`)
+      setRoles((prev) => prev.filter((r) => r.role !== role))
+      if (selectedRole === role) {
+        setSelectedRole(roles[0]?.role ?? 'ADMIN')
+      }
+      toast.success(t('admin.roleDeleted'))
+    } catch {
+      toast.error(t('admin.roleDeleteError'))
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex flex-col gap-5">
@@ -131,26 +191,51 @@ export default function RolesAdminPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight text-graydark dark:text-white">
-          {t('nav.roles')}
-        </h2>
-        <p className="text-sm text-bodystroke">Gerencie as permissões de cada role do sistema.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight text-graydark dark:text-white">
+            {t('nav.roles')}
+          </h2>
+          <p className="text-sm text-bodystroke">Gerencie as roles e permissões do sistema.</p>
+        </div>
+        <Button onClick={() => setShowCreateModal(true)} size="sm">
+          <Plus className="size-4" />
+          {t('admin.newRole')}
+        </Button>
       </div>
 
       <div className="flex flex-wrap gap-2">
         {roles.map((r) => (
-          <Button
-            key={r.role}
-            variant={selectedRole === r.role ? 'primary' : 'secondary'}
-            onClick={() => setSelectedRole(r.role)}
-          >
-            <Shield className="size-4" />
-            {ROLE_LABELS[r.role] ?? r.role}
-            <Badge tone="neutral" className="ml-1">
-              {r.permissions.length}
-            </Badge>
-          </Button>
+          <div key={r.role} className="flex items-center gap-1">
+            <Button
+              variant={selectedRole === r.role ? 'primary' : 'secondary'}
+              onClick={() => setSelectedRole(r.role)}
+            >
+              <Shield className="size-4" />
+              {r.label}
+              <Badge tone="neutral" className="ml-1">
+                {r.permissions.length}
+              </Badge>
+            </Button>
+            {!r.isSystem && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setEditLabel(r.label)
+                    setSelectedRole(r.role)
+                    setShowEditModal(true)
+                  }}
+                >
+                  <Pencil className="size-3" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => void handleDeleteRole(r.role)}>
+                  <Trash2 className="size-3 text-red-500" />
+                </Button>
+              </>
+            )}
+          </div>
         ))}
       </div>
 
@@ -205,6 +290,71 @@ export default function RolesAdminPage() {
           </Button>
         </div>
       </Card>
+
+      <Modal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        title={t('admin.newRole')}
+      >
+        <div className="flex flex-col gap-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-graydark dark:text-white">
+              {t('admin.roleName')}
+            </label>
+            <input
+              type="text"
+              value={newRoleName}
+              onChange={(e) => setNewRoleName(e.target.value)}
+              placeholder="Ex: SUPPLIER"
+              className="w-full rounded-lg border border-stroke bg-transparent px-4 py-2.5 text-sm text-graydark focus:border-primary dark:border-strobedark dark:text-white"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-graydark dark:text-white">
+              {t('admin.roleLabel')}
+            </label>
+            <input
+              type="text"
+              value={newRoleLabel}
+              onChange={(e) => setNewRoleLabel(e.target.value)}
+              placeholder="Ex: Fornecedor"
+              className="w-full rounded-lg border border-stroke bg-transparent px-4 py-2.5 text-sm text-graydark focus:border-primary dark:border-strobedark dark:text-white"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={() => void handleCreateRole()}>{t('common.create')}</Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        open={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title={t('admin.editRoleLabel')}
+      >
+        <div className="flex flex-col gap-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-graydark dark:text-white">
+              {t('admin.roleLabel')}
+            </label>
+            <input
+              type="text"
+              value={editLabel}
+              onChange={(e) => setEditLabel(e.target.value)}
+              className="w-full rounded-lg border border-stroke bg-transparent px-4 py-2.5 text-sm text-graydark focus:border-primary dark:border-strobedark dark:text-white"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={() => void handleEditLabel()}>{t('common.save')}</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
