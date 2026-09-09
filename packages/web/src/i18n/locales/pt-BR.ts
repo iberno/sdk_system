@@ -453,7 +453,7 @@ export const ptBR = {
     relatedChange: 'Mudança vinculada',
     relatedKb: 'Artigo da base de conhecimento',
     statusUpdated: 'Chamado atualizado.',
-    unassignedQueue: 'Fila de Pickup',
+    unassignedQueue: 'Fila de Atribuição',
     unassignedQueueSubtitle: 'Tickets aguardando ser assumidos por um agente.',
     noUnassigned: 'Nenhum ticket na fila.',
     pickupSuccess: 'Ticket assumido com sucesso.',

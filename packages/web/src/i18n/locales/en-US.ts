@@ -426,7 +426,7 @@ export const enUS = {
     relatedChange: 'Linked change',
     relatedKb: 'Knowledge base article',
     statusUpdated: 'Ticket updated.',
-    unassignedQueue: 'Pickup Queue',
+    unassignedQueue: 'Assignment Queue',
     unassignedQueueSubtitle: 'Tickets waiting to be claimed by an agent.',
     noUnassigned: 'No tickets in the queue.',
     pickupSuccess: 'Ticket claimed successfully.',

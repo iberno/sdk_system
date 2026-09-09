@@ -429,7 +429,7 @@ export const esES = {
     relatedChange: 'Cambio vinculado',
     relatedKb: 'Artículo de la base de conocimiento',
     statusUpdated: 'Ticket actualizado.',
-    unassignedQueue: 'Cola de Pickup',
+    unassignedQueue: 'Cola de Asignación',
     unassignedQueueSubtitle: 'Tickets esperando ser reclamados por un agente.',
     noUnassigned: 'No hay tickets en la cola.',
     pickupSuccess: 'Ticket reclamado con éxito.',
