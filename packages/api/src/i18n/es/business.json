@@ -17,6 +17,7 @@
   "routing_target_required": "La estrategia {strategy} requiere un grupo objetivo activo",
   "ticket_requires_company": "El usuario debe pertenecer a una empresa para abrir tickets",
   "beneficiary_invalid": "Beneficiario inválido o de otra empresa",
+  "requester_invalid": "Solicitante inválido, inactivo o de otra empresa",
   "invalid_transition": "Transición inválida de {from} a {to}",
   "reopen_window": "La reapertura solo está permitida dentro de las 24h posteriores al cierre",
   "ticket_closed": "Los tickets cerrados no aceptan nuevos comentarios",

@@ -17,6 +17,7 @@
   "routing_target_required": "Strategy {strategy} requires an active target group",
   "ticket_requires_company": "The user must belong to a company to open tickets",
   "beneficiary_invalid": "Invalid beneficiary or from another company",
+  "requester_invalid": "Invalid, inactive or from another company requester",
   "invalid_transition": "Invalid transition from {from} to {to}",
   "reopen_window": "Reopening is only allowed within 24h after closing",
   "ticket_closed": "Closed tickets do not accept new comments",

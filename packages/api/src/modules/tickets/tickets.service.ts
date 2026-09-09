@@ -127,11 +127,11 @@ export class TicketsService {
   }
 
   async create(dto: CreateTicketDto, actor: UserContext) {
-    const requester = await this.prisma.user.findUnique({ where: { id: actor.sub } });
-    if (!requester || requester.status !== Status.ACTIVE) {
+    const actorUser = await this.prisma.user.findUnique({ where: { id: actor.sub } });
+    if (!actorUser || actorUser.status !== Status.ACTIVE) {
       throw new NotFoundException({ key: 'errors.not_found', error: 'NotFound' });
     }
-    if (!requester.companyId) {
+    if (!actorUser.companyId) {
       throw new UnprocessableEntityException({
         key: 'business.ticket_requires_company',
         error: 'UnprocessableEntity',
@@ -139,9 +139,9 @@ export class TicketsService {
     }
 
     const isTeam = actor.role === 'AGENT' || actor.role === 'MANAGER' || actor.role === 'ADMIN';
-    const companyId = isTeam ? (dto.companyId ?? requester.companyId) : requester.companyId;
+    const companyId = isTeam ? (dto.companyId ?? actorUser.companyId) : actorUser.companyId;
 
-    if (companyId !== requester.companyId) {
+    if (companyId !== actorUser.companyId) {
       const company = await this.prisma.company.findUnique({ where: { id: companyId } });
       if (!company || company.status !== Status.ACTIVE) {
         throw new UnprocessableEntityException({
@@ -149,6 +149,23 @@ export class TicketsService {
           error: 'UnprocessableEntity',
         });
       }
+    }
+
+    // Solicitante: a equipe pode abrir em nome de outro empregado da MESMA empresa;
+    // usuário comum (USER) sempre é o próprio solicitante.
+    let requesterId = actorUser.id;
+    if (isTeam && dto.requesterId && dto.requesterId !== actorUser.id) {
+      requesterId = dto.requesterId;
+    }
+    const requester =
+      requesterId === actorUser.id
+        ? actorUser
+        : await this.prisma.user.findUnique({ where: { id: requesterId } });
+    if (!requester || requester.status !== Status.ACTIVE || requester.companyId !== companyId) {
+      throw new UnprocessableEntityException({
+        key: 'business.requester_invalid',
+        error: 'UnprocessableEntity',
+      });
     }
 
     let categoryId: string | null = null;
@@ -166,8 +183,8 @@ export class TicketsService {
     }
 
     const beneficiaryId = await this.resolveBeneficiary(
-      dto.beneficiaryId ?? requester.id,
-      requester.id,
+      dto.beneficiaryId ?? requesterId,
+      requesterId,
       companyId,
     );
 
@@ -201,7 +218,7 @@ export class TicketsService {
         urgency,
         slaResponseAt,
         slaResolveAt,
-        requesterId: requester.id,
+        requesterId,
         beneficiaryId,
         companyId,
         solverGroupId,

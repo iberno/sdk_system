@@ -32,6 +32,13 @@ export class CreateTicketDto {
   @IsString()
   beneficiaryId?: string;
 
+  @ApiPropertyOptional({
+    description: 'Solicitante do chamado (apenas equipe). Deve pertencer à mesma empresa do chamado; padrão: usuário logado',
+  })
+  @IsOptional()
+  @IsString()
+  requesterId?: string;
+
   @ApiPropertyOptional({ enum: Priority })
   @IsOptional()
   @IsEnum(Priority)

@@ -26,6 +26,8 @@ export default function NewTicketPage() {
   const { t } = useTranslation()
   const user = useAuthStore((state) => state.user)
   const isTeam = user?.role !== 'USER'
+  // TI alocada em grupo solucionador precisa escolher o solicitante
+  const mustChooseRequester = isTeam && Boolean(user?.solverGroupId)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [title, setTitle] = useState('')
@@ -33,10 +35,19 @@ export default function NewTicketPage() {
   const [type, setType] = useState('INCIDENT')
   const [priority, setPriority] = useState('MEDIUM')
   const [companyId, setCompanyId] = useState<string | null>(user?.companyId ?? null)
-  const [beneficiaryId, setBeneficiaryId] = useState<string | null>(null)
-  const [categoryId, setCategoryId] = useState<string | null>(null)
+  const [requesterId, setRequesterId] = useState<string | null>(null)
+  const [beneficiaryId, setBeneficiaryId] = useState<string | null>(
+    user?.role === 'USER' ? (user.id ?? null) : null,
+  )
+  const [catRootId, setCatRootId] = useState<string | null>(null)
+  const [catSubId, setCatSubId] = useState<string | null>(null)
+  const [catActionId, setCatActionId] = useState<string | null>(null)
   const [attachment, setAttachment] = useState<File | null>(null)
-  const [errors, setErrors] = useState<{ title?: string; description?: string }>({})
+  const [errors, setErrors] = useState<{
+    title?: string
+    description?: string
+    requester?: string
+  }>({})
 
   const [created, setCreated] = useState<TicketDetail | null>(null)
 
@@ -49,7 +60,7 @@ export default function NewTicketPage() {
     [companiesQuery.data],
   )
 
-  const beneficiaryOptions = useMemo<SelectOption[]>(
+  const directoryOptions = useMemo<SelectOption[]>(
     () =>
       (directoryQuery.data ?? []).map((u) => ({
         value: u.id,
@@ -58,14 +69,29 @@ export default function NewTicketPage() {
     [directoryQuery.data],
   )
 
-  const categoryOptions = useMemo<SelectOption[]>(() => {
-    const categories = categoriesQuery.data ?? []
-    const parentIds = new Set(categories.map((c) => c.parentId).filter(Boolean))
-    return categories
-      .filter((c) => !parentIds.has(c.id))
-      .map((c) => ({ value: c.id, label: c.path }))
-      .sort((a, b) => a.label.localeCompare(b.label))
-  }, [categoriesQuery.data])
+  // Categorias em 3 níveis: Categoria → Subcategoria → Ação
+  const categoryRoots = useMemo<SelectOption[]>(
+    () =>
+      (categoriesQuery.data ?? [])
+        .filter((c) => c.depth === 0)
+        .map((c) => ({ value: c.id, label: c.name })),
+    [categoriesQuery.data],
+  )
+  const categorySubs = useMemo<SelectOption[]>(
+    () =>
+      (categoriesQuery.data ?? [])
+        .filter((c) => c.parentId === catRootId)
+        .map((c) => ({ value: c.id, label: c.name })),
+    [categoriesQuery.data, catRootId],
+  )
+  const categoryActions = useMemo<SelectOption[]>(
+    () =>
+      (categoriesQuery.data ?? [])
+        .filter((c) => c.parentId === catSubId)
+        .map((c) => ({ value: c.id, label: c.name })),
+    [categoriesQuery.data, catSubId],
+  )
+  const categoryId = catActionId ?? catSubId ?? catRootId
 
   const createMutation = useCreateTicket()
   const uploadMutation = useUploadAttachment(created?.id ?? '')
@@ -74,6 +100,7 @@ export default function NewTicketPage() {
     const nextErrors: typeof errors = {}
     if (title.trim().length < 3) nextErrors.title = t('tickets.createError')
     if (description.trim().length < 3) nextErrors.description = t('tickets.createError')
+    if (mustChooseRequester && !requesterId) nextErrors.requester = t('tickets.requesterRequired')
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
@@ -83,6 +110,7 @@ export default function NewTicketPage() {
         description: description.trim(),
         type,
         ...(isTeam ? { priority } : {}),
+        ...(isTeam && requesterId ? { requesterId } : {}),
         ...(companyId ? { companyId } : {}),
         ...(categoryId ? { categoryId } : {}),
         ...(beneficiaryId ? { beneficiaryId } : {}),
@@ -107,8 +135,11 @@ export default function NewTicketPage() {
     setType('INCIDENT')
     setPriority('MEDIUM')
     setCompanyId(user?.companyId ?? null)
-    setBeneficiaryId(null)
-    setCategoryId(null)
+    setRequesterId(null)
+    setBeneficiaryId(user?.role === 'USER' ? (user.id ?? null) : null)
+    setCatRootId(null)
+    setCatSubId(null)
+    setCatActionId(null)
     setAttachment(null)
     setErrors({})
     setCreated(null)
@@ -207,17 +238,40 @@ export default function NewTicketPage() {
       </div>
 
       <Card bodyClassName="flex flex-col gap-4">
-        <FormField label={t('tickets.requester')}>
-          <div
-            className={cn(
-              'flex items-center gap-2 rounded-lg border border-stroke bg-graylight px-3.5 py-2.5',
-              'dark:border-strokedark dark:bg-boxdark-3',
-            )}
+        {isTeam ? (
+          <FormField
+            label={t('tickets.requester')}
+            required={mustChooseRequester}
+            error={errors.requester}
+            hint={t('tickets.requesterHint')}
           >
-            <span className="text-sm font-medium text-graydark dark:text-white">{user?.name}</span>
-            <span className="text-sm text-bodystroke">{user?.email}</span>
-          </div>
-        </FormField>
+            <SearchableSelect
+              options={directoryOptions}
+              value={requesterId}
+              onChange={(value) => {
+                setRequesterId(value)
+                // ao escolher o solicitante, ele vira o beneficiário por padrão
+                setBeneficiaryId(value)
+              }}
+              placeholder={t('tickets.requesterPlaceholder')}
+              emptyMessage={t('common.noResults')}
+              disabled={!companyId || directoryQuery.isLoading}
+              clearable={!mustChooseRequester}
+            />
+          </FormField>
+        ) : (
+          <FormField label={t('tickets.requester')}>
+            <div
+              className={cn(
+                'flex items-center gap-2 rounded-lg border border-stroke bg-graylight px-3.5 py-2.5',
+                'dark:border-strokedark dark:bg-boxdark-3',
+              )}
+            >
+              <span className="text-sm font-medium text-graydark dark:text-white">{user?.name}</span>
+              <span className="text-sm text-bodystroke">{user?.email}</span>
+            </div>
+          </FormField>
+        )}
 
         <FormField label={t('tickets.titleField')} required error={errors.title}>
           <Input
@@ -245,6 +299,7 @@ export default function NewTicketPage() {
               value={companyId}
               onChange={(value) => {
                 setCompanyId(value)
+                setRequesterId(null)
                 setBeneficiaryId(null)
               }}
               placeholder={t('tickets.companyPlaceholder')}
@@ -259,7 +314,7 @@ export default function NewTicketPage() {
             hint={t('tickets.beneficiaryHint')}
           >
             <SearchableSelect
-              options={beneficiaryOptions}
+              options={directoryOptions}
               value={beneficiaryId}
               onChange={setBeneficiaryId}
               placeholder={t('tickets.beneficiaryPlaceholder')}
@@ -299,16 +354,50 @@ export default function NewTicketPage() {
           </FormField>
         </div>
 
-        <FormField label={t('tickets.categoryField')} hint={t('tickets.categoryHint')}>
-          <SearchableSelect
-            options={categoryOptions}
-            value={categoryId}
-            onChange={setCategoryId}
-            placeholder={t('tickets.categoryPlaceholder')}
-            emptyMessage={t('common.noResults')}
-            disabled={categoriesQuery.isLoading}
-            clearable
-          />
+        <FormField
+          label={t('tickets.categoryField')}
+          hint={t('tickets.categoryHint')}
+        >
+          <div className="flex flex-col gap-4">
+            <Select
+              value={catRootId ?? ''}
+              onChange={(event) => {
+                setCatRootId(event.target.value || null)
+                setCatSubId(null)
+                setCatActionId(null)
+              }}
+              disabled={categoriesQuery.isLoading}
+              options={[
+                { value: '', label: t('tickets.categoryPlaceholder') },
+                ...categoryRoots,
+              ]}
+            />
+
+            {catRootId && categorySubs.length > 0 && (
+              <Select
+                value={catSubId ?? ''}
+                onChange={(event) => {
+                  setCatSubId(event.target.value || null)
+                  setCatActionId(null)
+                }}
+                options={[
+                  { value: '', label: t('tickets.subcategoryPlaceholder') },
+                  ...categorySubs,
+                ]}
+              />
+            )}
+
+            {catSubId && categoryActions.length > 0 && (
+              <Select
+                value={catActionId ?? ''}
+                onChange={(event) => setCatActionId(event.target.value || null)}
+                options={[
+                  { value: '', label: t('tickets.actionPlaceholder') },
+                  ...categoryActions,
+                ]}
+              />
+            )}
+          </div>
         </FormField>
 
         {isTeam && (
