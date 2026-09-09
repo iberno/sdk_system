@@ -458,6 +458,8 @@ export const ptBR = {
     noUnassigned: 'Nenhum ticket na fila.',
     pickupSuccess: 'Ticket assumido com sucesso.',
     pickupError: 'Não foi possível assumir o ticket.',
+    requestApproval: 'Solicitar Aprovação',
+    selectApprovalFlow: 'Selecionar fluxo...',
   },
   changes: {
     submit: 'Submeter',

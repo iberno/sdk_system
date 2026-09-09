@@ -36,10 +36,12 @@ import {
   useChangeStatus,
   usePickupTicket,
   useUploadAttachment,
+  useRequestApproval,
 } from '@/hooks/useTicketMutations'
 import { useTicket } from '@/hooks/useTickets'
 import { useAgents, useSolverGroups } from '@/hooks/useDirectory'
 import { useKnowledgeArticles } from '@/hooks/useKnowledge'
+import { useApprovalFlows } from '@/hooks/useAdmin'
 import { useAuthStore } from '@/stores/authStore'
 import { api } from '@/lib/api'
 import { PRIORITY_TONE, STATUS_TONE, TYPE_TONE } from '@/lib/domain'
@@ -103,11 +105,14 @@ export default function TicketDetailPage() {
   const pickupMutation = usePickupTicket(id)
   const assignMutation = useAssignTicket(id)
   const uploadMutation = useUploadAttachment(id)
+  const requestApprovalMutation = useRequestApproval(id)
 
   const { data: agents = [] } = useAgents(isManagerAdmin)
   const { data: groups = [] } = useSolverGroups(isTeam)
+  const { data: approvalFlows = [] } = useApprovalFlows()
   const [assignTo, setAssignTo] = useState('')
   const [assignGroup, setAssignGroup] = useState('')
+  const [selectedFlowId, setSelectedFlowId] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const categoryLeaf = ticket?.category?.path?.split(' > ').pop() ?? ''
@@ -190,6 +195,17 @@ export default function TicketDetailPage() {
       })
       setAssignTo('')
       setAssignGroup('')
+      toast.success(t('tickets.statusUpdated'))
+    } catch {
+      toast.error(t('tickets.createError'))
+    }
+  }
+
+  const runRequestApproval = async () => {
+    if (!selectedFlowId) return
+    try {
+      await requestApprovalMutation.mutateAsync({ flowId: selectedFlowId })
+      setSelectedFlowId('')
       toast.success(t('tickets.statusUpdated'))
     } catch {
       toast.error(t('tickets.createError'))
@@ -361,6 +377,30 @@ export default function TicketDetailPage() {
                   {action.label}
                 </Button>
               ))}
+              {isTeam && ticket.status === 'IN_PROGRESS' && approvalFlows.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={selectedFlowId}
+                    onChange={(e) => setSelectedFlowId(e.target.value)}
+                  >
+                    <option value="">{t('tickets.selectApprovalFlow')}</option>
+                    {approvalFlows.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.name}
+                      </option>
+                    ))}
+                  </Select>
+                  <Button
+                    variant="secondary"
+                    disabled={!selectedFlowId}
+                    loading={requestApprovalMutation.isPending}
+                    onClick={() => void runRequestApproval()}
+                  >
+                    <CheckCheck className="size-4" />
+                    {t('tickets.requestApproval')}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -74,3 +74,12 @@ export function useUploadAttachment(id: string) {
     onSuccess: (ticket) => invalidateTicket(queryClient, ticket.id),
   })
 }
+
+export function useRequestApproval(id: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: { flowId: string }) =>
+      unwrap<TicketDetail>(await api.post(`/tickets/${id}/request-approval`, payload)),
+    onSuccess: (ticket) => invalidateTicket(queryClient, ticket.id),
+  })
+}
