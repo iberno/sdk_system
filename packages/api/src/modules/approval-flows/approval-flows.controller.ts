@@ -17,11 +17,13 @@ import {
   UpdateFlowStatusDto,
 } from './dto/approval-flow.dto.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 
 @ApiTags('ApprovalFlows')
 @Controller('approval-flows')
+@Permissions('admin.flows')
 export class ApprovalFlowsController {
   constructor(private readonly flows: ApprovalFlowsService) {}
 

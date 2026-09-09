@@ -18,6 +18,7 @@ import {
 import { QueryUsersDto } from './dto/query-users.dto.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 
 @ApiTags('Users')
@@ -26,6 +27,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @Permissions('admin.users')
   @Roles('ADMIN', 'MANAGER')
   @ApiOperation({ summary: 'Lista usuários com filtros e paginação' })
   findAll(@Query() query: QueryUsersDto) {
@@ -33,6 +35,7 @@ export class UsersController {
   }
 
   @Post()
+  @Permissions('admin.users')
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Cria usuário' })
   create(@Body() dto: CreateUserDto, @CurrentUser() actor: UserContext) {
@@ -40,6 +43,7 @@ export class UsersController {
   }
 
   @Get('directory')
+  @Permissions('tickets.read')
   @Roles('ADMIN', 'MANAGER', 'AGENT', 'USER')
   @ApiOperation({
     summary: 'Diretório de usuários (busca por empresa/departamento/nome)',
@@ -49,6 +53,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @Permissions('admin.users')
   @Roles('ADMIN', 'MANAGER')
   @ApiOperation({ summary: 'Detalhes do usuário com permissões efetivas' })
   findOne(@Param('id') id: string) {
@@ -56,6 +61,7 @@ export class UsersController {
   }
 
   @Put(':id')
+  @Permissions('admin.users')
   @Roles('ADMIN', 'MANAGER')
   @ApiBody({ type: UpdateUserDto })
   @ApiOperation({
@@ -70,6 +76,7 @@ export class UsersController {
   }
 
   @Patch(':id/status')
+  @Permissions('admin.users')
   @Roles('ADMIN', 'MANAGER')
   @ApiOperation({ summary: 'Altera status do usuário (soft disable)' })
   updateStatus(

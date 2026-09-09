@@ -39,6 +39,7 @@ import {
 } from './dto/status-comment.dto.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -70,12 +71,14 @@ export class TicketsController {
   ) {}
 
   @Get()
+  @Permissions('tickets.read')
   @ApiOperation({ summary: 'Lista tickets com filtros avançados' })
   findAll(@Query() query: QueryTicketsDto, @CurrentUser() actor: UserContext) {
     return this.tickets.findAll(query, actor);
   }
 
   @Get('unassigned')
+  @Permissions('tickets.pickup')
   @Roles('AGENT', 'MANAGER', 'ADMIN')
   @ApiOperation({ summary: 'Fila de pickup do grupo do usuário autenticado' })
   unassigned(@CurrentUser() actor: UserContext) {
@@ -83,6 +86,7 @@ export class TicketsController {
   }
 
   @Post()
+  @Permissions('tickets.create')
   @ApiOperation({
     summary: 'Cria ticket (auto-roteamento + SLA + ticketNumber)',
   })
@@ -92,6 +96,7 @@ export class TicketsController {
 
   @Post('reassign')
   @HttpCode(HttpStatus.OK)
+  @Permissions('tickets.assign')
   @Roles('MANAGER', 'ADMIN')
   @ApiOperation({ summary: 'Reatribuição em lote (MANAGER/ADMIN)' })
   reassign(@Body() dto: ReassignTicketsDto, @CurrentUser() actor: UserContext) {
@@ -104,12 +109,14 @@ export class TicketsController {
   }
 
   @Get(':id')
+  @Permissions('tickets.read')
   @ApiOperation({ summary: 'Detalhe completo com timeline, comments, history' })
   findOne(@Param('id') id: string, @CurrentUser() actor: UserContext) {
     return this.tickets.findOne(id, actor);
   }
 
   @Put(':id')
+  @Permissions('tickets.update')
   @Roles('AGENT', 'MANAGER', 'ADMIN')
   @ApiOperation({
     summary: 'Atualiza campos (priority/impact/urgency: MANAGER+)',
@@ -124,6 +131,7 @@ export class TicketsController {
 
   @Post(':id/assign')
   @HttpCode(HttpStatus.OK)
+  @Permissions('tickets.assign')
   @Roles('AGENT', 'MANAGER', 'ADMIN')
   @ApiOperation({ summary: 'Atribui/reatribui grupo e/ou agente' })
   assign(
@@ -136,6 +144,7 @@ export class TicketsController {
 
   @Post(':id/pickup')
   @HttpCode(HttpStatus.OK)
+  @Permissions('tickets.pickup')
   @Roles('AGENT')
   @ApiOperation({ summary: 'Agente assume ticket da fila do grupo' })
   pickup(
@@ -148,6 +157,7 @@ export class TicketsController {
 
   @Post(':id/request-approval')
   @HttpCode(HttpStatus.OK)
+  @Permissions('tickets.approval')
   @Roles('AGENT', 'MANAGER', 'ADMIN')
   @ApiOperation({
     summary: 'Submete ticket a um fluxo de aprovação (WAITING_APPROVAL)',
@@ -162,6 +172,7 @@ export class TicketsController {
 
   @Post(':id/status')
   @HttpCode(HttpStatus.OK)
+  @Permissions('tickets.update')
   @ApiOperation({ summary: 'Transição de status validada (state machine)' })
   changeStatus(
     @Param('id') id: string,
@@ -173,6 +184,7 @@ export class TicketsController {
 
   @Post(':id/comments')
   @HttpCode(HttpStatus.OK)
+  @Permissions('tickets.comment')
   @ApiOperation({ summary: 'Adiciona comentário (PUBLIC | INTERNAL)' })
   addComment(
     @Param('id') id: string,
@@ -183,6 +195,7 @@ export class TicketsController {
   }
 
   @Post(':id/attachments')
+  @Permissions('tickets.attach')
   @Roles('AGENT', 'MANAGER', 'ADMIN')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -244,6 +257,7 @@ export class TicketsController {
   }
 
   @Get(':id/attachments/:attachmentId/download')
+  @Permissions('tickets.read')
   @ApiOperation({ summary: 'Download/visualização de anexo' })
   async downloadAttachment(
     @Param('id') id: string,

@@ -18,11 +18,13 @@ import {
 } from './dto/company.dto.js';
 import { PaginationDto } from '../../common/dto/pagination.dto.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 
 @ApiTags('Companies')
 @Controller('companies')
+@Permissions('admin.companies')
 @Roles('ADMIN')
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
@@ -34,6 +36,7 @@ export class CompaniesController {
   }
 
   @Get('options')
+  @Permissions('tickets.create')
   @Roles('ADMIN', 'MANAGER', 'AGENT', 'USER')
   @ApiOperation({
     summary:

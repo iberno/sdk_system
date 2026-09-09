@@ -8,9 +8,11 @@ import {
   UpdateSolverGroupStatusDto,
 } from './dto/solver-group.dto.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 
 @ApiTags('SolverGroups')
 @Controller('solver-groups')
+@Permissions('admin.groups')
 export class SolverGroupsController {
   constructor(private readonly solverGroupsService: SolverGroupsService) {}
 

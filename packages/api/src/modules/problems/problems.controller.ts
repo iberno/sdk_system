@@ -16,6 +16,7 @@ import { ChangesService } from '../changes/changes.service.js';
 import { KnowledgeService } from '../knowledge/knowledge.service.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 import {
   CreateProblemDto,
@@ -27,6 +28,7 @@ import {
 @ApiTags('problems')
 @ApiBearerAuth()
 @Controller('problems')
+@Permissions('problems.read')
 @Roles('ADMIN', 'MANAGER', 'AGENT')
 export class ProblemsController {
   constructor(
@@ -41,6 +43,7 @@ export class ProblemsController {
   }
 
   @Post()
+  @Permissions('problems.create')
   create(@Body() dto: CreateProblemDto, @CurrentUser() actor: UserContext) {
     return this.problemsService.create(dto, actor);
   }
@@ -51,6 +54,7 @@ export class ProblemsController {
   }
 
   @Put(':id')
+  @Permissions('problems.update')
   update(
     @Param('id') id: string,
     @Body() dto: UpdateProblemDto,
@@ -61,6 +65,7 @@ export class ProblemsController {
 
   @Post(':id/link-ticket')
   @HttpCode(HttpStatus.OK)
+  @Permissions('problems.link')
   linkTicket(
     @Param('id') id: string,
     @Body() dto: LinkTicketDto,
@@ -71,6 +76,7 @@ export class ProblemsController {
 
   @Delete(':id/unlink-ticket')
   @HttpCode(HttpStatus.OK)
+  @Permissions('problems.link')
   unlinkTicket(
     @Param('id') id: string,
     @Body() dto: LinkTicketDto,
@@ -81,12 +87,14 @@ export class ProblemsController {
 
   @Post(':id/propose-change')
   @HttpCode(HttpStatus.OK)
+  @Permissions('problems.create')
   proposeChange(@Param('id') id: string, @CurrentUser() actor: UserContext) {
     return this.changesService.proposeFromProblem(id, actor);
   }
 
   @Post(':id/publish-article')
   @HttpCode(HttpStatus.OK)
+  @Permissions('knowledge.publish')
   publishArticle(@Param('id') id: string, @CurrentUser() actor: UserContext) {
     return this.knowledge.publishFromProblem(id, actor);
   }

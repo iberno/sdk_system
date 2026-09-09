@@ -16,6 +16,7 @@ import {
   RejectDto,
 } from './dto/approval.dto.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import type { UserContext } from '../auth/interfaces/auth-user.interface.js';
 
 @ApiTags('Approvals')
@@ -24,6 +25,7 @@ export class ApprovalsController {
   constructor(private readonly approvals: ApprovalsService) {}
 
   @Get()
+  @Permissions('approvals.read')
   @ApiOperation({ summary: 'Minhas aprovações (item/por fluxo)' })
   list(@CurrentUser() actor: UserContext, @Query() query: QueryApprovalsDto) {
     return this.approvals.list(actor, query);
@@ -31,6 +33,7 @@ export class ApprovalsController {
 
   @Post(':id/approve')
   @HttpCode(HttpStatus.OK)
+  @Permissions('approvals.decide')
   @ApiOperation({ summary: 'Aprova a etapa' })
   approve(
     @Param('id') id: string,
@@ -42,6 +45,7 @@ export class ApprovalsController {
 
   @Post(':id/reject')
   @HttpCode(HttpStatus.OK)
+  @Permissions('approvals.decide')
   @ApiOperation({ summary: 'Rejeita a etapa e encerra o fluxo' })
   reject(
     @Param('id') id: string,

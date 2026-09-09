@@ -8,9 +8,11 @@ import {
   UpdateRoutingRuleStatusDto,
 } from './dto/routing-rule.dto.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 
 @ApiTags('RoutingRules')
 @Controller('routing-rules')
+@Permissions('admin.routing')
 export class RoutingRulesController {
   constructor(private readonly routingRulesService: RoutingRulesService) {}
 

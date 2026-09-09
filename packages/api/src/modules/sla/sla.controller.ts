@@ -7,6 +7,7 @@ import {
   UpdateSlapolicyStatusDto,
 } from './dto/sla-policy.dto.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 
 @ApiTags('SLA')
 @Controller('sla-policies')
@@ -14,6 +15,7 @@ export class SlaController {
   constructor(private readonly slaService: SlaService) {}
 
   @Get()
+  @Permissions('admin.sla')
   @Roles('ADMIN', 'MANAGER', 'AGENT')
   @ApiOperation({ summary: 'Lista políticas de SLA' })
   findAll() {
@@ -21,6 +23,7 @@ export class SlaController {
   }
 
   @Post()
+  @Permissions('admin.sla')
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Cria política de SLA (matriz tipo+prioridade)' })
   create(@Body() dto: CreateSlapolicyDto) {
@@ -28,6 +31,7 @@ export class SlaController {
   }
 
   @Get(':id')
+  @Permissions('admin.sla')
   @Roles('ADMIN', 'MANAGER', 'AGENT')
   @ApiOperation({ summary: 'Detalhes da política' })
   findOne(@Param('id') id: string) {
@@ -35,6 +39,7 @@ export class SlaController {
   }
 
   @Put(':id')
+  @Permissions('admin.sla')
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Atualiza política' })
   update(@Param('id') id: string, @Body() dto: UpdateSlapolicyDto) {
@@ -42,6 +47,7 @@ export class SlaController {
   }
 
   @Patch(':id/status')
+  @Permissions('admin.sla')
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Ativa/desativa política' })
   updateStatus(@Param('id') id: string, @Body() dto: UpdateSlapolicyStatusDto) {
