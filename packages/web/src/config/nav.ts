@@ -3,6 +3,7 @@ import {
   Building2,
   CheckSquare,
   GitBranch,
+  Inbox,
   LayoutDashboard,
   Route,
   ScrollText,
@@ -35,6 +36,12 @@ export const NAV_SECTIONS: NavSection[] = [
     sectionKey: 'nav.tickets',
     items: [
       { labelKey: 'nav.tickets', href: '/tickets', icon: Ticket },
+      {
+        labelKey: 'tickets.unassignedQueue',
+        href: '/tickets/queue',
+        icon: Inbox,
+        roles: ['AGENT', 'MANAGER', 'ADMIN'],
+      },
       { labelKey: 'nav.approvals', href: '/approvals', icon: CheckSquare },
     ],
   },
